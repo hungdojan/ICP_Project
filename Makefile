@@ -6,6 +6,7 @@
 PROJECT_NAME=DiagramEditor
 ZIP_NAME=1_xdohun00_xkedra00
 
+TEST_NAME=tests
 BUILD_DIR=./build
 BIN_DIR=$(BUILD_DIR)/bin
 TARGET=$(BIN_DIR)/$(PROJECT_NAME)
@@ -37,6 +38,9 @@ clean:
 #######################################
 
 $(TARGET): $(BUILD_DIR)/Makefile ./src/*
+	make -C$(BUILD_DIR) -j8
+
+$(TEST_TARGET): $(BUILD_DIR)/Makefile ./tests/*.cpp
 	make -C$(BUILD_DIR) -j8
 
 $(BUILD_DIR)/Makefile: CMakeLists.txt

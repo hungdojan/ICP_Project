@@ -23,7 +23,7 @@ add_executable(${PROJECT_NAME} main.cpp)
 
 # create libraries
 add_library(model_lib ${LIB_FILES})
-add_library(view_lib ${HEADERS} ${VIEW_MODELS} ${UIS}) # ${UI_HEADERS})
+add_library(view_lib ${HEADERS} ${VIEW_MODELS} ${UIS})
 target_link_libraries(view_lib
         Qt5::Core
         Qt5::Gui
