@@ -1,9 +1,9 @@
-#ifndef DIAGRAMEDITOR_CLASSDIAGRAM_H
-#define DIAGRAMEDITOR_CLASSDIAGRAM_H
-#include "UMLClassifier.h"
-#include "UMLOperation.h"
+#ifndef DIAGRAMEDITOR_UMLINTERFACE_H
+#define DIAGRAMEDITOR_UMLINTERFACE_H
 #include <vector>
 #include <unordered_set>
+#include "UMLClassifier.h"
+#include "UMLOperation.h"
 
 class UMLInterface : public UMLClassifier {
 protected:
@@ -22,7 +22,9 @@ public:
     const std::unordered_set<UMLInterface *> &parentInterfaces() const;
     const bool containsParentInterface(UMLInterface *interface) const;
     bool removeParentInterface(UMLInterface *interface);
-    ~UMLInterface();
+
+    // TODO: destructor
+    ~UMLInterface() =default;
 };
 
-#endif //DIAGRAMEDITOR_CLASSDIAGRAM_H
+#endif //DIAGRAMEDITOR_UMLINTERFACE_H

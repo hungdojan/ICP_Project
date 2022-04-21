@@ -15,11 +15,15 @@ protected:
     std::vector<UMLClassifier *> classElements_;
     std::vector<SequenceDiagram *> sequenceDiagrams_;
 public:
+    enum ClassElementType {
+        CLASSIFIER, CLASS, INTERFACE
+    };
+
     ClassDiagram() =delete;
     // Class constructor
     explicit ClassDiagram(const std::string& name) : Element{name}, classElements_{}, sequenceDiagrams_{} { };
     // Updates class diagram's name
-    void setName(std::string newName);
+    void setName(const std::string& newName) override;
     // Returns collection of class elements
     const std::vector<UMLClassifier *>& classElements() const;
     // Returns collection of sequence diagrams
@@ -32,7 +36,7 @@ public:
 
     // classifier methods
     // Factory method that creates new classifier
-    static UMLClassifier *createClassifier(std::string name, bool isClass);
+    static UMLClassifier *createClassifier(std::string name, ClassElementType classElementType);
     // Adds new classifier to the class diagram
     bool addClassifier(UMLClassifier *classifier);
     // Adds new classifier to the class diagram

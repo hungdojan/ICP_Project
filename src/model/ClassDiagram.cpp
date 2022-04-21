@@ -6,9 +6,10 @@
 #include <list>
 #include <utility>
 #include "ClassDiagram.h"
+#include "UMLInterface.h"
 
-void ClassDiagram::setName(std::string newName) {
-    Element::setName(std::move(newName));
+void ClassDiagram::setName(const std::string& newName) {
+    Element::setName(newName);
 }
 
 const std::vector<UMLClassifier *>& ClassDiagram::classElements() const {
@@ -26,10 +27,17 @@ void ClassDiagram::saveClassDiagramToFile(std::string path) {
     // TODO:
 }
 
-UMLClassifier *ClassDiagram::createClassifier(std::string name, bool isClass) {
-    if (isClass)
-        return new UMLClass(name);
-    return new UMLClassifier(name);
+UMLClassifier *ClassDiagram::createClassifier(std::string name, ClassElementType classElementType) {
+    switch(classElementType) {
+        case CLASSIFIER:
+            return new UMLClassifier(name);
+        case CLASS:
+            return new UMLClass(name);
+        case INTERFACE:
+            return new UMLInterface(name);
+        default:
+            return nullptr;
+    }
 }
 
 bool ClassDiagram::addClassifier(UMLClassifier *classifier) {
