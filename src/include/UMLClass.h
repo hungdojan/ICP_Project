@@ -40,7 +40,7 @@ public:
     // Returns instance of UMLAttribute in the class by a given name
     UMLAttribute *getAttribute(const std::string &name);
     //Returns collection of all callable operations_
-    const std::list<UMLAttribute *> &getOperations() const;
+    const std::list<UMLAttribute *> getOperations() const;
     // Returns attribute from a given position
     UMLAttribute *getAttributeAtPosition(int pos);
     // Get attributes position in the class
