@@ -5,12 +5,21 @@
 #ifndef DIAGRAMEDITOR_SEQUENCEDIAGRAM_H
 #define DIAGRAMEDITOR_SEQUENCEDIAGRAM_H
 #include <utility>
+#include <vector>
 #include "Element.h"
-
+#include "UMLClass.h"
+#include "UMLObject.h"
 
 class SequenceDiagram : public Element {
+    std::vector<UMLObject *> objects_;
+
 public:
-    explicit SequenceDiagram(std::string name) : Element{std::move(name)} { }
+    SequenceDiagram() =delete;
+    explicit SequenceDiagram(const std::string &name) : Element{name} { }
+    void addObject(UMLClass *instanceOfClass, const std::string &objName);
+    UMLObject *getObject(const std::string &name);
+    void removeObject(UMLObject *object);
+    ~SequenceDiagram() =default;
 };
 
 

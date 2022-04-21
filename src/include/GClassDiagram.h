@@ -14,7 +14,12 @@
 class GClassDiagram: public QObject{
 Q_OBJECT
 public:
-    GClassDiagram(GraphicsScene *scene);
+    GClassDiagram() =delete;
+    GClassDiagram(GraphicsScene *scene, ClassDiagram *model);
+    void setModel(ClassDiagram *model);
+    const ClassDiagram *model() const;
+    void scene(GraphicsScene *scene);
+    const GraphicsScene *scene() const;
 //    ~GClassDiagram();
 private slots:
     void addClassifier();

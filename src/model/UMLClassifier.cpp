@@ -5,9 +5,21 @@
 #include "UMLClassifier.h"
 
 void UMLClassifier::setName(std::string name) {
-    Element::setName(name);
+    Element::setName(std::move(name));
 }
 
-bool UMLClassifier::isUserDefined() {
-    return _isUserDefined;
+const bool &UMLClassifier::isUserDefined() const {
+    return isUserDefined_;
+}
+
+bool &UMLClassifier::isUserDefined() {
+    return isUserDefined_;
+}
+
+const bool &UMLClassifier::isAbstract() const {
+    return isAbstract_;
+}
+
+bool &UMLClassifier::isAbstract() {
+    return isAbstract_;
 }

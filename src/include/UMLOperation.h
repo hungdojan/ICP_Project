@@ -31,6 +31,7 @@ public:
     // Clear collection of operation parameters
     void clearParameters(std::vector<UMLAttribute> *vectorContent);
 
+    // bool operator==(UMLOperation &operation) const;
     explicit operator std::string() const final;
     friend std::ostream &operator<<(std::ostream &strm, const UMLOperation &operation);
 };

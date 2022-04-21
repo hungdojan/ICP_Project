@@ -8,15 +8,15 @@
 #include <algorithm>
 #include <iterator>
 
-UMLClass::UMLClass(const std::string& name, const std::vector<UMLAttribute *>& attributes) : UMLClassifier{name}, isAbstract_{false} {
+UMLClass::UMLClass(const std::string& name, const std::vector<UMLAttribute *>& attributes) : UMLClassifier{name} {
     for (auto attribute : attributes) {
         // TODO: call addAttribute function
         this->attributes_.push_back(attribute);
     }
 }
 
-bool &UMLClass::isAbstract() {
-    return isAbstract_;
+const std::string &UMLClass::stereotype() const {
+    return stereotype_;
 }
 
 std::string &UMLClass::stereotype() {
@@ -78,7 +78,7 @@ UMLAttribute *UMLClass::getAttribute(const std::string &name) {
 }
 
 const std::list<UMLAttribute *> UMLClass::getOperations() const {
-    // TODO: merge operations of this and
+    // TODO: merge operations_ of this and
     return std::list<UMLAttribute *>();
 }
 
