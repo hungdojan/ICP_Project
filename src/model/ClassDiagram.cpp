@@ -5,7 +5,6 @@
 #include <algorithm>
 #include <list>
 #include <utility>
-#include <json/json.h>
 #include "ClassDiagram.h"
 
 void ClassDiagram::setName(std::string newName) {
