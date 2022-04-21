@@ -6,7 +6,6 @@
 #include "UMLOperation.h"
 #include <stdexcept>
 #include <algorithm>
-#include <iterator>
 
 UMLClass::UMLClass(const std::string& name, const std::vector<UMLAttribute *>& attributes) : UMLClassifier{name} {
     for (auto attribute : attributes) {
@@ -27,17 +26,8 @@ const std::vector<UMLAttribute *> &UMLClass::attributes() const {
     return attributes_;
 }
 
-const std::unordered_set<UMLClass *> &UMLClass::parentClasses() const {
+const std::unordered_set<UMLClassifier *> &UMLClass::parentClasses() const {
     return parentClasses_;
-}
-
-UMLAttribute *UMLClass::createAttribute(bool isOperation, const std::string &name, UMLClassifier *type,
-                                        const std::vector<UMLAttribute> &parameters) {
-    if (!isOperation && !parameters.empty())
-        throw std::invalid_argument("Attribute instance cannot have parameters");
-    if (isOperation)
-        return new UMLOperation(name, type, parameters);
-    return new UMLAttribute(name, type);
 }
 
 bool UMLClass::addAttribute(UMLAttribute *attr) {
@@ -148,7 +138,7 @@ bool UMLClass::removeAttribute(UMLAttribute *attr) {
     return true;
 }
 
-bool UMLClass::addParentClass(UMLClass *parentClass) {
+bool UMLClass::addParentClass(UMLClassifier *parentClass) {
     if (parentClass == nullptr)
         return false;
     auto iter{std::find(parentClasses_.begin(), parentClasses_.end(), parentClass)};
@@ -158,7 +148,7 @@ bool UMLClass::addParentClass(UMLClass *parentClass) {
     return true;
 }
 
-bool UMLClass::removeParentClass(UMLClass *parentClass) {
+bool UMLClass::removeParentClass(UMLClassifier *parentClass) {
     if (parentClass == nullptr)
         return false;
     auto iter{std::find(parentClasses_.begin(), parentClasses_.end(), parentClass)};
@@ -168,10 +158,10 @@ bool UMLClass::removeParentClass(UMLClass *parentClass) {
     return true;
 }
 
-UMLClass *UMLClass::removeParentClass(const std::string &parentClassName) {
+UMLClassifier *UMLClass::removeParentClass(const std::string &parentClassName) {
     auto iter{std::find_if(parentClasses_.begin(), parentClasses_.end(),
-                           [parentClassName](UMLClass *attr) { return attr->name() == parentClassName; })};
-    UMLClass *found{nullptr};
+                           [parentClassName](UMLClassifier *attr) { return attr->name() == parentClassName; })};
+    UMLClassifier *found{nullptr};
     if (iter != parentClasses_.end()) {
         found = *iter;
         parentClasses_.erase(iter);

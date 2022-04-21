@@ -10,12 +10,13 @@
 #include <list>
 #include <unordered_set>
 
+class UMLRelation;
+
 class UMLClass : public UMLClassifier {
-    std::unordered_set<UMLClass *> parentClasses_;
+    std::unordered_set<UMLClassifier *> parentClasses_;
     std::vector<UMLAttribute *> attributes_;
+    std::unordered_set<UMLRelation *> relations;
     std::string stereotype_;
-    // TODO: add relations
-    // TODO: add parentClasses
 public:
     UMLClass() =delete;
     // Class constructor
@@ -29,11 +30,9 @@ public:
     // public getter, private setter
     const std::vector<UMLAttribute *> &attributes() const;
     // public getter, private setter
-    const std::unordered_set<UMLClass *> &parentClasses() const;
+    const std::unordered_set<UMLClassifier *> &parentClasses() const;
 
     // TODO: add getter and setter for relations
-    // Factory function that creates new attribute
-    static UMLAttribute *createAttribute(bool isOperation, const std::string& name, UMLClassifier *type, const std::vector<UMLAttribute> &parameters);
     // Adds new attribute to hte class
     bool addAttribute(UMLAttribute *attr);
     // Adds new attribute to the class
@@ -41,7 +40,7 @@ public:
     // Returns instance of UMLAttribute in the class by a given name
     UMLAttribute *getAttribute(const std::string &name);
     //Returns collection of all callable operations_
-    const std::list<UMLAttribute *>getOperations() const;
+    const std::list<UMLAttribute *> &getOperations() const;
     // Returns attribute from a given position
     UMLAttribute *getAttributeAtPosition(int pos);
     // Get attributes position in the class
@@ -57,14 +56,15 @@ public:
     // Removes attribute from the class
     bool removeAttribute(UMLAttribute *attr);
     // Adds new parent class
-    bool addParentClass(UMLClass *parentClass);
+    bool addParentClass(UMLClassifier *parentClass);
     // Removes class from the set of parent classes
-    bool removeParentClass(UMLClass *parentClass);
+    bool removeParentClass(UMLClassifier *parentClass);
     // Removes class from the set of parent classes
-    UMLClass *removeParentClass(const std::string &parentClassName);
+    UMLClassifier *removeParentClass(const std::string &parentClassName);
 
     // TODO: function for relations
-    ~UMLClass();
+    // TODO: destructor
+    ~UMLClass() =default;
 };
 
 

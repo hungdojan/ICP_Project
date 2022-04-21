@@ -10,6 +10,8 @@
 #include <utility>
 #include <vector>
 
+class UMLAttribute;
+
 class UMLClassifier : public Element {
 protected:
     bool isUserDefined_;
@@ -21,6 +23,7 @@ public:
     const bool &isUserDefined() const;
     bool &isUserDefined();
     const bool &isAbstract() const;
+    static UMLAttribute *createAttribute(bool isOperation, const std::string &name, UMLClassifier *type, const std::vector<UMLAttribute> &params);
 
     virtual bool &isAbstract();
     void setName(std::string name);

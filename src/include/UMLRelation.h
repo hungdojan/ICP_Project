@@ -31,9 +31,9 @@ public:
     // Removes this relation from both source and destination classes
     void removeRelationDependency();
     // Compare if this relation is between two given classes
-    bool compareClassesInRelation(const UMLClass *cls1, const UMLClass cls2);
+    bool compareClassesInRelation(const UMLClass *cls1, const UMLClass *cls2);
 
-    bool &operator==(const UMLRelation& relation);
+    // operator==(UMLRelation &relation, UMLRelation &relation2);
 };
 
 
