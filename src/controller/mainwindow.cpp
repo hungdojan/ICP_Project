@@ -11,6 +11,7 @@
 #include "GClassifier.h"
 #include "GRelation.h"
 #include "GClassDiagram.h"
+#include "ClassDiagram.h"
 
 MainWindow::MainWindow(QWidget *parent) :
         QMainWindow(parent), ui(new Ui::MainWindow) {
@@ -19,7 +20,7 @@ MainWindow::MainWindow(QWidget *parent) :
     scene = new GraphicsScene(ui->graphicsView, this);
     ui->graphicsView->setScene(scene);
 
-    gClassDiagram = new GClassDiagram(scene);
+    gClassDiagram = new GClassDiagram(scene, new ClassDiagram("MyClassDiagram"));
 
     connect(ui->addClassButton, SIGNAL(pressed()), gClassDiagram, SLOT(addClassifier()));
 

@@ -2,16 +2,17 @@
 #define TESTEDITOR_CLASSSETTINGS_H
 
 #include <QTreeWidget>
-#include "UMLClassifier.h"
+//#include "UMLClassifier.h"
+#include "GClassifier.h"
 
 class GClassSettings: public QObject {
 Q_OBJECT
 public:
     GClassSettings(QTreeWidget *tree);
-    void loadCategories();
-    void hideCategories();
+//    void loadCategories();
+    void hideContent();
+    void loadContent(GClassifier *gClassifier);
     QString title;
-    UMLClassifier *umlClassifier;
 
 private:
     QTreeWidget *tree;
@@ -32,7 +33,8 @@ private slots:
     void deleteRow();
     void selectionChanged();
     void saveContent();
-
+private:
+    GClassifier *selectedGClassifier;
 };
 
 #endif //TESTEDITOR_CLASSSETTINGS_H

@@ -7,6 +7,8 @@
 
 #include "GClassifier.h"
 #include "GraphicsScene.h"
+#include "ClassDiagram.h"
+#include "GClassSettings.h"
 
 
 class GClassDiagram: public QObject{
@@ -16,8 +18,12 @@ public:
 //    ~GClassDiagram();
 private slots:
     void addClassifier();
+    void onGClassifierSelectionChanged();
 private:
-    GraphicsScene *scene;
+    ClassDiagram *classDiagramModel;
+    GraphicsScene *scene_;
+    std::vector<GClassifier*> gClassifiers;
+    GClassSettings *gClassSettings;
 };
 
 #endif //DIAGRAMEDITOR_GCLASSDIAGRAM_H
