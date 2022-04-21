@@ -11,12 +11,18 @@
 #include <vector>
 
 class UMLClassifier : public Element {
-    bool _isUserDefined;
+protected:
+    bool isUserDefined_;
+    bool isAbstract_{false};
 public:
     UMLClassifier() =delete;
-    explicit UMLClassifier(std::string name) : Element{std::move(name)}, _isUserDefined{false} { };
-    explicit UMLClassifier(std::string name, bool isUserDefined) : Element{std::move(name)}, _isUserDefined{isUserDefined} { }
-    bool isUserDefined();
+    explicit UMLClassifier(std::string name) : Element{std::move(name)}, isUserDefined_{false} { };
+    explicit UMLClassifier(std::string name, bool isUserDefined) : Element{std::move(name)}, isUserDefined_{isUserDefined} { }
+    const bool &isUserDefined() const;
+    bool &isUserDefined();
+    const bool &isAbstract() const;
+
+    virtual bool &isAbstract();
     void setName(std::string name);
 };
 

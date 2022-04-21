@@ -27,11 +27,13 @@ UMLClassifier *UMLAttribute::setType(UMLClassifier *classifier) {
     return temp;
 }
 
+bool UMLAttribute::operator==(UMLAttribute &attr) const {
+    return type_ == attr.type_ && name_ == attr.name_;
+}
+
 UMLAttribute::operator std::string() const {
     std::ostringstream stream;
-    if (visibility_ != '\0')
-        stream << visibility_ << " ";
-    stream << type_->name() << " " << name_;
+    stream << visibility_ << type_->name() << " " << name_;
     return stream.str();
 }
 

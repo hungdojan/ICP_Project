@@ -14,9 +14,9 @@ public:
     Element() =delete;
     explicit Element(std::string name) : name_{std::move(name)} { };
     const std::string &name() const;
+    virtual void setName(const std::string &newName);
 
 protected:
-    virtual void setName(const std::string &newName);
 };
 
 

@@ -5,7 +5,9 @@
 #include "UMLOperation.h"
 #include "UMLAttribute.h"
 #include "UMLClassifier.h"
+#include <iostream>
 #include <algorithm>
+#include <vector>
 #include <sstream>
 
 UMLOperation::UMLOperation(const std::string &name, UMLClassifier *type, std::vector<UMLAttribute> parameters)
@@ -81,11 +83,21 @@ void UMLOperation::clearParameters(std::vector<UMLAttribute> *vectorContent) {
     parameters_.clear();
 }
 
+// TODO:
+// bool UMLOperation::operator==(UMLOperation &operation) const {
+//     if (name_ != operation.name_ || type_ != operation.type_)
+//         return false;
+//     std::equal(operation.parameters().begin(), operation.parameters().end(),
+//                parameters().begin(), parameters().end(),
+//                [](const UMLOperation &op1, const UMLOperation &op2)
+//                { return op1.name_ == op2.name_ && op1.type_ == op2.type_; });
+//     return true;
+//     // return name_ == operation.name_ && parameters_ == operation.parameters_;
+// }
+
 UMLOperation::operator std::string() const {
     std::ostringstream stream;
-    if (visibility_ != '\0')
-        stream << visibility_ << " ";
-    stream << type_->name() << " " << name_ << "(";
+    stream << visibility_ << type_->name() << " " << name_ << "(";
     for (auto i = parameters_.begin(); i != parameters_.end(); ++i) {
         if (i != parameters_.begin())
             stream << " ";

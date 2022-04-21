@@ -20,13 +20,13 @@ public:
     void setName(const std::string &name);
     // Returns attribute's visibility
     char &visibility();
-    // Returns attribute;s type
+    // Returns attribute's type
     const UMLClassifier *type() const;
-    // Sets attribute's name
+    // Sets attribute's type
     UMLClassifier *setType(UMLClassifier *classifier);
 
-    virtual // toString functions
-    explicit operator std::string() const;
+    bool operator==(UMLAttribute &attr) const;
+    virtual explicit operator std::string() const;
     friend std::ostream& operator<<(std::ostream &strm, const UMLAttribute &attr);
     ~UMLAttribute() =default;
 };

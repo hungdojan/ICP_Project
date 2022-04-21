@@ -14,19 +14,17 @@ class UMLClass : public UMLClassifier {
     std::unordered_set<UMLClass *> parentClasses_;
     std::vector<UMLAttribute *> attributes_;
     std::string stereotype_;
-    bool isAbstract_;
     // TODO: add relations
     // TODO: add parentClasses
 public:
     UMLClass() =delete;
     // Class constructor
-    explicit UMLClass(const std::string &name) : UMLClassifier{name}, isAbstract_{false} { };
+    explicit UMLClass(const std::string &name) : UMLClassifier{name} { };
     // Class constructor
     explicit UMLClass(const std::string& name, const std::vector<UMLAttribute *>&attributes);
 
     // public getter and setter
-    bool &isAbstract();
-    // public getter and setter
+    const std::string &stereotype() const;
     std::string &stereotype();
     // public getter, private setter
     const std::vector<UMLAttribute *> &attributes() const;
@@ -42,7 +40,7 @@ public:
     UMLAttribute *addOrReplaceAttribute(UMLAttribute *attr);
     // Returns instance of UMLAttribute in the class by a given name
     UMLAttribute *getAttribute(const std::string &name);
-    //Returns collection of all callable operations
+    //Returns collection of all callable operations_
     const std::list<UMLAttribute *>getOperations() const;
     // Returns attribute from a given position
     UMLAttribute *getAttributeAtPosition(int pos);

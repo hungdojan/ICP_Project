@@ -21,7 +21,9 @@ public:
     const UMLClass *src() const;
     const UMLClass *dst() const;
     std::string &srcMsg();
+    const std::string &srcMsg() const;
     std::string &dstMsg();
+    const std::string &dstMsg() const;
     // Adds this relation to bot source and destination classes
     bool setRelationDependency();
     // Swap source and destination classes
