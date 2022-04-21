@@ -6,6 +6,8 @@
 #include "GClassifier.h"
 #include "mainwindow.h"
 #include <GraphicsScene.h>
+#include "UMLClassifier.h"
+#include <QDebug>
 
 GClassifier::GClassifier(qreal x, qreal y, qreal width, qreal height, QGraphicsItem *parent) :
         QGraphicsRectItem(x, y, width, height, parent), QObject(){
@@ -14,33 +16,28 @@ GClassifier::GClassifier(qreal x, qreal y, qreal width, qreal height, QGraphicsI
     setFlag(QGraphicsItem::ItemIsSelectable);
     setFlag(QGraphicsItem::ItemSendsScenePositionChanges);
     setBrush(QBrush(Qt::white));
-    gClassSettings = nullptr;
 
-    title = new QGraphicsTextItem("blank_title", this);
+    umlClassifier = new UMLClassifier("todo_name", false);
+
+    title = new QGraphicsTextItem(QString::fromStdString(umlClassifier->name()), this);
     title->setPos(x, y);
 }
 GClassifier::~GClassifier(){
 }
 
 void GClassifier::contentSaved(){
-//    title->setPlainText(classSettings->title);
+    title->setPlainText(QString::fromStdString(umlClassifier->name()));
 }
 
 QVariant GClassifier::itemChange(GraphicsItemChange change, const QVariant &value){
     if (change == QGraphicsItem::ItemSelectedChange){
         if (value == true) {
             setBrush(QBrush(Qt::gray));
-            if(gClassSettings == nullptr){
-                gClassSettings = (gClassSettings == nullptr)? new GClassSettings(((MainWindow*)scene()->parent())->getCategoryTree()): gClassSettings; //todo
-                connect(gClassSettings, SIGNAL(contentSaved()), this, SLOT(contentSaved()));
-            }
-            else
-                gClassSettings->loadCategories();
         }
         else {
-            gClassSettings->hideCategories();
             setBrush(QBrush(Qt::lightGray));
         }
+        emit gClassifierSelectionChanged();
     }
     if (change == ItemPositionChange && scene()) {
         emit gClassifierPositionChanged();

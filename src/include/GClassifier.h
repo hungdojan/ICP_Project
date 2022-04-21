@@ -8,9 +8,7 @@
 
 #include <QGraphicsRectItem>
 #include "GRelation.h"
-#include "GClassSettings.h"
-//#include "ClassSettings.h"
-
+#include "UMLClassifier.h"
 
 class GClassifier: public QObject, public QGraphicsRectItem{
 Q_OBJECT
@@ -18,12 +16,12 @@ public:
     GClassifier(qreal x, qreal y, qreal width, qreal height, QGraphicsItem *parent = nullptr);
     ~GClassifier();
     QVariant itemChange(GraphicsItemChange change, const QVariant & value);
+    UMLClassifier *umlClassifier;
 signals:
     void gClassifierPositionChanged();
-
+    void gClassifierSelectionChanged();
 private:
     QGraphicsTextItem *title;
-    GClassSettings *gClassSettings;
 private slots:
     void contentSaved();
 };

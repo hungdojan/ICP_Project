@@ -7,7 +7,9 @@
 #include <QLineEdit>
 #include <QDebug>
 #include <QString>
-#include "UMLClassifier.h"
+//#include "UMLClassifier.h"
+#include "GClassifier.h"
+
 
 #define SAVE_BUTTON_STYLE "QPushButton { background-color: #0B892A; font-size: 30px;}"
 #define SELECTED_ROW_STYLE "QFrame {background-color: #229944}"
@@ -19,7 +21,7 @@
 GClassSettings::GClassSettings(QTreeWidget *tree): QObject(){
     this->tree = tree;
 
-    umlClassifier = new UMLClassifier("class_name", false);
+    selectedGClassifier = nullptr;
 
     categories.push_back(addSavePanel());
     categories.push_back(addCategoryGeneral());
@@ -27,20 +29,48 @@ GClassSettings::GClassSettings(QTreeWidget *tree): QObject(){
     categories.push_back(addCategoryFunctions());
     categories.push_back(addCategoryRelations());
 
+    hideContent();
+
     connect(tree, SIGNAL(itemSelectionChanged()), this, SLOT(selectionChanged()));
 }
 
-void GClassSettings::loadCategories(){
-    // Show only those in vector that belongs the class
-    for(int i = 0; i < categories.size(); i++){
+void GClassSettings::loadContent(GClassifier *gClassifier){
+    //todo add attributes(e.g) rows to categories, when needed
+
+    // Currently selected GClassifier
+    selectedGClassifier = gClassifier;
+
+    categories.at(0)->setHidden(false); // Save button panel
+
+    for(int i = 1; i < categories.size(); ++i) {
         categories.at(i)->setHidden(false);
+        QString categoryName = tree->itemWidget(categories.at(i), 0)->findChild<QLabel*>()->text();
+
+        if(categoryName == "General") {
+            tree->itemWidget(categories.at(i)->child(0),0)->findChild<QLineEdit *>()->setText(QString::fromStdString(gClassifier->umlClassifier->name())); // todo accessibleName ?
+        }
     }
 }
 
-void GClassSettings::hideCategories() {
+//void GClassSettings::loadCategories(){
+//    // Show only those in vector that belongs the class
+//    for(int i = 0; i < categories.size(); i++){
+//        categories.at(i)->setHidden(false);
+//    }
+//}
+
+void GClassSettings::hideContent() {
+    tree->topLevelItem(0)->setHidden(true); // Save button panel
+
     // Hide all categories
-    for(int i = 0; i < tree->topLevelItemCount(); i++){
+    for(int i = 1; i < tree->topLevelItemCount(); i++){
         tree->topLevelItem(i)->setHidden(true);
+
+        // todo starts at attributes, remove only blank???
+        for(int k = 1; i > 1, k < tree->topLevelItem(i)->childCount(); k++) {
+            tree->topLevelItem(i)->removeChild(tree->topLevelItem(i)->child(k));
+            k--; // todo only for removing all children, number of them decreases -> also index
+        }
     }
 }
 
@@ -49,16 +79,18 @@ void GClassSettings::saveContent(){
 
     // [0] category Save Button
     // skip
+    if(selectedGClassifier == nullptr)
+        return;
 
     for(int i = 1; i < categories.size(); ++i) {
         QString categoryName = tree->itemWidget(categories.at(i), 0)->findChild<QLabel*>()->text();
 
         if(categoryName == "General") {
-//            qDebug() << tree->findChild<QLineEdit*>("QLabel_Title");
-            umlClassifier->setName(tree->itemWidget(categories.at(i)->child(0),0)->findChild<QLineEdit *>()->text().toStdString()); // todo accessibleName ?
-//            for(int i=0; i<tree->itemWidget(categories.at(i),0)->children().count(); )
+            selectedGClassifier->umlClassifier->setName(tree->itemWidget(categories.at(i)->child(0),0)->findChild<QLineEdit *>()->text().toStdString());
         }
     }
+    // notify GClassifier
+    connect(this, SIGNAL(contentSaved()), selectedGClassifier, SLOT(contentSaved()));
     emit contentSaved();
 }
 
