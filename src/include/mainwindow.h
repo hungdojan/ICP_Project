@@ -10,7 +10,10 @@
 
 #include <QWidget>
 #include <QMainWindow>
-
+#include <QGraphicsScene>
+#include <QTreeWidget>
+#include "GraphicsScene.h"
+#include "GClassDiagram.h"
 
 QT_BEGIN_NAMESPACE
 namespace Ui { class MainWindow; }
@@ -21,11 +24,16 @@ Q_OBJECT
 
 public:
     explicit MainWindow(QWidget *parent = nullptr);
-
     ~MainWindow() override;
+    QTreeWidget *getCategoryTree();
+
+//private slots:
+//    void addClass();
 
 private:
     Ui::MainWindow *ui;
+    GraphicsScene *scene;
+    GClassDiagram *gClassDiagram;
 };
 
 
