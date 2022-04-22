@@ -34,6 +34,8 @@ public:
     // bool operator==(UMLOperation &operation) const;
     explicit operator std::string() const final;
     friend std::ostream &operator<<(std::ostream &strm, const UMLOperation &operation);
+
+    ~UMLOperation();
 };
 
 

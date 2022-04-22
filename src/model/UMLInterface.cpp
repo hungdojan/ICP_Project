@@ -77,3 +77,9 @@ bool UMLInterface::removeParentInterface(UMLInterface *interface) {
     parentInterfaces_.erase(iter);
     return true;
 }
+
+UMLInterface::~UMLInterface() {
+    for (auto o : operations_)
+        delete o;
+    // TODO: relation
+}

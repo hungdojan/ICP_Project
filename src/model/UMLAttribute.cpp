@@ -41,3 +41,8 @@ std::ostream &operator<<(std::ostream &strm, const UMLAttribute &attr) {
     std::string str{attr};
     return strm << str;
 }
+
+UMLAttribute::~UMLAttribute() {
+    if (!type_->isUserDefined())
+        delete type_;
+}

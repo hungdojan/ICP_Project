@@ -168,3 +168,13 @@ UMLClassifier *UMLClass::removeParentClass(const std::string &parentClassName) {
     }
     return found;
 }
+
+UMLClass::~UMLClass() {
+    for (auto attr : attributes_) {
+        delete attr;
+    }
+    for (auto relation : relations_) {
+        // clean relations
+    }
+    attributes_.clear();
+}

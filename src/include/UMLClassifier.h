@@ -21,7 +21,6 @@ public:
     explicit UMLClassifier(std::string name) : Element{std::move(name)}, isUserDefined_{false} { };
     explicit UMLClassifier(std::string name, bool isUserDefined) : Element{std::move(name)}, isUserDefined_{isUserDefined} { }
     const bool &isUserDefined() const;
-    bool &isUserDefined();
     const bool &isAbstract() const;
     static UMLAttribute *createAttribute(bool isOperation, const std::string &name, UMLClassifier *type, const std::vector<UMLAttribute> &params);
 
