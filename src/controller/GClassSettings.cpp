@@ -7,11 +7,18 @@
 #include <QLineEdit>
 #include <QDebug>
 #include <QString>
-//#include "UMLClassifier.h"
+#include <QRadioButton>
+#include <QCheckBox>
 #include "GClassifier.h"
+#include "UMLInterface.h"
+#include "UMLClass.h"
+#include "ClassDiagram.h"
 
 
-#define SAVE_BUTTON_STYLE "QPushButton { background-color: #0B892A; font-size: 30px;}"
+#define SAVE_BUTTON_STYLE "QPushButton { background-color: qlineargradient(x1:0, y1:0, x2:0, y2:1,\n"\
+                              "stop:0 #6BD96A, stop:0.05 #2BA94A, stop:0.95 #0B892A, stop:1 #06690F); font-size: 30px; border-radius: 3px;}" \
+                              "QPushButton:hover { background-color: #25A545;}"\
+                              "QPushButton:pressed { background-color: #057525;}"
 #define SELECTED_ROW_STYLE "QFrame {background-color: #229944}"
 #define CATEGORY_HEADER_STYLE "QFrame { background-color: qlineargradient(x1:0, y1:0, x2:0, y2:1,\n"\
                               "stop:0 #50555A, stop:0.05 #35383D, stop:0.95 #33363B, stop:1 #152020); }"
@@ -34,6 +41,21 @@ GClassSettings::GClassSettings(QTreeWidget *tree): QObject(){
     connect(tree, SIGNAL(itemSelectionChanged()), this, SLOT(selectionChanged()));
 }
 
+void GClassSettings::hideContent() {
+    // Hide all categories
+    for(int i = 0; i < tree->topLevelItemCount(); i++){
+        tree->topLevelItem(i)->setHidden(true);
+
+        // todo starts at attributes, remove only blank???
+        if( i > 1) {
+            for (int k = 1; k < tree->topLevelItem(i)->childCount(); k++) {
+                tree->topLevelItem(i)->removeChild(tree->topLevelItem(i)->child(k));
+                k--; // todo only for removing all children, number of them decreases -> also index
+            }
+        }
+    }
+}
+
 void GClassSettings::loadContent(GClassifier *gClassifier){
     //todo add attributes(e.g) rows to categories, when needed
 
@@ -43,50 +65,125 @@ void GClassSettings::loadContent(GClassifier *gClassifier){
     categories.at(0)->setHidden(false); // Save button panel
 
     for(int i = 1; i < categories.size(); ++i) {
-        categories.at(i)->setHidden(false);
-        QString categoryName = tree->itemWidget(categories.at(i), 0)->findChild<QLabel*>()->text();
+        bool keepHidden = false;
+        QTreeWidgetItem *category = categories.at(i);
+        QString categoryName = tree->itemWidget(category, 0)->findChild<QLabel*>()->text();
 
-        if(categoryName == "General") {
-            tree->itemWidget(categories.at(i)->child(0),0)->findChild<QLineEdit *>()->setText(QString::fromStdString(gClassifier->umlClassifier->name())); // todo accessibleName ?
+        // LOADING model data -> view
+        if(categoryName.toStdString().find("General") != std::string::npos) {
+            tree->itemWidget(categories.at(i)->child(0),0)->findChild<QLineEdit*>()->setText(QString::fromStdString(gClassifier->umlClassifier->name()));
+//            tree->itemWidget(categories.at(i)->child(1),0)->findChild<QCheckBox*>()->setChecked(gClassifier->umlClassifier->isAbstract());
         }
-    }
-}
-
-//void GClassSettings::loadCategories(){
-//    // Show only those in vector that belongs the class
-//    for(int i = 0; i < categories.size(); i++){
-//        categories.at(i)->setHidden(false);
-//    }
-//}
-
-void GClassSettings::hideContent() {
-    tree->topLevelItem(0)->setHidden(true); // Save button panel
-
-    // Hide all categories
-    for(int i = 1; i < tree->topLevelItemCount(); i++){
-        tree->topLevelItem(i)->setHidden(true);
-
-        // todo starts at attributes, remove only blank???
-        for(int k = 1; i > 1, k < tree->topLevelItem(i)->childCount(); k++) {
-            tree->topLevelItem(i)->removeChild(tree->topLevelItem(i)->child(k));
-            k--; // todo only for removing all children, number of them decreases -> also index
+        if(categoryName.toStdString().find("Attributes") != std::string::npos){
+            UMLClass *cls;
+            if((cls = dynamic_cast<UMLClass*>(selectedGClassifier->umlClassifier))) {
+                for(auto a : cls->attributes()) {
+                    if(dynamic_cast<UMLOperation*>(a) == nullptr) // Is not operation
+                        addRow((QWidget*)category, QString::fromStdString(a->type()->name()), QString::fromStdString(a->name()));
+                }
+            }
+            else
+                keepHidden = true;
         }
+        else if(categoryName.toStdString().find("Functions") != std::string::npos){
+            UMLClass *cls;
+            if((cls = dynamic_cast<UMLClass*>(selectedGClassifier->umlClassifier))) {
+                for(auto a : cls->attributes()) {
+                    if(dynamic_cast<UMLOperation*>(a)) // Is operation
+                        addRow((QWidget*)category, QString::fromStdString(a->type()->name()), QString::fromStdString(a->name()));
+                }
+            }
+            UMLInterface *inf;
+            if((inf = dynamic_cast<UMLInterface*>(selectedGClassifier->umlClassifier))) {
+                for(auto a : inf->operations()) {
+                    if(dynamic_cast<UMLOperation*>(a)) // Is operation
+                        addRow((QWidget*)category, QString::fromStdString(a->type()->name()), QString::fromStdString(a->name()));
+                }
+            }
+        }
+        categories.at(i)->setHidden(keepHidden);
     }
 }
 
 void GClassSettings::saveContent(){
-    // todo better to bind to model data
-
-    // [0] category Save Button
-    // skip
     if(selectedGClassifier == nullptr)
         return;
 
     for(int i = 1; i < categories.size(); ++i) {
-        QString categoryName = tree->itemWidget(categories.at(i), 0)->findChild<QLabel*>()->text();
+        QTreeWidgetItem *category = categories.at(i);
+        QString categoryName = tree->itemWidget(category, 0)->findChild<QLabel*>()->text();
 
-        if(categoryName == "General") {
-            selectedGClassifier->umlClassifier->setName(tree->itemWidget(categories.at(i)->child(0),0)->findChild<QLineEdit *>()->text().toStdString());
+        if(categoryName.toStdString().find("General") != std::string::npos) {
+            // Title
+            selectedGClassifier->umlClassifier->setName(tree->itemWidget(category->child(0),0)->findChild<QLineEdit *>()->text().toStdString());
+        }
+        if(categoryName.toStdString().find("Attributes") != std::string::npos) {
+            UMLClass *cls;
+            if((cls = dynamic_cast<UMLClass*>(selectedGClassifier->umlClassifier))) {
+                // [0] attributes() is the [1] child in a category
+                // Save attributes to UML
+                int j = 0;
+                for(int a = 1; a < category->childCount(); a++){
+                    // Assign view values from categories to UML
+                    while(j < cls->attributes().size()){
+                        // Iterate while Attribute is not operation
+                        if(dynamic_cast<UMLOperation*>(cls->attributes()[j]) == nullptr){ // Is not operation
+                            cls->getAttributeAtPosition(j)->setType(new UMLClassifier(tree->itemWidget(category->child(a),0)->findChild<QLineEdit*>()->text().toStdString()));
+                            cls->getAttributeAtPosition(j)->setName(tree->itemWidget(category->child(a),0)->findChildren<QLineEdit*>()[1]->text().toStdString());
+                            j++;
+                            break;
+                        }
+                        j++;
+                    }
+                    // If the attribute is new, add it to UML
+                    if(j >= cls->attributes().size()){
+                        std::string name = tree->itemWidget(category->child(a),0)->findChildren<QLineEdit*>()[1]->text().toStdString();
+                        UMLClassifier *type = new UMLClassifier(tree->itemWidget(category->child(a),0)->findChild<QLineEdit*>()->text().toStdString());
+                        cls->addAttribute(new UMLAttribute(name, type));
+                    }
+                }
+            }
+        }
+        else if(categoryName.toStdString().find("Functions") != std::string::npos){
+            UMLClass *cls;
+            if((cls = dynamic_cast<UMLClass*>(selectedGClassifier->umlClassifier))) { // TODO "similar" as class attrinutes saving
+                int j = 0;
+                for(int a = 1; a < category->childCount(); a++){
+                    // Assign view values from categories to UML
+                    while(j < cls->attributes().size()){
+                        if(dynamic_cast<UMLOperation*>(cls->attributes()[j])){ // Is operation
+                            cls->getAttributeAtPosition(j)->setType(new UMLClassifier(tree->itemWidget(category->child(a),0)->findChild<QLineEdit*>()->text().toStdString()));
+                            cls->getAttributeAtPosition(j)->setName(tree->itemWidget(category->child(a),0)->findChildren<QLineEdit*>()[1]->text().toStdString());
+                            j++;
+                            break;
+                        }
+                        j++;
+                    }
+                    // If the operation is new, add it to UML
+                    if(j >= cls->attributes().size()){
+                        std::string name = tree->itemWidget(category->child(a),0)->findChildren<QLineEdit*>()[1]->text().toStdString();
+                        UMLClassifier *type = new UMLClassifier(tree->itemWidget(category->child(a),0)->findChild<QLineEdit*>()->text().toStdString());
+                        cls->addAttribute(new UMLOperation(name, type));
+                    }
+                }
+            }
+            UMLInterface *inf;
+            if((inf = dynamic_cast<UMLInterface*>(selectedGClassifier->umlClassifier))) {
+                for(int a = 1; a < category->childCount(); a++){
+                    int j = a-1;
+                    if(j < inf->operations().size()){
+                        // Assign view values from categories to UML
+                        inf->getOperation(inf->operations()[j]->name())->setType(new UMLClassifier(tree->itemWidget(category->child(a),0)->findChild<QLineEdit*>()->text().toStdString()));
+                        inf->getOperation(inf->operations()[j]->name())->setName(tree->itemWidget(category->child(a),0)->findChildren<QLineEdit*>()[1]->text().toStdString());
+                    }
+                    else{
+                        // If the operation is new, add it to UML
+                        std::string name = tree->itemWidget(category->child(a),0)->findChildren<QLineEdit*>()[1]->text().toStdString();
+                        UMLClassifier *type = new UMLClassifier(tree->itemWidget(category->child(a),0)->findChild<QLineEdit*>()->text().toStdString());
+                        inf->addOperation(new UMLOperation(name, type));
+                    }
+                }
+            }
         }
     }
     // notify GClassifier
@@ -94,11 +191,40 @@ void GClassSettings::saveContent(){
     emit contentSaved();
 }
 
-void GClassSettings::selectionChanged(){
+
+void GClassSettings::deleteRow(){
     auto list = tree->selectedItems();
+    if(list.empty() || selectedGClassifier == nullptr)
+        return;
+    QTreeWidgetItem *item = tree->selectedItems().at(0);
+
+    // Delete non-top item, which is not the first row with buttons
+    if(item != nullptr && item->parent() != nullptr && item->parent()->indexOfChild(item) >= 1) {
+        QTreeWidgetItem *category = item->parent();
+        QString categoryName = tree->itemWidget(category, 0)->findChild<QLabel*>()->text();
+
+        if(categoryName.toStdString().find("Attributes") != std::string::npos ||
+           categoryName.toStdString().find("Functions") != std::string::npos) {
+            UMLClass *cls;
+            if((cls = dynamic_cast<UMLClass*>(selectedGClassifier->umlClassifier))) {
+                cls->removeAttribute(cls->getAttribute(tree->itemWidget(category->child(category->indexOfChild(item)),0)->findChildren<QLineEdit*>()[1]->text().toStdString()));
+            }
+        }
+        if(categoryName.toStdString().find("Functions") != std::string::npos) {
+            UMLInterface *inf;
+            if((inf = dynamic_cast<UMLInterface*>(selectedGClassifier->umlClassifier))) {
+                inf->removeOperation(inf->getOperation(tree->itemWidget(category->child(category->indexOfChild(item)),0)->findChildren<QLineEdit*>()[1]->text().toStdString()));
+            }
+        }
+
+        item->parent()->removeChild(item);
+    }
+}
+
+void GClassSettings::selectionChanged(){
     // todo gets first, but must exist..
     QTreeWidgetItem *item = tree->selectedItems().at(0);
-    if(item->parent() != NULL) {
+    if(item->parent() != nullptr) {
         // Color all to default
         for(int i = 0; i < tree->topLevelItemCount(); ++i) {
             QTreeWidgetItem *topLvl = tree->topLevelItem(i);
@@ -107,22 +233,13 @@ void GClassSettings::selectionChanged(){
             }
         }
         // Color selected non first row
-        if(item->parent()->indexOfChild(item) != 0)
+        if(item->parent()->indexOfChild(item) != 0 && tree->indexOfTopLevelItem(item->parent()) > 1)
             tree->itemWidget(item, 0)->setStyleSheet(SELECTED_ROW_STYLE);
     }
 }
 
-void GClassSettings::deleteRow(){
-    auto list = tree->selectedItems();
-    //todo gets first, null?
-    QTreeWidgetItem *item = tree->selectedItems().at(0);
-    // Delete non-top item, which is not the first row with buttons todo !!! overit nazvem widget tree->itemWidget(categories.at(0)->child(1), 0)->findChild<QLineEdit*>("title_of_button")
-    if(item != nullptr && item->parent() != nullptr && item->parent()->indexOfChild(item) >= 1) // todo dat title mimo category attributes
-        item->parent()->removeChild(item);
-}
-
-void GClassSettings::addRow(QWidget *obj) {
-    QTreeWidgetItem *category = (QTreeWidgetItem*)obj;
+void GClassSettings::addRow(QWidget *obj, const QString &type, const QString &name) {
+    auto *category = (QTreeWidgetItem*)obj;
     // New attribute row
     auto *row = new QTreeWidgetItem();
     category->addChild(row);
@@ -135,10 +252,15 @@ void GClassSettings::addRow(QWidget *obj) {
     auto *lineEditContent = new QLineEdit();
 
     lineEditType->setPlaceholderText("type");
+    if(!type.isNull())
+        lineEditType->setText(type);
     lineEditType->setContentsMargins(0,0,0,0);
     lineEditType->setMaximumWidth(100);
     rowLayout->addWidget(lineEditType);
+
     lineEditContent->setPlaceholderText("name");
+    if(!name.isNull())
+        lineEditContent->setText(name);
     lineEditContent->setContentsMargins(0,0,0,0);
     rowLayout->addWidget(lineEditContent);
 
@@ -187,16 +309,16 @@ void GClassSettings::addDeleteAndAddRow(QTreeWidgetItem *category) {
     tree->setItemWidget(topLine, 0, topLineFrame);
 }
 
-QTreeWidgetItem *GClassSettings::addCategoryHeader(QString name){
+QTreeWidgetItem *GClassSettings::addCategoryHeader(const QString name){
     auto *category = new QTreeWidgetItem();
     tree->addTopLevelItem(category);
     // Category Frame-Layout Content
     auto *headerLineFrame = new QFrame();
     QBoxLayout* headerLineLayout = new QHBoxLayout(headerLineFrame);
 
-    auto *label = new QLabel(name);
-    label->setAlignment(Qt::AlignHCenter);
-    label->setContentsMargins(0,2,0,2);
+    auto *label = new QLabel("▸    "+name);
+    label->setAlignment(Qt::AlignLeft);
+    label->setContentsMargins(10,2,0,2);
     label->setFont(QFont("Ubuntu", 12, QFont::Normal));
     label->setStyleSheet("QLabel { background-color: #00000000;}"); // Transparent label
     headerLineFrame->setStyleSheet(CATEGORY_HEADER_STYLE);
@@ -216,10 +338,9 @@ QTreeWidgetItem *GClassSettings::addCategoryGeneral() {
     // Row Frame-Layout Content
     auto *rowFrame = new QFrame();
     QBoxLayout* rowLayout = new QHBoxLayout(rowFrame);
-    rowLayout->setContentsMargins(9,0,9,0);
+    rowLayout->setContentsMargins(9,9,9,5);
 
     auto qLabelTitle = new QLabel("Title");
-    qLabelTitle->setAccessibleName("QLabel_Title");
     rowLayout->addWidget(qLabelTitle);
     auto *lineEdit = new QLineEdit();
     lineEdit->setPlaceholderText("title");
@@ -251,7 +372,7 @@ QTreeWidgetItem *GClassSettings::addCategoryFunctions() {
 
 QTreeWidgetItem *GClassSettings::addCategoryRelations() {
     // Category 'Relations'
-    auto *categoryAttributes = addCategoryHeader("Relations TODO");
+    auto *categoryAttributes = addCategoryHeader("Relations");
 
     // Attach buttons 'X' and '+' row
     addDeleteAndAddRow(categoryAttributes);

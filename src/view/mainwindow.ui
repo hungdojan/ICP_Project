@@ -61,45 +61,20 @@
         <property name="bottomMargin">
          <number>0</number>
         </property>
-        <property name="horizontalSpacing">
+        <property name="spacing">
          <number>0</number>
         </property>
-        <property name="verticalSpacing">
-         <number>15</number>
-        </property>
-        <item row="0" column="2">
-         <widget class="QPushButton" name="addClassButton">
-          <property name="sizePolicy">
-           <sizepolicy hsizetype="Minimum" vsizetype="Fixed">
-            <horstretch>0</horstretch>
-            <verstretch>0</verstretch>
-           </sizepolicy>
-          </property>
-          <property name="minimumSize">
-           <size>
-            <width>350</width>
-            <height>35</height>
-           </size>
-          </property>
-          <property name="styleSheet">
-           <string notr="true">background-color: #095090; color: white; font-size: 19px;</string>
-          </property>
-          <property name="text">
-           <string>➕ Class</string>
-          </property>
-         </widget>
-        </item>
-        <item row="0" column="0" rowspan="2">
+        <item row="0" column="0" rowspan="3">
          <widget class="QGraphicsView" name="graphicsView">
           <property name="styleSheet">
            <string notr="true">background-color: #EEF0F9</string>
           </property>
          </widget>
         </item>
-        <item row="1" column="2">
+        <item row="2" column="2">
          <widget class="QTreeWidget" name="treeWidget">
           <property name="sizePolicy">
-           <sizepolicy hsizetype="Fixed" vsizetype="Expanding">
+           <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
             <horstretch>0</horstretch>
             <verstretch>0</verstretch>
            </sizepolicy>
@@ -112,7 +87,10 @@
           </property>
           <property name="styleSheet">
            <string notr="true">QTreeWidget{ background-color: #282C31; color: white;}
-QTreeWidget::item{height:40px;}</string>
+QTreeWidget::item{height:30px;}
+QHeaderView::section {                          
+    padding: 10px;
+}</string>
           </property>
           <property name="verticalScrollMode">
            <enum>QAbstractItemView::ScrollPerPixel</enum>
@@ -125,7 +103,7 @@ QTreeWidget::item{height:40px;}</string>
           </property>
           <column>
            <property name="text">
-            <string>CLASS SETTINGS</string>
+            <string>TYPE SETTINGS</string>
            </property>
            <property name="font">
             <font>
@@ -145,6 +123,96 @@ QTreeWidget::item{height:40px;}</string>
             </color>
            </property>
           </column>
+         </widget>
+        </item>
+        <item row="1" column="2">
+         <widget class="QFrame" name="frame">
+          <property name="sizePolicy">
+           <sizepolicy hsizetype="Maximum" vsizetype="Preferred">
+            <horstretch>0</horstretch>
+            <verstretch>0</verstretch>
+           </sizepolicy>
+          </property>
+          <property name="minimumSize">
+           <size>
+            <width>350</width>
+            <height>0</height>
+           </size>
+          </property>
+          <property name="maximumSize">
+           <size>
+            <width>350</width>
+            <height>16777215</height>
+           </size>
+          </property>
+          <property name="frameShape">
+           <enum>QFrame::StyledPanel</enum>
+          </property>
+          <property name="frameShadow">
+           <enum>QFrame::Raised</enum>
+          </property>
+          <layout class="QHBoxLayout" name="horizontalLayout_2">
+           <property name="spacing">
+            <number>0</number>
+           </property>
+           <property name="leftMargin">
+            <number>0</number>
+           </property>
+           <property name="topMargin">
+            <number>0</number>
+           </property>
+           <property name="rightMargin">
+            <number>0</number>
+           </property>
+           <property name="bottomMargin">
+            <number>10</number>
+           </property>
+           <item>
+            <layout class="QHBoxLayout" name="horizontalLayout">
+             <property name="spacing">
+              <number>1</number>
+             </property>
+             <item>
+              <widget class="QPushButton" name="addClassButton">
+               <property name="sizePolicy">
+                <sizepolicy hsizetype="Minimum" vsizetype="Fixed">
+                 <horstretch>0</horstretch>
+                 <verstretch>0</verstretch>
+                </sizepolicy>
+               </property>
+               <property name="minimumSize">
+                <size>
+                 <width>174</width>
+                 <height>35</height>
+                </size>
+               </property>
+               <property name="styleSheet">
+                <string notr="true">background-color: #095090; color: white; font-size: 19px;</string>
+               </property>
+               <property name="text">
+                <string>➕ Class</string>
+               </property>
+              </widget>
+             </item>
+             <item>
+              <widget class="QPushButton" name="addInterfaceButton">
+               <property name="minimumSize">
+                <size>
+                 <width>174</width>
+                 <height>35</height>
+                </size>
+               </property>
+               <property name="styleSheet">
+                <string notr="true">background-color: #095090; color: white; font-size: 19px;</string>
+               </property>
+               <property name="text">
+                <string>➕ Interface</string>
+               </property>
+              </widget>
+             </item>
+            </layout>
+           </item>
+          </layout>
          </widget>
         </item>
        </layout>

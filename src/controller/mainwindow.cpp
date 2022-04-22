@@ -23,6 +23,8 @@ MainWindow::MainWindow(QWidget *parent) :
     gClassDiagram = new GClassDiagram(scene, new ClassDiagram("MyClassDiagram"));
 
     connect(ui->addClassButton, SIGNAL(pressed()), gClassDiagram, SLOT(addClassifier()));
+    connect(ui->addInterfaceButton, SIGNAL(pressed()), gClassDiagram, SLOT(addClassifierInterface()));
+
 
 //
 //    auto *rect1 = new GClassifier(-20, 20, 100, 150);
