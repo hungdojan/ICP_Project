@@ -4,6 +4,7 @@
 
 #include "UMLClass.h"
 #include "UMLOperation.h"
+#include "UMLRelation.h"
 #include <stdexcept>
 #include <algorithm>
 
@@ -24,10 +25,6 @@ std::string &UMLClass::stereotype() {
 
 const std::vector<UMLAttribute *> &UMLClass::attributes() const {
     return attributes_;
-}
-
-const std::unordered_set<UMLClassifier *> &UMLClass::parentClasses() const {
-    return parentClasses_;
 }
 
 bool UMLClass::addAttribute(UMLAttribute *attr) {
@@ -90,6 +87,7 @@ int UMLClass::getAttributesPosition(UMLAttribute *attr) {
 }
 
 bool UMLClass::moveAttributeToPosition(const std::string &name, int pos) {
+    // TODO:
     return false;
 }
 
@@ -123,9 +121,8 @@ UMLAttribute *UMLClass::removeAttribute(const std::string &name) {
                            [name](UMLAttribute *attr) { return name == attr->name(); })};
     if (iter == attributes_.end())
         return nullptr;
-    UMLAttribute *found = *iter;
     attributes_.erase(iter);
-    return found;
+    return *iter;
 }
 
 bool UMLClass::removeAttribute(UMLAttribute *attr) {
@@ -138,43 +135,36 @@ bool UMLClass::removeAttribute(UMLAttribute *attr) {
     return true;
 }
 
-bool UMLClass::addParentClass(UMLClassifier *parentClass) {
-    if (parentClass == nullptr)
+bool UMLClass::addRelation(UMLClassifier *dst) {
+    if (inRelationWith(dst))
         return false;
-    auto iter{std::find(parentClasses_.begin(), parentClasses_.end(), parentClass)};
-    if (iter != parentClasses_.end())
-        return false;
-    parentClasses_.insert(parentClass);
+    new UMLRelation(this, dst);
     return true;
 }
 
-bool UMLClass::removeParentClass(UMLClassifier *parentClass) {
-    if (parentClass == nullptr)
+bool UMLClass::removeRelation(UMLRelation *relation) {
+    auto iter{std::find(relations_.begin(), relations_.end(), relation)};
+    if (iter == relations_.end())
         return false;
-    auto iter{std::find(parentClasses_.begin(), parentClasses_.end(), parentClass)};
-    if (iter == parentClasses_.end())
-        return false;
-    parentClasses_.erase(iter);
+    relation->removeRelationDependency();
+    delete relation;
     return true;
 }
 
-UMLClassifier *UMLClass::removeParentClass(const std::string &parentClassName) {
-    auto iter{std::find_if(parentClasses_.begin(), parentClasses_.end(),
-                           [parentClassName](UMLClassifier *attr) { return attr->name() == parentClassName; })};
-    UMLClassifier *found{nullptr};
-    if (iter != parentClasses_.end()) {
-        found = *iter;
-        parentClasses_.erase(iter);
-    }
-    return found;
+bool UMLClass::removeRelation(UMLClassifier *dstClass) {
+    if (!inRelationWith(dstClass))
+        return false;
+    auto iter{std::find_if(relations_.begin(), relations_.end(),
+                           [&,dstClass](UMLRelation *r) { return r->compareClassesInRelation(this, dstClass); })};
+    if (iter == relations_.end())
+        return false;
+    (*iter)->removeRelationDependency();
+    delete *iter;
+    return true;
 }
 
 UMLClass::~UMLClass() {
     for (auto attr : attributes_) {
         delete attr;
     }
-    for (auto relation : relations_) {
-        // clean relations
-    }
-    attributes_.clear();
 }
