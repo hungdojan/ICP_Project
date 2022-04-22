@@ -4,22 +4,40 @@
 
 #ifndef DIAGRAMEDITOR_UMLRELATION_H
 #define DIAGRAMEDITOR_UMLRELATION_H
-#include "UMLClass.h"
-
+#include "UMLClassifier.h"
 
 class UMLRelation {
-    UMLClass *src_;
-    UMLClass *dst_;
-    // TODO: relation type
+public:
+    enum UMLRelationType {
+        ASSOCIATION,
+        DIR_ASSOCIATION,
+        REF_ASSOCIATION,
+        MULTIPLICITY,
+        AGGREGATION,
+        COMPOSITION,
+        INHERITANCE,
+        REALIZATION,
+        UNDEFINED
+    };
+private:
+    UMLClassifier *src_;
+    UMLClassifier *dst_;
+    UMLRelationType relationType_;
+    std::string relationMsg_;
     std::string srcMsg_;
     std::string dstMsg_;
 public:
     UMLRelation() =delete;
     // Class constructor
-    UMLRelation(UMLClass *src, UMLClass *dst);
-    // TODO: constructor with relation type
-    const UMLClass *src() const;
-    const UMLClass *dst() const;
+    explicit UMLRelation(UMLClassifier *src, UMLClassifier *dst);
+    explicit UMLRelation(UMLClassifier *src, UMLClassifier *dst, UMLRelationType relationType);
+
+    const UMLClassifier *src() const;
+    const UMLClassifier *dst() const;
+    void setRelationType(const UMLRelationType &relationType);
+    const UMLRelationType &relationType() const;
+    std::string &relationMsg();
+    const std::string &relationMsg() const;
     std::string &srcMsg();
     const std::string &srcMsg() const;
     std::string &dstMsg();
@@ -31,7 +49,7 @@ public:
     // Removes this relation from both source and destination classes
     void removeRelationDependency();
     // Compare if this relation is between two given classes
-    bool compareClassesInRelation(const UMLClass *cls1, const UMLClass *cls2);
+    bool compareClassesInRelation(const UMLClassifier *cls1, const UMLClassifier *cls2);
 
     // operator==(UMLRelation &relation, UMLRelation &relation2);
 };
