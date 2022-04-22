@@ -9,19 +9,25 @@
 #include <QGraphicsRectItem>
 #include "GRelation.h"
 #include "UMLClassifier.h"
+#include "GText.h"
 
 class GClassifier: public QObject, public QGraphicsRectItem{
 Q_OBJECT
 public:
-    GClassifier(qreal x, qreal y, qreal width, qreal height, QGraphicsItem *parent = nullptr);
+    GClassifier(qreal x, qreal y, qreal width, qreal height, bool isInterface = false, QGraphicsItem *parent = nullptr);
     ~GClassifier();
     QVariant itemChange(GraphicsItemChange change, const QVariant & value);
     UMLClassifier *umlClassifier;
+    std::vector<GText*> gTextAttributes;
 signals:
     void gClassifierPositionChanged();
     void gClassifierSelectionChanged();
+    void gTextChanged();
+    void centerText();
 private:
-    QGraphicsTextItem *title;
+    GText *title;
+    GText *classificType;
+    bool isInterface;
 private slots:
     void contentSaved();
 };

@@ -8,8 +8,7 @@
 class GClassSettings: public QObject {
 Q_OBJECT
 public:
-    GClassSettings(QTreeWidget *tree);
-//    void loadCategories();
+    explicit GClassSettings(QTreeWidget *tree);
     void hideContent();
     void loadContent(GClassifier *gClassifier);
     QString title;
@@ -23,13 +22,13 @@ private:
     QTreeWidgetItem *addSavePanel();
     std::vector<QTreeWidgetItem*> categories;
     void addDeleteAndAddRow(QTreeWidgetItem *category);
-    QTreeWidgetItem *addCategoryHeader(QString name);
+    QTreeWidgetItem *addCategoryHeader(const QString name);
 
 public:
 signals:
     void contentSaved();
 private slots:
-    void addRow(QWidget *);
+    void addRow(QWidget *, const QString &type = QString(), const QString &name = QString());
     void deleteRow();
     void selectionChanged();
     void saveContent();

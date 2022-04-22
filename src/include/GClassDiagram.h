@@ -23,6 +23,7 @@ public:
 //    ~GClassDiagram();
 private slots:
     void addClassifier();
+    void addClassifierInterface();
     void onGClassifierSelectionChanged();
 private:
     ClassDiagram *classDiagramModel;
