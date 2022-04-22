@@ -10,17 +10,13 @@
 #include <list>
 #include <unordered_set>
 
-class UMLRelation;
-
 class UMLClass : public UMLClassifier {
-    std::unordered_set<UMLClassifier *> parentClasses_;
     std::vector<UMLAttribute *> attributes_;
-    std::unordered_set<UMLRelation *> relations_;
     std::string stereotype_;
 public:
     UMLClass() =delete;
     // Class constructor
-    explicit UMLClass(const std::string &name) : UMLClassifier{name} { };
+    explicit UMLClass(const std::string &name) : UMLClassifier{name, true} { };
     // Class constructor
     explicit UMLClass(const std::string& name, const std::vector<UMLAttribute *>&attributes);
 
@@ -30,9 +26,7 @@ public:
     // public getter, private setter
     const std::vector<UMLAttribute *> &attributes() const;
     // public getter, private setter
-    const std::unordered_set<UMLClassifier *> &parentClasses() const;
 
-    // TODO: add getter and setter for relations
     // Adds new attribute to hte class
     bool addAttribute(UMLAttribute *attr);
     // Adds new attribute to the class
@@ -55,17 +49,17 @@ public:
     UMLAttribute *removeAttribute(const std::string &name);
     // Removes attribute from the class
     bool removeAttribute(UMLAttribute *attr);
-    // Adds new parent class
-    bool addParentClass(UMLClassifier *parentClass);
-    // Removes class from the set of parent classes
-    bool removeParentClass(UMLClassifier *parentClass);
-    // Removes class from the set of parent classes
-    UMLClassifier *removeParentClass(const std::string &parentClassName);
+    // // Adds new parent class
+    // bool addParentClass(UMLClassifier *parentClass) override;
+    // // Removes class from the set of parent classes
+    // bool removeParentClass(UMLClassifier *parentClass) override;
+    // // Removes class from the set of parent classes
+    // UMLClassifier *removeParentClass(const std::string &parentClassName) override;
 
-    // TODO: function for relations
-    // TODO: destructor
+    bool addRelation(UMLClassifier *dst) override;
+    bool removeRelation(UMLRelation *relation)  override;
+    bool removeRelation(UMLClassifier *dstClass) override;
     ~UMLClass();
 };
-
 
 #endif //DIAGRAMEDITOR_UMLCLASS_H

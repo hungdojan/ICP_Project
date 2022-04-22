@@ -1,8 +1,17 @@
 #include "UMLInterface.h"
+#include "UMLRelation.h"
 #include <algorithm>
 
-UMLInterface::UMLInterface(const std::string &name) : UMLClassifier(name) {
+UMLInterface::UMLInterface(const std::string &name) : UMLClassifier(name, true) {
     isAbstract_ = true;
+}
+
+UMLInterface::UMLInterface(const std::string &name, const std::vector<UMLOperation *> &operations)
+        : UMLClassifier(name, true) {
+    isAbstract_ = true;
+    for (auto operation : operations) {
+        addOperation(operation);
+    }
 }
 
 bool UMLInterface::addOperation(UMLOperation *operation) {
@@ -25,7 +34,7 @@ UMLOperation *UMLInterface::getOperation(const std::string &name) const {
     return *iter;
 }
 
-const bool UMLInterface::containsOperation(const UMLOperation *operation) const {
+bool UMLInterface::containsOperation(const UMLOperation *operation) const {
     if (operation == nullptr)
         return false;
     auto iter{std::find(operations_.begin(), operations_.end(), operation)};
@@ -46,40 +55,41 @@ bool UMLInterface::removeOperation(UMLOperation *operation) {
     return true;
 }
 
-bool UMLInterface::addParentClassifier(UMLInterface *interface) {
-    if (interface == nullptr)
-        return false;
+void UMLInterface::addOperations(const std::vector<UMLOperation *> &operations) {
+    for (auto o : operations) {
+        addOperation(o);
+    }
+}
 
-    auto iter{std::find(parentInterfaces_.begin(), parentInterfaces_.end(), interface)};
-    if (iter != parentInterfaces_.end())
+bool UMLInterface::addRelation(UMLClassifier *dst) {
+    if (inRelationWith(dst))
         return false;
-    parentInterfaces_.insert(interface);
+    new UMLRelation(this, dst);
     return true;
 }
 
-const std::unordered_set<UMLInterface *> &UMLInterface::parentInterfaces() const {
-    return parentInterfaces_;
+bool UMLInterface::removeRelation(UMLRelation *relation) {
+    auto iter{std::find(relations_.begin(), relations_.end(), relation)};
+    if (iter == relations_.end())
+        return false;
+    relation->removeRelationDependency();
+    delete relation;
+    return true;
 }
 
-const bool UMLInterface::containsParentInterface(UMLInterface *interface) const {
-    if (interface == nullptr)
+bool UMLInterface::removeRelation(UMLClassifier *dstClass) {
+    if (!inRelationWith(dstClass))
         return false;
-    auto iter{std::find(parentInterfaces_.begin(), parentInterfaces_.end(),interface)};
-    return iter == parentInterfaces_.end();
-}
-
-bool UMLInterface::removeParentInterface(UMLInterface *interface) {
-    if (interface == nullptr)
+    auto iter{std::find_if(relations_.begin(), relations_.end(),
+                           [&,dstClass](UMLRelation *r) { return r->compareClassesInRelation(this, dstClass); })};
+    if (iter == relations_.end())
         return false;
-    auto iter{std::find(parentInterfaces_.begin(), parentInterfaces_.end(), interface)};
-    if (iter == parentInterfaces_.end())
-        return false;
-    parentInterfaces_.erase(iter);
+    (*iter)->removeRelationDependency();
+    delete *iter;
     return true;
 }
 
 UMLInterface::~UMLInterface() {
     for (auto o : operations_)
         delete o;
-    // TODO: relation
 }
