@@ -111,3 +111,8 @@ std::ostream &operator<<(std::ostream &strm, const UMLOperation &operation) {
     std::string str{operation};
     return strm << str;
 }
+
+UMLOperation::~UMLOperation() {
+    if (!type_->isUserDefined())
+        delete type_;
+}

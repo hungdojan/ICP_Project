@@ -127,3 +127,57 @@ TEST_F(BasicTests, ReplaceClassifier) {
     ASSERT_EQ(classDiagram.classElements().size(), 1);
     delete cls1;
 }
+
+TEST_F(BasicTests, RemoveClassifierByName) {
+    UMLClassifier *cls1 = ClassDiagram::createClassifier("cls1", ClassDiagram::CLASSIFIER);
+    UMLClassifier *cls2 = ClassDiagram::createClassifier("cls2", ClassDiagram::CLASSIFIER);
+    UMLClass *cls3 = dynamic_cast<UMLClass *>(ClassDiagram::createClassifier("cls3", ClassDiagram::CLASS));
+    UMLClass *cls4 = dynamic_cast<UMLClass *>(ClassDiagram::createClassifier("cls4", ClassDiagram::CLASS));
+
+    classDiagram.addClassifiers({cls1, cls2, cls3, cls4});
+
+    ASSERT_EQ(classDiagram.classElements().size(), 4);
+
+    for (int i = 0; i < 4; i++) {
+        std::ostringstream stream;
+        stream << "cls" << i;
+        if (i == 0)
+            ASSERT_FALSE(classDiagram.removeClassElement(stream.str()));
+        else
+            ASSERT_TRUE(classDiagram.removeClassElement(stream.str()));
+    }
+
+    ASSERT_EQ(classDiagram.classElements().size(), 1);
+    ASSERT_EQ(classDiagram.getClassifier("cls4"), cls4);
+    ASSERT_TRUE(classDiagram.removeClassElement(cls4));
+    delete cls1; delete cls2; delete cls3; delete cls4;
+}
+
+TEST_F(BasicTests, ChangeClassName) {
+    UMLClassifier *cls1 = ClassDiagram::createClassifier("cls1", ClassDiagram::CLASSIFIER);
+    UMLClassifier *cls2 = ClassDiagram::createClassifier("cls2", ClassDiagram::CLASSIFIER);
+    UMLClass *cls3 = dynamic_cast<UMLClass *>(ClassDiagram::createClassifier("cls3", ClassDiagram::CLASS));
+    UMLClass *cls4 = dynamic_cast<UMLClass *>(ClassDiagram::createClassifier("cls4", ClassDiagram::CLASS));
+    UMLClass *cls5 = dynamic_cast<UMLClass *>(ClassDiagram::createClassifier("cls5", ClassDiagram::CLASS));
+
+    classDiagram.addClassifiers({cls1, cls2, cls3, cls4});
+
+    ASSERT_TRUE(classDiagram.changeClassifierName("cls1", "Cls1"));
+    ASSERT_TRUE(classDiagram.changeClassifierName("cls2", "cls1"));
+    ASSERT_FALSE(classDiagram.changeClassifierName("cls3", "cls4"));
+
+    ASSERT_EQ(cls3, classDiagram.getClassifier("cls3"));
+    ASSERT_EQ(cls4, classDiagram.getClassifier("cls4"));
+
+    ASSERT_FALSE(classDiagram.changeClassifierName(cls5, "cls5"));
+    ASSERT_FALSE(classDiagram.changeClassifierName(cls3, "cls4"));
+    ASSERT_FALSE(classDiagram.changeClassifierName(cls3, "cls3"));
+    ASSERT_TRUE(classDiagram.changeClassifierName(cls4, "cls5"));
+
+    ASSERT_EQ(classDiagram.getClassifier("cls5"), cls4);
+    ASSERT_EQ(classDiagram.getClassifier("cls3"), cls3);
+    ASSERT_EQ(classDiagram.getClassifier("cls1"), cls2);
+    ASSERT_EQ(classDiagram.getClassifier("Cls1"), cls1);
+
+    delete cls5;
+}

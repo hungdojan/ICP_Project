@@ -15,10 +15,6 @@ const bool &UMLClassifier::isUserDefined() const {
     return isUserDefined_;
 }
 
-bool &UMLClassifier::isUserDefined() {
-    return isUserDefined_;
-}
-
 const bool &UMLClassifier::isAbstract() const {
     return isAbstract_;
 }

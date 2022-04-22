@@ -15,7 +15,7 @@ class UMLRelation;
 class UMLClass : public UMLClassifier {
     std::unordered_set<UMLClassifier *> parentClasses_;
     std::vector<UMLAttribute *> attributes_;
-    std::unordered_set<UMLRelation *> relations;
+    std::unordered_set<UMLRelation *> relations_;
     std::string stereotype_;
 public:
     UMLClass() =delete;
@@ -64,7 +64,7 @@ public:
 
     // TODO: function for relations
     // TODO: destructor
-    ~UMLClass() =default;
+    ~UMLClass();
 };
 
 

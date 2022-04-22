@@ -24,7 +24,7 @@ public:
     bool removeParentInterface(UMLInterface *interface);
 
     // TODO: destructor
-    ~UMLInterface() =default;
+    ~UMLInterface();
 };
 
 #endif //DIAGRAMEDITOR_UMLINTERFACE_H

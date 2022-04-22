@@ -17,7 +17,7 @@ public:
     // Class constructor
     explicit UMLAttribute(const std::string &name, UMLClassifier *classifier) : Element(name), type_{classifier} { }
     // Updates attributes name
-    void setName(const std::string &name);
+    void setName(const std::string &name) override;
     // Returns attribute's visibility
     char &visibility();
     // Returns attribute's type
@@ -28,7 +28,7 @@ public:
     bool operator==(UMLAttribute &attr) const;
     virtual explicit operator std::string() const;
     friend std::ostream& operator<<(std::ostream &strm, const UMLAttribute &attr);
-    ~UMLAttribute() =default;
+    ~UMLAttribute();
 };
 
 
