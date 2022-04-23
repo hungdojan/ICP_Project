@@ -10,11 +10,12 @@
 #include "GRelation.h"
 #include "UMLClassifier.h"
 #include "GText.h"
+#include "ClassDiagram.h"
 
 class GClassifier: public QObject, public QGraphicsRectItem{
 Q_OBJECT
 public:
-    GClassifier(qreal x, qreal y, qreal width, qreal height, bool isInterface = false, QGraphicsItem *parent = nullptr);
+    GClassifier(std::string name, qreal x, qreal y, qreal width, qreal height, ClassDiagram *classDiagram, bool isInterface = false, QGraphicsItem *parent = nullptr);
     ~GClassifier();
     QVariant itemChange(GraphicsItemChange change, const QVariant & value);
     UMLClassifier *umlClassifier;
@@ -28,6 +29,7 @@ private:
     GText *title;
     GText *classificType;
     bool isInterface;
+    ClassDiagram *classDiagram;
 private slots:
     void contentSaved();
 };

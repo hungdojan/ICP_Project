@@ -11,8 +11,8 @@
 #include <QDebug>
 #include <QLabel>
 
-GClassifier::GClassifier(qreal x, qreal y, qreal width, qreal height, bool isInterface, QGraphicsItem *parent) :
-        QGraphicsRectItem(x, y, width, height, parent), QObject(), isInterface{isInterface}{
+GClassifier::GClassifier(std::string name, qreal x, qreal y, qreal width, qreal height, ClassDiagram *classDiagram, bool isInterface, QGraphicsItem *parent) :
+        QGraphicsRectItem(x, y, width, height, parent), QObject(), classDiagram{classDiagram}, isInterface{isInterface}{
 
     setFlag(QGraphicsItem::ItemIsMovable);
     setFlag(QGraphicsItem::ItemIsSelectable);
@@ -20,20 +20,21 @@ GClassifier::GClassifier(qreal x, qreal y, qreal width, qreal height, bool isInt
     setBrush(QBrush(Qt::white));
 
     if(isInterface) {
-        umlClassifier = ClassDiagram::createClassifier("todo_name", ClassDiagram::INTERFACE);
+        umlClassifier = ClassDiagram::createClassifier(name, ClassDiagram::INTERFACE);
         // todo DEMO DATA SEED
         if(dynamic_cast<UMLInterface*>(umlClassifier)) {
             dynamic_cast<UMLInterface *>(umlClassifier)->addOperation(new UMLOperation("Itodo_oper", new UMLClassifier("void")));
         }
     }
     else {
-        umlClassifier = ClassDiagram::createClassifier("todo_name", ClassDiagram::CLASS);
+        umlClassifier = ClassDiagram::createClassifier(name, ClassDiagram::CLASS);
         // todo DEMO DATA SEED
         if(dynamic_cast<UMLClass*>(umlClassifier)) {
             dynamic_cast<UMLClass *>(umlClassifier)->addAttribute(new UMLAttribute("todo_attrib", new UMLClassifier("int")));
             dynamic_cast<UMLClass *>(umlClassifier)->addAttribute(new UMLOperation("Ctodo_oper", new UMLClassifier("void")));
         }
     }
+    classDiagram->addClassifier(umlClassifier);
 
 
     auto *titleRect = new QGraphicsRectItem(x,y, width, 50, this);
