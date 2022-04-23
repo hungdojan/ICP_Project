@@ -57,6 +57,9 @@ void UMLRelation::setRelationType(const UMLRelation::UMLRelationType &relationTy
         if (dynamic_cast<UMLInterface *>(src_) != nullptr && dynamic_cast<UMLInterface *>(dst_) == nullptr) {
             throw std::invalid_argument("Interface cannot derive from non-interface element");
         }
+        else if (src_ == dst_) {
+            throw std::invalid_argument("Class element cannot derive from itself.");
+        }
         src_->addParentClass(dst_);
     }
 }
@@ -65,10 +68,13 @@ const UMLRelation::UMLRelationType &UMLRelation::relationType() const {
     return relationType_;
 }
 
-bool UMLRelation::setRelationDependency() {
+void UMLRelation::setRelationDependency() {
     if (relationType_ == INHERITANCE) {
         if (dynamic_cast<UMLInterface *>(src_) != nullptr && dynamic_cast<UMLInterface *>(dst_) == nullptr) {
             throw std::invalid_argument("Interface cannot derive from non-interface element");
+        }
+        else if (src_ == dst_) {
+            throw std::invalid_argument("Class element cannot derive from itself.");
         }
         src_->addParentClass(dst_);
     }
@@ -77,6 +83,8 @@ bool UMLRelation::setRelationDependency() {
 }
 
 void UMLRelation::swapDirection() {
+    if (src_ == dst_)
+        return;
     if (relationType_ == INHERITANCE) {
         if (dynamic_cast<UMLInterface *>(dst_) != nullptr && dynamic_cast<UMLInterface *>(src_) == nullptr) {
             throw std::invalid_argument("Interface cannot derive from non-interface element");
@@ -90,16 +98,25 @@ void UMLRelation::swapDirection() {
 }
 
 
-void UMLRelation::removeRelationDependency() {
+void UMLRelation::removeRelationDependency(UMLClassifier *src) {
     if (relationType_ == INHERITANCE) {
         src_->removeParentClass(dst_);
     }
-    auto srcRelation{std::find(src_->relations_.begin(), src_->relations_.end(), this)};
-    if (srcRelation != src_->relations_.end())
-        src_->relations_.erase(srcRelation);
-    auto dstRelation{std::find(dst_->relations_.begin(), dst_->relations_.end(), this)};
-    if (srcRelation != dst_->relations_.end())
-        dst_->relations_.erase(dstRelation);
+    if (src_ != src && dst_ != src)
+        throw std::invalid_argument("Parameter src MUST be instance of src_ or dst_");
+    if (src_ == dst_)
+        return;
+
+    if (src == src_) {
+        auto dstRelation{std::find(dst_->relations_.begin(), dst_->relations_.end(), this)};
+        if (dstRelation != dst_->relations_.end())
+            dst_->relations_.erase(dstRelation);
+    }
+    else {
+        auto srcRelation{std::find(src_->relations_.begin(), src_->relations_.end(), this)};
+        if (srcRelation != src_->relations_.end())
+            src_->relations_.erase(srcRelation);
+    }
 }
 
 bool UMLRelation::compareClassesInRelation(const UMLClassifier *cls1, const UMLClassifier *cls2) {

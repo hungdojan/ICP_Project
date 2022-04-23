@@ -146,7 +146,8 @@ bool UMLClass::removeRelation(UMLRelation *relation) {
     auto iter{std::find(relations_.begin(), relations_.end(), relation)};
     if (iter == relations_.end())
         return false;
-    relation->removeRelationDependency();
+    relations_.erase(iter);
+    relation->removeRelationDependency(this);
     delete relation;
     return true;
 }
@@ -158,7 +159,8 @@ bool UMLClass::removeRelation(UMLClassifier *dstClass) {
                            [&,dstClass](UMLRelation *r) { return r->compareClassesInRelation(this, dstClass); })};
     if (iter == relations_.end())
         return false;
-    (*iter)->removeRelationDependency();
+    (*iter)->removeRelationDependency(this);
+    relations_.erase(iter);
     delete *iter;
     return true;
 }
