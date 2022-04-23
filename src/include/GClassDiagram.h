@@ -30,6 +30,7 @@ private:
     GraphicsScene *scene_;
     std::vector<GClassifier*> gClassifiers;
     GClassSettings *gClassSettings;
+    int name_index{0};
 };
 
 #endif //DIAGRAMEDITOR_GCLASSDIAGRAM_H

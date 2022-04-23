@@ -12,11 +12,11 @@
 #include "mainwindow.h"
 
 GClassDiagram::GClassDiagram(GraphicsScene *scene, ClassDiagram *model) : scene_{scene}, classDiagramModel{model} {
-    gClassSettings = new GClassSettings(((MainWindow*)scene->parent())->getCategoryTree());
+    gClassSettings = new GClassSettings(((MainWindow*)scene->parent())->getCategoryTree(), classDiagramModel);
 }
 
 void GClassDiagram::addClassifier() {
-    GClassifier *rect = new GClassifier(0, 0, 100, 150);
+    GClassifier *rect = new GClassifier("class"+std::to_string(name_index++), 0, 0, 100, 150, classDiagramModel);
     scene_->addItem(rect);
     connect(rect, SIGNAL(gClassifierSelectionChanged()), this, SLOT(onGClassifierSelectionChanged()));
     gClassifiers.push_back(rect);
@@ -27,7 +27,7 @@ void GClassDiagram::addClassifier() {
 }
 
 void GClassDiagram::addClassifierInterface() {
-    GClassifier *rect = new GClassifier(0, 0, 100, 150, true);
+    GClassifier *rect = new GClassifier("interface"+std::to_string(name_index++), 0, 0, 100, 150, classDiagramModel, true);
     scene_->addItem(rect);
     connect(rect, SIGNAL(gClassifierSelectionChanged()), this, SLOT(onGClassifierSelectionChanged()));
     gClassifiers.push_back(rect);
