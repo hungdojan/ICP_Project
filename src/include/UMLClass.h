@@ -59,7 +59,7 @@ public:
     bool addRelation(UMLClassifier *dst) override;
     bool removeRelation(UMLRelation *relation)  override;
     bool removeRelation(UMLClassifier *dstClass) override;
-    ~UMLClass();
+    ~UMLClass() override;
 };
 
 #endif //DIAGRAMEDITOR_UMLCLASS_H

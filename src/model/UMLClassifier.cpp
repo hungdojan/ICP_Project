@@ -87,6 +87,14 @@ bool UMLClassifier::inRelationWith(UMLClassifier *dst) const {
     return iter != relations_.end();
 }
 
+UMLRelation *UMLClassifier::getRelationWith(UMLClassifier *dst) {
+    auto iter{std::find_if(relations_.begin(), relations_.end(),
+                           [&,dst](UMLRelation *r) { return r->compareClassesInRelation(this, dst); })};
+    if (iter == relations_.end())
+        return nullptr;
+    return *iter;
+}
+
 bool UMLClassifier::removeRelation(UMLClassifier *dstClass) {
     throw std::invalid_argument("Cannot use function removeRelation with UMLClassifier");
 }

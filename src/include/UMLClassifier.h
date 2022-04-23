@@ -43,10 +43,11 @@ public:
 
     virtual bool addRelation(UMLClassifier *dst);
     virtual bool inRelationWith(UMLClassifier *dst) const;
+    virtual UMLRelation *getRelationWith(UMLClassifier *dst);
     virtual bool removeRelation(UMLRelation *relation);
     virtual bool removeRelation(UMLClassifier *dstClass);
 
-    ~UMLClassifier();
+    ~UMLClassifier() override;
 };
 
 

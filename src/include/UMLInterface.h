@@ -29,7 +29,7 @@ public:
     bool removeRelation(UMLClassifier *dstClass) override;
 
     // TODO: destructor
-    ~UMLInterface();
+    ~UMLInterface() override;
 };
 
 #endif //DIAGRAMEDITOR_UMLINTERFACE_H

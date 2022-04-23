@@ -28,7 +28,7 @@ public:
     bool operator==(UMLAttribute &attr) const;
     virtual explicit operator std::string() const;
     friend std::ostream& operator<<(std::ostream &strm, const UMLAttribute &attr);
-    ~UMLAttribute();
+    ~UMLAttribute() override;
 };
 
 
