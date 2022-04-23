@@ -1,3 +1,11 @@
+/**
+ * @brief Main entry point of program.
+ *
+ * @file main.cpp
+ * @date 22/04/2022
+ * @authors Hung Do     (xdohun00)
+ *          David Kedra (xkedra00)
+ */
 #include <QApplication>
 #include "mainwindow.h"
 

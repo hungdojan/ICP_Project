@@ -1,12 +1,22 @@
-//
-// Created by rebulien on 4/2/22.
-//
+/**
+ * @brief Definition of ClassDiagram class.
+ * This file contains implementations of all functions of ClassDiagram class.
+ *
+ * This source code serves as submission for semester assignment of class ICP at FIT, BUT 2021/22
+ *
+ * @file ClassDiagram.cpp
+ * @date 22/04/2022
+ * @authors Hung Do     (xdohun00)
+ *          David Kedra (xkedra00)
+ */
 
 #include <algorithm>
 #include <list>
-#include <utility>
 #include "ClassDiagram.h"
 #include "UMLInterface.h"
+#include <QJsonDocument>
+#include <QJsonObject>
+#include <QString>
 
 void ClassDiagram::setName(const std::string& newName) {
     Element::setName(newName);
@@ -20,17 +30,17 @@ const std::vector<SequenceDiagram *>& ClassDiagram::sequenceDiagrams() const {
     return sequenceDiagrams_;
 }
 
-void ClassDiagram::initClassDiagramFromFile(ClassDiagram &classDiagram, std::string path) {
+ClassDiagram *ClassDiagram::initClassDiagramFromFile(const std::string &path) {
     // TODO: name will be passed from the file content
 }
-void ClassDiagram::saveClassDiagramToFile(std::string path) {
+void ClassDiagram::saveClassDiagramToFile(const std::string &path) {
     // TODO:
 }
 
-UMLClassifier *ClassDiagram::createClassifier(std::string name, ClassElementType classElementType) {
+UMLClassifier *ClassDiagram::createClassifier(const std::string& name, ClassElementType classElementType) {
     switch(classElementType) {
         case CLASSIFIER:
-            return new UMLClassifier(name);
+            return new UMLClassifier(name, true);
         case CLASS:
             return new UMLClass(name);
         case INTERFACE:
@@ -41,6 +51,8 @@ UMLClassifier *ClassDiagram::createClassifier(std::string name, ClassElementType
 }
 
 bool ClassDiagram::addClassifier(UMLClassifier *classifier) {
+    // search for class element with identical name
+    // ignore insertion when diagram contain class element with identical name
     auto iter { std::find_if(classElements_.begin(), classElements_.end(),
                              [&classifier] (UMLClassifier *item) { return item->name() == classifier->name(); })};
 
@@ -52,6 +64,8 @@ bool ClassDiagram::addClassifier(UMLClassifier *classifier) {
 }
 
 UMLClassifier *ClassDiagram::addOrReplaceClassifier(UMLClassifier *classifier) {
+    // search for class element with given name
+    // remove it and replace it with _classifier_ when instance found
     auto iter{ std::find_if(classElements_.begin(), classElements_.end(),
                             [classifier](UMLClassifier *c) { return c->name() == classifier->name(); })};
 
@@ -61,12 +75,18 @@ UMLClassifier *ClassDiagram::addOrReplaceClassifier(UMLClassifier *classifier) {
         classElements_.erase(iter);
     }
     classElements_.push_back(classifier);
+    // return result for user to handle resources
     return found;
 }
 
-void ClassDiagram::addClassifiers(std::vector<UMLClassifier *> classifiers) {
+void ClassDiagram::addClassifiers(const std::vector<UMLClassifier *>& classifiers, bool cleanUnsuccessful) {
     for (auto item : classifiers) {
-        addClassifier(item);
+        // deletes classifiers when classifier with same name already in the diagram
+        if (item == nullptr)
+            continue;
+        if (!addClassifier(item) && cleanUnsuccessful) {
+            delete item;
+        }
     }
 }
 
@@ -85,7 +105,7 @@ bool ClassDiagram::changeClassifierName(UMLClassifier *classifier, const std::st
     return false;
 }
 
-bool ClassDiagram::changeClassifierName(std::string oldName, std::string newName) {
+bool ClassDiagram::changeClassifierName(const std::string& oldName, const std::string& newName) {
     // check parameters
     // list ClassDiagram::classElements_ must contain classifier named _oldName_
     // and must not contain instance of classifier that has identical name as _newName_
@@ -100,7 +120,9 @@ bool ClassDiagram::changeClassifierName(std::string oldName, std::string newName
     return false;
 }
 
-UMLClassifier *ClassDiagram::getClassifier(std::string name) {
+UMLClassifier *ClassDiagram::getClassifier(const std::string &name) const {
+    // search for class element within diagram
+    // return result
     auto iter{std::find_if(classElements_.begin(), classElements_.end(),
                            [name](UMLClassifier *c) { return name == c->name(); })};
     if (iter != classElements_.end())
@@ -108,32 +130,23 @@ UMLClassifier *ClassDiagram::getClassifier(std::string name) {
     return nullptr;
 }
 
-UMLClass *ClassDiagram::getClass(std::string name) {
-    auto iter{std::find_if(classElements_.begin(), classElements_.end(),
-                           [name](UMLClassifier *c) { return c->name() == name && dynamic_cast<UMLClass *>(c) != nullptr; })};
-
-    if (iter != classElements_.end())
-        return dynamic_cast<UMLClass *>(*iter);
-    return nullptr;
-}
-
-bool ClassDiagram::isInClassDiagram(const UMLClassifier *classifier) {
+bool ClassDiagram::isInClassDiagram(const UMLClassifier *classifier) const {
     return std::find(classElements_.begin(), classElements_.end(), classifier) != classElements_.end();
 }
 
-// TODO: change return type
-UMLClassifier *ClassDiagram::removeClassElement(std::string name) {
+UMLClassifier *ClassDiagram::removeClassElement(const std::string &name) {
+    // if search for class element ends up successfully
+    // remove it and return in to user to handle resources
     auto iter{std::find_if(classElements_.begin(), classElements_.end(),
                            [name](UMLClassifier *c) { return c->name() == name; })};
     if (iter == classElements_.end())
         return nullptr;
-    UMLClassifier *classifier{*iter};
     classElements_.erase(iter);
-    return classifier;
+    return *iter;
 }
 
-bool ClassDiagram::removeClassElement(UMLClassifier *classElement) {
-    auto iter{std::find(classElements_.begin(), classElements_.end(), classElement)};
+bool ClassDiagram::removeClassElement(UMLClassifier *classifier) {
+    auto iter{std::find(classElements_.begin(), classElements_.end(), classifier)};
     if (iter == classElements_.end())
         return false;
     classElements_.erase(iter);

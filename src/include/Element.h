@@ -1,6 +1,14 @@
-//
-// Created by rebulien on 4/2/22.
-//
+/**
+ * @brief Declaration of Element class
+ * Element is base class for (almost) all elements within ClassDiagram.
+ *
+ * This source code serves as submission for semester assignment of class ICP at FIT, BUT 2021/22
+ *
+ * @file Element.h
+ * @date 22/04/2022
+ * @authors Hung Do     (xdohun00)
+ *          David Kedra (xkedra00)
+ */
 
 #ifndef DIAGRAMEDITOR_ELEMENT_H
 #define DIAGRAMEDITOR_ELEMENT_H
