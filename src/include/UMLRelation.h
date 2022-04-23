@@ -43,14 +43,15 @@ public:
     std::string &dstMsg();
     const std::string &dstMsg() const;
     // Adds this relation to bot source and destination classes
-    bool setRelationDependency();
+    void setRelationDependency();
     // Swap source and destination classes
     void swapDirection();
     // Removes this relation from both source and destination classes
-    void removeRelationDependency();
+    void removeRelationDependency(UMLClassifier *src);
     // Compare if this relation is between two given classes
     bool compareClassesInRelation(const UMLClassifier *cls1, const UMLClassifier *cls2);
 
+    ~UMLRelation() =default;
     // operator==(UMLRelation &relation, UMLRelation &relation2);
 };
 

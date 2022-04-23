@@ -1,6 +1,13 @@
-//
-// Created by rebulien on 4/2/22.
-//
+/**
+ * @brief Definition of UMLClassifier class.
+ *
+ * This source code serves as submission for semester assignment of class ICP at FIT, BUT 2021/22.
+ *
+ * @file UMLClassifier.cpp
+ * @date 22/04/2022
+ * @authors Hung Do     (xdohun00)
+ *          David Kedra (xkedra00)
+ */
 
 #include "UMLClassifier.h"
 #include "UMLAttribute.h"
@@ -27,8 +34,6 @@ bool &UMLClassifier::isAbstract() {
 
 UMLAttribute *UMLClassifier::createAttribute(bool isOperation, const std::string &name, UMLClassifier *type,
                                              const std::vector<UMLAttribute> &params) {
-    if (!isOperation && !params.empty())
-        throw std::invalid_argument("Attribute instance cannot have parameters");
     if (isOperation)
         return new UMLOperation(name, type, params);
     return new UMLAttribute(name, type);
@@ -45,11 +50,9 @@ const std::unordered_set<UMLRelation *> &UMLClassifier::relations() const {
 bool UMLClassifier::addParentClass(UMLClassifier *parentClass) {
     if (parentClass == nullptr)
         return false;
-    auto iter{std::find(parentClasses_.begin(), parentClasses_.end(), parentClass)};
-    if (iter != parentClasses_.end())
-        return false;
-    parentClasses_.insert(parentClass);
-    return true;
+    // return insertion result
+    auto result = parentClasses_.insert(parentClass);
+    return result.second;
 }
 
 bool UMLClassifier::containsParentClass(UMLClassifier *parentClass) const {
@@ -103,17 +106,19 @@ bool UMLClassifier::removeRelation(UMLRelation *relation) {
     throw std::invalid_argument("Cannot use function removeRelation with UMLClassifier");
 }
 
-UMLClassifier::~UMLClassifier() {
+void UMLClassifier::clearRelations() {
+    // removes dependency of each relation, clear up resources
+    // and clear whole collection afterwards
     for (auto r : relations_) {
-        r->removeRelationDependency();
-        delete r;
-    }
-}
-
-void UMLClassifier::removeAllRelation() {
-    for (auto r : relations_) {
-        r->removeRelationDependency();
+        r->removeRelationDependency(this);
         delete r;
     }
     relations_.clear();
+}
+
+UMLClassifier::~UMLClassifier() {
+    for (auto r : relations_) {
+        r->removeRelationDependency(this);
+        delete r;
+    }
 }
