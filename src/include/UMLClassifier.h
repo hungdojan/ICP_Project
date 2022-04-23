@@ -46,6 +46,7 @@ public:
     virtual UMLRelation *getRelationWith(UMLClassifier *dst);
     virtual bool removeRelation(UMLRelation *relation);
     virtual bool removeRelation(UMLClassifier *dstClass);
+    virtual void removeAllRelation();
 
     ~UMLClassifier() override;
 };

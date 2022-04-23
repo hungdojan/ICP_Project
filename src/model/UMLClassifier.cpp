@@ -109,3 +109,11 @@ UMLClassifier::~UMLClassifier() {
         delete r;
     }
 }
+
+void UMLClassifier::removeAllRelation() {
+    for (auto r : relations_) {
+        r->removeRelationDependency();
+        delete r;
+    }
+    relations_.clear();
+}
