@@ -51,6 +51,12 @@ public:
     // Compare if this relation is between two given classes
     bool compareClassesInRelation(const UMLClassifier *cls1, const UMLClassifier *cls2);
 
+    /**
+     * @brief Creates JSON representation of element's content.
+     * @param object Reference to QJsonObject instance.
+     */
+    void createObject(QJsonObject &object);
+
     ~UMLRelation() =default;
     // operator==(UMLRelation &relation, UMLRelation &relation2);
 };

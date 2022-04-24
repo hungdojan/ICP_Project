@@ -8,6 +8,11 @@ class UMLMessage : public Element {
 public:
     UMLMessage() =delete;
     explicit UMLMessage(const std::string &name, UMLOperation *baseOperation) : Element{name}, baseOperation_{baseOperation} { }
+    /**
+     * @brief Creates JSON representation of element's content.
+     * @param object Reference to QJsonObject instance.
+     */
+    virtual void createObject(QJsonObject &object) { /* TODO: */ };
 
 
 };

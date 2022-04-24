@@ -18,6 +18,7 @@
 #include "UMLClassifier.h"
 #include "UMLClass.h"
 #include "SequenceDiagram.h"
+#include <QJsonObject>
 
 /**
  * @brief Representation of class diagram.
@@ -62,20 +63,6 @@ public:
      * @return Collection of sequence diagrams.
      */
     const std::vector<SequenceDiagram *>& sequenceDiagrams() const;
-
-    /**
-     * Loads class diagram from file and creates new instance of ClassDiagram.
-     * @brief Loads class diagram from the file.
-     * @param path Path to file.
-     * @return New instance of ClassDiagram.
-     */
-    static ClassDiagram *initClassDiagramFromFile(const std::string &path);
-
-    /**
-     * @brief Saves class diagram into the file.
-     * @param path Path to file.
-     */
-    void saveClassDiagramToFile(const std::string &path);
 
     /**
      * Factory method that creates new instance of class elements. Attributes has to be added afterwards.
@@ -172,6 +159,11 @@ public:
      * @return Whether removal was successful. When function returns true, user can cleanup resources.
      */
     bool removeClassElement(UMLClassifier *classifier);
+
+    /**
+     * @brief Creates JSON representation of element's content.
+     */
+    void createObject(QJsonObject &object) override;
 
     // sequence diagram methods
     // TODO: add, search, remove

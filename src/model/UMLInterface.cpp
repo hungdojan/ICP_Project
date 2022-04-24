@@ -1,6 +1,7 @@
 #include "UMLInterface.h"
 #include "UMLRelation.h"
 #include <algorithm>
+#include <QJsonArray>
 
 UMLInterface::UMLInterface(const std::string &name) : UMLClassifier(name, true) {
     isAbstract_ = true;
@@ -61,11 +62,10 @@ void UMLInterface::addOperations(const std::vector<UMLOperation *> &operations) 
     }
 }
 
-bool UMLInterface::addRelation(UMLClassifier *dst) {
+UMLRelation *UMLInterface::addRelation(UMLClassifier *dst) {
     if (inRelationWith(dst))
-        return false;
-    new UMLRelation(this, dst);
-    return true;
+        return nullptr;
+    return new UMLRelation(this, dst);
 }
 
 bool UMLInterface::removeRelation(UMLRelation *relation) {
@@ -94,4 +94,31 @@ bool UMLInterface::removeRelation(UMLClassifier *dstClass) {
 UMLInterface::~UMLInterface() {
     for (auto o : operations_)
         delete o;
+}
+
+void UMLInterface::createObject(QJsonObject &object) {
+    object.insert("_class", "UMLInterface");
+    object.insert("name", QString::fromStdString(name_));
+    object.insert("isUserDefined", isUserDefined_);
+    object.insert("isAbstract", isAbstract_);
+    QJsonArray lofOperations;
+    for (auto o : operations_) {
+        QJsonObject obj;
+        o->createObject(obj);
+        lofOperations.push_back(obj);
+    }
+    object.insert("operations", lofOperations);
+}
+
+std::unordered_set<UMLAttribute *> UMLInterface::getOperations() const {
+    std::unordered_set<UMLAttribute *> operations;
+    operations.insert(operations_.begin(), operations_.end());
+    // get operations from base classes
+    for (auto cls : parentClasses_) {
+        for (auto a : cls->getOperations()) {
+            if (dynamic_cast<UMLOperation *>(a) != nullptr)
+                operations.insert(a);
+        }
+    }
+    return operations;
 }
