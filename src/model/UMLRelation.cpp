@@ -6,6 +6,7 @@
 #include "UMLInterface.h"
 #include <algorithm>
 #include <stdexcept>
+#include <QString>
 
 UMLRelation::UMLRelation(UMLClassifier *src, UMLClassifier *dst)
         : src_{src}, dst_{dst}, relationType_{ASSOCIATION}, srcMsg_{}, dstMsg_{} {
@@ -121,4 +122,13 @@ void UMLRelation::removeRelationDependency(UMLClassifier *src) {
 
 bool UMLRelation::compareClassesInRelation(const UMLClassifier *cls1, const UMLClassifier *cls2) {
     return (cls1 == src_ && cls2 == dst_) || (cls2 == src_ && cls1 == dst_);
+}
+
+void UMLRelation::createObject(QJsonObject &object) {
+    object.insert("_class", "UMLRelation");
+    object.insert("src", QString::fromStdString(src_->name()));
+    object.insert("dst", QString::fromStdString(dst_->name()));
+    object.insert("relationType", relationType_);
+    object.insert("dstMsg", QString::fromStdString(dstMsg_));
+    object.insert("srcMsg", QString::fromStdString(srcMsg_));
 }

@@ -14,9 +14,11 @@
 #include <list>
 #include "ClassDiagram.h"
 #include "UMLInterface.h"
-#include <QJsonDocument>
-#include <QJsonObject>
+#include "UMLRelation.h"
 #include <QString>
+#include <QJsonDocument>
+#include <QJsonArray>
+#include <fstream>
 
 void ClassDiagram::setName(const std::string& newName) {
     Element::setName(newName);
@@ -28,13 +30,6 @@ const std::vector<UMLClassifier *>& ClassDiagram::classElements() const {
 
 const std::vector<SequenceDiagram *>& ClassDiagram::sequenceDiagrams() const {
     return sequenceDiagrams_;
-}
-
-ClassDiagram *ClassDiagram::initClassDiagramFromFile(const std::string &path) {
-    // TODO: name will be passed from the file content
-}
-void ClassDiagram::saveClassDiagramToFile(const std::string &path) {
-    // TODO:
 }
 
 UMLClassifier *ClassDiagram::createClassifier(const std::string& name, ClassElementType classElementType) {
@@ -151,6 +146,32 @@ bool ClassDiagram::removeClassElement(UMLClassifier *classifier) {
         return false;
     classElements_.erase(iter);
     return true;
+}
+
+void ClassDiagram::createObject(QJsonObject &object) {
+    object.insert("_class", "ClassDiagram");
+    object.insert("name", QString::fromStdString(name_));
+    QJsonArray qClassElements, qSequenceDiagram, qRelations;
+    std::unordered_set<UMLRelation *> setOfRelations;
+    for (auto classifier : classElements_) {
+        QJsonObject obj;
+        classifier->createObject(obj);
+        qClassElements.push_back(obj);
+        for (auto r : classifier->relations()) {
+            setOfRelations.insert(r);
+        }
+    }
+    object.insert("classElements", qClassElements);
+
+    // TODO: sequence diagram
+    object.insert("sequenceDiagrams", qSequenceDiagram);
+
+    for (auto r : setOfRelations) {
+        QJsonObject obj;
+        r->createObject(obj);
+        qRelations.push_back(obj);
+    }
+    object.insert("relations", qRelations);
 }
 
 ClassDiagram::~ClassDiagram() {

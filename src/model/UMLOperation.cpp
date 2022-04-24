@@ -9,6 +9,8 @@
 #include <algorithm>
 #include <vector>
 #include <sstream>
+#include <QString>
+#include <QJsonArray>
 
 UMLOperation::UMLOperation(const std::string &name, UMLClassifier *type, std::vector<UMLAttribute> parameters)
     : UMLAttribute(name, type) {
@@ -115,4 +117,18 @@ std::ostream &operator<<(std::ostream &strm, const UMLOperation &operation) {
 UMLOperation::~UMLOperation() {
     if (!type_->isUserDefined())
         delete type_;
+}
+
+void UMLOperation::createObject(QJsonObject &object) {
+    object.insert("_class", "UMLOperation");
+    object.insert("name", QString::fromStdString(name_));
+    object.insert("type", QString::fromStdString(type_->name()));
+    object.insert("visibility", visibility_);
+    QJsonArray paramsArray;
+    for (auto param : parameters_) {
+        QJsonObject qParam;
+        param.createObject(qParam);
+        paramsArray.push_back(qParam);
+    }
+    object.insert("parameters", paramsArray);
 }

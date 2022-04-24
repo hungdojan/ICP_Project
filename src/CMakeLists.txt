@@ -24,7 +24,8 @@ file(GLOB LIB_FILES ./model/*.cpp)
 add_executable(${PROJECT_NAME} main.cpp)
 
 # create libraries
-add_library(${MODEL_LIB} ${LIB_FILES})
+add_library(${MODEL_LIB} SHARED ${LIB_FILES})
+target_link_libraries(${MODEL_LIB} Qt5::Core)
 add_library(${VIEW_LIB} ${HEADERS} ${VIEW_MODELS} ${UIS})
 target_link_libraries(${VIEW_LIB}
         Qt5::Core

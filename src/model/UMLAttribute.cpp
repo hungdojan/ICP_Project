@@ -5,6 +5,7 @@
 #include "UMLAttribute.h"
 #include <sstream>
 #include <stdexcept>
+#include <QString>
 
 void UMLAttribute::setName(const std::string &name) {
     Element::setName(name);
@@ -45,4 +46,11 @@ std::ostream &operator<<(std::ostream &strm, const UMLAttribute &attr) {
 UMLAttribute::~UMLAttribute() {
     if (!type_->isUserDefined())
         delete type_;
+}
+
+void UMLAttribute::createObject(QJsonObject &object) {
+    object.insert("_class", "UMLAttribute");
+    object.insert("name", QString::fromStdString(name_));
+    object.insert("type", QString::fromStdString(type_->name()));
+    object.insert("visibility", visibility_);
 }

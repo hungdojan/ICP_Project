@@ -15,6 +15,7 @@
 #include "UMLRelation.h"
 #include <stdexcept>
 #include <algorithm>
+#include <QString>
 
 void UMLClassifier::setName(std::string name) {
     Element::setName(name);
@@ -80,7 +81,7 @@ UMLClassifier *UMLClassifier::removeParentClass(const std::string &name) {
     return *iter;
 }
 
-bool UMLClassifier::addRelation(UMLClassifier *dst) {
+UMLRelation *UMLClassifier::addRelation(UMLClassifier *dst) {
     throw std::invalid_argument("Cannot use function addRelation with UMLClassifier");
 }
 
@@ -121,4 +122,15 @@ UMLClassifier::~UMLClassifier() {
         r->removeRelationDependency(this);
         delete r;
     }
+}
+
+void UMLClassifier::createObject(QJsonObject &object) {
+    object.insert("_class", "UMLClassifier");
+    object.insert("name", QString::fromStdString(name_));
+    object.insert("isUserDefined", isUserDefined_);
+    object.insert("isAbstract", isAbstract_);
+}
+
+std::unordered_set<UMLAttribute *> UMLClassifier::getOperations() const {
+    return {};
 }

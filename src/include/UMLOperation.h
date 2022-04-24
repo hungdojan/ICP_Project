@@ -9,6 +9,7 @@
 #include "UMLAttribute.h"
 
 class UMLOperation : public UMLAttribute {
+protected:
     std::vector<UMLAttribute> parameters_;
 public:
     UMLOperation() =delete;
@@ -30,6 +31,12 @@ public:
     bool removeParameter(const UMLAttribute &parameter);
     // Clear collection of operation parameters
     void clearParameters(std::vector<UMLAttribute> *vectorContent);
+
+    /**
+     * @brief Creates JSON representation of element's content.
+     * @param object Reference to QJsonObject instance.
+     */
+    void createObject(QJsonObject &object) override;
 
     // bool operator==(UMLOperation &operation) const;
     explicit operator std::string() const final;

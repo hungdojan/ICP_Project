@@ -14,6 +14,7 @@
 #define DIAGRAMEDITOR_ELEMENT_H
 #include <string>
 #include <utility>
+#include <QJsonObject>
 
 class Element {
 protected:
@@ -32,6 +33,13 @@ public:
      * @return Read-only reference of element's name.
      */
     const std::string &name() const;
+
+    /**
+     * @brief Creates JSON representation of element's content.
+     * @param object Reference to QJsonObject instance.
+     */
+    virtual void createObject(QJsonObject &object) =0;
+
     virtual ~Element() =default;
 
 protected:

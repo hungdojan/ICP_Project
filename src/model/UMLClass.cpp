@@ -1,12 +1,19 @@
-//
-// Created by rebulien on 4/5/22.
-//
-
+/**
+ * @brief Definition of UMLClass methods.
+ *
+ * This source code serves as submission for semester assignment of class ICP at FIT, BUT 2021/22.
+ *
+ * @file UMLClassifier.h
+ * @date 22/04/2022
+ * @authors Hung Do     (xdohun00)
+ *          David Kedra (xkedra00)
+ */
 #include "UMLClass.h"
 #include "UMLOperation.h"
 #include "UMLRelation.h"
 #include <stdexcept>
 #include <algorithm>
+#include <QJsonArray>
 
 UMLClass::UMLClass(const std::string& name, const std::vector<UMLAttribute *>& attributes) : UMLClassifier{name} {
     for (auto attribute : attributes) {
@@ -64,9 +71,20 @@ UMLAttribute *UMLClass::getAttribute(const std::string &name) {
     return nullptr;
 }
 
-const std::list<UMLAttribute *> UMLClass::getOperations() const {
-    // TODO: merge operations_ of this and
-    return std::list<UMLAttribute *>();
+std::unordered_set<UMLAttribute *> UMLClass::getOperations() const {
+    std::unordered_set<UMLAttribute *> operations;
+    for (auto a : attributes_) {
+        if (dynamic_cast<UMLOperation *>(a) != nullptr)
+            operations.insert(a);
+    }
+    // get operations from base classes
+    for (auto cls : parentClasses_) {
+        for (auto a : cls->getOperations()) {
+            if (dynamic_cast<UMLOperation *>(a) != nullptr)
+                operations.insert(a);
+        }
+    }
+    return operations;
 }
 
 UMLAttribute *UMLClass::getAttributeAtPosition(int pos) {
@@ -77,18 +95,13 @@ UMLAttribute *UMLClass::getAttributeAtPosition(int pos) {
     return *iter;
 }
 
-int UMLClass::getAttributesPosition(UMLAttribute *attr) {
+long UMLClass::getAttributesPosition(UMLAttribute *attr) {
     if (attr == nullptr)
         return -1;
     auto iter{std::find(attributes_.begin(), attributes_.end(), attr)};
     if (iter == attributes_.end())
         return -1;
     return std::distance(attributes_.begin(), iter);
-}
-
-bool UMLClass::moveAttributeToPosition(const std::string &name, int pos) {
-    // TODO:
-    return false;
 }
 
 bool UMLClass::updateAttributeName(UMLAttribute *attribute, const std::string &newName) {
@@ -135,11 +148,10 @@ bool UMLClass::removeAttribute(UMLAttribute *attr) {
     return true;
 }
 
-bool UMLClass::addRelation(UMLClassifier *dst) {
+UMLRelation *UMLClass::addRelation(UMLClassifier *dst) {
     if (inRelationWith(dst))
-        return false;
-    new UMLRelation(this, dst);
-    return true;
+        return nullptr;
+    return new UMLRelation(this, dst);
 }
 
 bool UMLClass::removeRelation(UMLRelation *relation) {
@@ -169,4 +181,18 @@ UMLClass::~UMLClass() {
     for (auto attr : attributes_) {
         delete attr;
     }
+}
+
+void UMLClass::createObject(QJsonObject &object) {
+    object.insert("_class", "UMLClass");
+    object.insert("name", QString::fromStdString(name_));
+    object.insert("isUserDefined", isUserDefined_);
+    object.insert("isAbstract", isAbstract_);
+    QJsonArray lofAttributes;
+    for (auto attr : attributes_) {
+        QJsonObject obj;
+        attr->createObject(obj);
+        lofAttributes.push_back(obj);
+    }
+    object.insert("attributes", lofAttributes);
 }

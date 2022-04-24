@@ -21,6 +21,7 @@
 #include <utility>
 #include <vector>
 #include <unordered_set>
+#include <QJsonObject>
 
 // Declaration of classes that are implemented in different source file
 class UMLAttribute;
@@ -139,6 +140,12 @@ public:
     void setName(std::string name);
 
     /**
+     * @brief Returns collection of callable operations of this class.
+     * @return Collection of callable operations.
+     */
+    virtual std::unordered_set<UMLAttribute *> getOperations() const;
+
+    /**
      * @brief Checks if this class derive from given classifier.
      * @param parentClass Base classifier.
      * @return Whether this classifier derive from _parentClass_.
@@ -151,9 +158,9 @@ public:
      * New relation is also added to destination classifier.
      * @param dst Destination classifier.
      * @throw invalid_argument Cannot be used with UMLClassifier.
-     * @return Status of insertion.
+     * @return Instance of created relation, nullptr otherwise.
      */
-    virtual bool addRelation(UMLClassifier *dst);
+    virtual UMLRelation *addRelation(UMLClassifier *dst);
 
     /**
      * @brief Checks if there is a relation formed between this and given classifier.
@@ -195,6 +202,12 @@ public:
      * @brief Clear all relations in the classifier.
      */
     virtual void clearRelations();
+
+    /**
+     * @brief Creates JSON representation of element's content.
+     * @param object Reference to QJsonObject instance.
+     */
+    void createObject(QJsonObject &object) override;
 
     /**
      * @brief Class destructor.

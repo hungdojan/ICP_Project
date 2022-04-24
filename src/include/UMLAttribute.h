@@ -25,6 +25,12 @@ public:
     // Sets attribute's type
     UMLClassifier *setType(UMLClassifier *classifier);
 
+    /**
+     * @brief Creates JSON representation of element's content.
+     * @param object Reference to QJsonObject instance.
+     */
+    void createObject(QJsonObject &object) override;
+
     bool operator==(UMLAttribute &attr) const;
     virtual explicit operator std::string() const;
     friend std::ostream& operator<<(std::ostream &strm, const UMLAttribute &attr);

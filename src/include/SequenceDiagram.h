@@ -19,6 +19,11 @@ public:
     void addObject(UMLClass *instanceOfClass, const std::string &objName);
     UMLObject *getObject(const std::string &name);
     void removeObject(UMLObject *object);
+    /**
+     * @brief Creates JSON representation of element's content.
+     * @param object Reference to QJsonObject instance.
+     */
+    virtual void createObject(QJsonObject &object) { /* TODO: */ };
     ~SequenceDiagram() =default;
 };
 

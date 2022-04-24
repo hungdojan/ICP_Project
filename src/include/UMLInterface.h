@@ -20,13 +20,20 @@ public:
     const std::vector<UMLOperation *> &operations() const;
     bool removeOperation(UMLOperation *operation);
 
-    // bool addParentClass(UMLClassifier *parentClass) override;
-    // bool removeParentClass(UMLClassifier *parentClass) override;
-    // UMLClassifier *removeParentClass(const std::string &parentClassName) override;
+    /**
+     * @brief Returns collection of callable operations of this class.
+     * @return Collection of callable operations.
+     */
+    std::unordered_set<UMLAttribute *> getOperations() const override;
 
-    bool addRelation(UMLClassifier *dst) override;
+    UMLRelation *addRelation(UMLClassifier *dst) override;
     bool removeRelation(UMLRelation *relation) override;
     bool removeRelation(UMLClassifier *dstClass) override;
+    /**
+     * @brief Creates JSON representation of element's content.
+     * @param object Reference to QJsonObject instance.
+     */
+    void createObject(QJsonObject &object) override;
 
     // TODO: destructor
     ~UMLInterface() override;
