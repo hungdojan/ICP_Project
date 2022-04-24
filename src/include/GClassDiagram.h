@@ -25,12 +25,15 @@ private slots:
     void addClassifier();
     void addClassifierInterface();
     void onGClassifierSelectionChanged();
+    void onGClassifierContentChanged();
 private:
     ClassDiagram *classDiagramModel;
     GraphicsScene *scene_;
     std::vector<GClassifier*> gClassifiers;
+    std::vector<GRelation*> gRelations;
     GClassSettings *gClassSettings;
     int name_index{0};
+    void addGClassifier(GClassifier *g);
 };
 
 #endif //DIAGRAMEDITOR_GCLASSDIAGRAM_H

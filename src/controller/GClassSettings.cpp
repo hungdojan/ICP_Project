@@ -25,7 +25,7 @@
 #define CATEGORY_HEADER_STYLE "QFrame { background-color: qlineargradient(x1:0, y1:0, x2:0, y2:1,\n"\
                               "stop:0 #50555A, stop:0.05 #35383D, stop:0.95 #33363B, stop:1 #152020); }"
 #define DELETE_BUTTON_STYLE "QPushButton { color: #FF4444;}"
-#define RELATION_PARENT_STYLE "QLabel { color: rgb(255,255,255,60); border: 1px solid rgb(0,0,0,70); border-radius: 2px;}"
+#define RELATION_PARENT_STYLE "QLabel { color: rgb(255,255,255,70); border: 1px solid rgb(0,0,0,70); border-radius: 2px;}"
 
 
 GClassSettings::GClassSettings(QTreeWidget *tree,  ClassDiagram *classDiagram): QObject(), classDiagram{classDiagram}{
@@ -269,6 +269,10 @@ void GClassSettings::deleteRow(){
 
         item->parent()->removeChild(item);
     }
+
+    // notify GClassifier
+    connect(this, SIGNAL(contentDeleted()), selectedGClassifier, SLOT(contentDeleted()));
+    emit contentDeleted();
 }
 
 void GClassSettings::selectionChanged(){
@@ -353,7 +357,7 @@ void GClassSettings::addRelationRow(QWidget *obj) {
     lineEditTarget->setFixedWidth(162);
     rowLayoutH1->addWidget(lineEditTarget);
 
-    QString x = "none,0,1,*,0..1,0..*,1..*,◆,◇,△";
+    QString x = " ,0,1,*,0..1,0..*,1..*,◆,◇,◁";
     auto *comboBoxParent = new QComboBox();
     comboBoxParent->addItems(QStringList(x.split(",")));
     comboBoxParent->setFixedWidth(162);

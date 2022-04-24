@@ -18,14 +18,28 @@ void GText::centerText() {
 }
 
 void GText::onTextChanged(){
-    // Text width increases all parent rectangles widths
-    QGraphicsItem *parentItem = parent;
-    QGraphicsRectItem *rect;
-
-    while(rect = dynamic_cast<QGraphicsRectItem*>(parentItem)){
-        if(sceneBoundingRect().width() > rect->sceneBoundingRect().width()){
-            rect->setRect(boundingRect().x(), boundingRect().y(), sceneBoundingRect().width(), rect->sceneBoundingRect().height());
-        }
-        parentItem = rect->parentItem();
-    }
+//    // Text width increases all parent rectangles widths
+//    QGraphicsItem *parentItem = parent;
+//    QGraphicsRectItem *rect;
+//
+//    while(rect = dynamic_cast<QGraphicsRectItem*>(parentItem)) {
+//
+//        // Update size of all child rectangles
+//        for(auto child: rect->childItems()){
+//            QGraphicsRectItem *childRect;
+//            childRect = dynamic_cast<QGraphicsRectItem *>(child);
+//            if(childRect){
+//                if(sceneBoundingRect().width() > childRect->sceneBoundingRect().width()) {
+//                    childRect->setRect(boundingRect().x(), boundingRect().y(), boundingRect().width(), childRect->boundingRect().height()); //?? todo
+//                }
+//            }
+//        }
+//
+//        // Update size of this rectangle
+//        if(sceneBoundingRect().width() > rect->sceneBoundingRect().width()){
+//            rect->setRect(boundingRect().x(), boundingRect().y(), sceneBoundingRect().width(), rect->sceneBoundingRect().height());
+//        }
+//
+//        parentItem = rect->parentItem();
+//    }
 }
