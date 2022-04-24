@@ -19,19 +19,28 @@ public:
     ~GClassifier();
     QVariant itemChange(GraphicsItemChange change, const QVariant & value);
     UMLClassifier *umlClassifier;
-    std::vector<GText*> gTextAttributes;
 signals:
     void gClassifierPositionChanged();
     void gClassifierSelectionChanged();
-    void gTextChanged();
+    qreal gTextChanged();
     void centerText();
+    void gClassifierContentChanged();
 private:
     GText *title;
     GText *classificType;
+    std::vector<GText*> gTextAttributes;
+    std::vector<GRelation*> gRelations;
     bool isInterface;
     ClassDiagram *classDiagram;
+    void loadAttributes();
+    QGraphicsRectItem *attribRect;
+    QGraphicsRectItem *titleRect;
+    void resizeRectangles();
+    qreal width;
+    qreal height;
 private slots:
     void contentSaved();
+    void contentDeleted();
 };
 
 #endif //DIAGRAMEDITOR_GCLASIFIER_H

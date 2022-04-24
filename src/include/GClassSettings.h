@@ -28,6 +28,7 @@ private:
 public:
 signals:
     void contentSaved();
+    void contentDeleted();
 private slots:
     void addRow(QWidget *, const QString &type = QString(), const QString &name = QString());
     void addRelationRow(QWidget *);
