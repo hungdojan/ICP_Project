@@ -26,6 +26,7 @@ private slots:
     void addClassifierInterface();
     void onGClassifierSelectionChanged();
     void onGClassifierContentChanged();
+    void onGClassifierDeleted();
 private:
     ClassDiagram *classDiagramModel;
     GraphicsScene *scene_;

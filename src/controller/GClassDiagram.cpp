@@ -18,7 +18,7 @@ GClassDiagram::GClassDiagram(GraphicsScene *scene, ClassDiagram *model) : scene_
 }
 
 void GClassDiagram::addClassifier() {
-    addGClassifier(new GClassifier("class"+std::to_string(name_index++), 0, 0, 100, 150, classDiagramModel));
+    addGClassifier(new GClassifier("class"+std::to_string(name_index++), 0+name_index, 0+name_index, 100, 150, classDiagramModel));
 }
 
 void GClassDiagram::addClassifierInterface() {
@@ -28,6 +28,7 @@ void GClassDiagram::addGClassifier(GClassifier *gRect){
     scene_->addItem(gRect);
     connect(gRect, SIGNAL(gClassifierSelectionChanged()), this, SLOT(onGClassifierSelectionChanged()));
     connect(gRect, SIGNAL(gClassifierContentChanged()), this, SLOT(onGClassifierContentChanged()));
+    connect(gRect, SIGNAL(gClassifierDeleted()), this, SLOT(onGClassifierDeleted()));
 
     gClassifiers.push_back(gRect);
 }
@@ -37,6 +38,30 @@ void GClassDiagram::onGClassifierSelectionChanged(){
         gClassSettings->hideContent();
     else
         gClassSettings->loadContent((GClassifier*)sender());
+}
+
+void GClassDiagram::onGClassifierDeleted(){
+    auto src = (GClassifier*)sender();
+
+    std::vector<GRelation*>toRem; // GRelations to remove
+
+    for(auto gR: gRelations) {
+        if (dynamic_cast<GClassifier *>(gR->getDst()) == src || dynamic_cast<GClassifier *>(gR->getSrc()) == src) {
+            toRem.push_back(gR);
+            delete gR;
+        }
+    }
+    for(auto r: toRem){
+        gRelations.erase(std::find(gRelations.begin(), gRelations.end(), r));
+    }
+
+    gClassifiers.erase(std::find(gClassifiers.begin(), gClassifiers.end(), src));
+
+    classDiagramModel->removeClassElement(src->umlClassifier);
+    delete src->umlClassifier;
+    delete src;
+
+    gClassSettings->hideContent();
 }
 
 void GClassDiagram::onGClassifierContentChanged(){
@@ -73,16 +98,14 @@ void GClassDiagram::onGClassifierContentChanged(){
     }
 //     If GRelation exists but UML not
     for(auto gR: gRelations){
-//        GClassifier *inRelItem = gR->getSrc() != src? src: (GClassifier *)gR->getDst(); // Item in relation with src
         GClassifier *inRelItem = nullptr;
-        if(gR->getSrc() == src)
-            inRelItem = (GClassifier*)gR->getDst();
-        else if(gR->getDst() == src)
-            inRelItem = (GClassifier*)gR->getSrc();
-//        if(!src->umlClassifier->inRelationWith(inRelItem->umlClassifier)) {
+        if(dynamic_cast<GClassifier *>(gR->getSrc()) == src)
+            inRelItem = dynamic_cast<GClassifier *>(gR->getDst());
+        else if(dynamic_cast<GClassifier *>(gR->getDst()) == src)
+            inRelItem = dynamic_cast<GClassifier *>(gR->getSrc());
 
         if(inRelItem && !src->umlClassifier->inRelationWith(inRelItem->umlClassifier)){
-            gRelations.erase(std::remove(gRelations.begin(), gRelations.end(), gR), gRelations.end());
+            gRelations.erase(std::find(gRelations.begin(), gRelations.end(), gR), gRelations.end());
             delete gR;
         }
     }

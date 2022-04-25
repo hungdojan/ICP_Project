@@ -30,13 +30,17 @@ signals:
     void contentSaved();
     void contentDeleted();
 private slots:
-    void addRow(QWidget *, const QString &type = QString(), const QString &name = QString());
-    void addRelationRow(QWidget *);
+    void addRow(QWidget *, const QString &access = QString(), const QString &type = QString(), const QString &name = QString());
+    void addRelationRow(QWidget *, const QString &dst = QString(), const QString &srcMsg = QString(), const QString &dstMsg = QString());
+    void addFuncRow(QWidget *obj, const QString &access  = QString(), const QString &ret = QString(),
+                    const QString &name = QString(), const QString &params = QString());
     void deleteRow();
     void selectionChanged();
     void saveContent();
 private:
     GClassifier *selectedGClassifier;
+    void fillOperation(UMLOperation *attr, QTreeWidgetItem *category, int index);
+    void loadOperation(QTreeWidgetItem *category, UMLOperation *a);
 };
 
 #endif //TESTEDITOR_CLASSSETTINGS_H

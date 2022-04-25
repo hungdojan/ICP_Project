@@ -7,16 +7,18 @@
 #include <QDebug>
 #include <QLabel>
 #include <QtMath>
+#include <QKeyEvent>
 
 #include "GClassifier.h"
 #include "mainwindow.h"
 #include "UMLClassifier.h"
 #include "UMLInterface.h"
+#include "UMLOperation.h"
 
 #define ROW_HEIGHT 25
 #define MIN_WIDTH 125
-#define ATTRIB_PREFIX "─ "
-#define FUNC_PREFIX "+ "
+#define SELECTED_COLOR "#99DCFF"
+#define UNSELECTED_COLOR "#CFCFDD"
 
 GClassifier::GClassifier(std::string name, qreal x, qreal y, qreal width, qreal height, ClassDiagram *classDiagram, bool isInterface, QGraphicsItem *parent) :
         QGraphicsRectItem(x, y, width, height, parent), QObject(), classDiagram{classDiagram}, isInterface{isInterface}, width{width}, height{height}{
@@ -24,25 +26,15 @@ GClassifier::GClassifier(std::string name, qreal x, qreal y, qreal width, qreal 
     setFlag(QGraphicsItem::ItemIsMovable);
     setFlag(QGraphicsItem::ItemIsSelectable);
     setFlag(QGraphicsItem::ItemSendsScenePositionChanges);
-    setBrush(QBrush(Qt::white));
+    setFlag(QGraphicsItem::ItemIsFocusable);
+    setBrush(QBrush(QColor(UNSELECTED_COLOR)));
 
-    if(isInterface) {
+    if(isInterface)
         umlClassifier = ClassDiagram::createClassifier(name, ClassDiagram::INTERFACE);
-//        // todo DEMO DATA SEED
-//        if(dynamic_cast<UMLInterface*>(umlClassifier)) {
-//            dynamic_cast<UMLInterface *>(umlClassifier)->addOperation(new UMLOperation("Itodo_oper", new UMLClassifier("void")));
-//        }
-    }
-    else {
+    else
         umlClassifier = ClassDiagram::createClassifier(name, ClassDiagram::CLASS);
-//        // todo DEMO DATA SEED
-//        if(dynamic_cast<UMLClass*>(umlClassifier)) {
-//            dynamic_cast<UMLClass *>(umlClassifier)->addAttribute(new UMLAttribute("todo_attrib", new UMLClassifier("int")));
-//            dynamic_cast<UMLClass *>(umlClassifier)->addAttribute(new UMLOperation("Ctodo_oper", new UMLClassifier("void")));
-//        }
-    }
-    classDiagram->addClassifier(umlClassifier);
 
+    classDiagram->addClassifier(umlClassifier);
 
     titleRect = new QGraphicsRectItem(x,y, width, ROW_HEIGHT*2, this);
     title = new GText(QString::fromStdString(umlClassifier->name()), titleRect->x(), titleRect->y(), titleRect);
@@ -56,7 +48,6 @@ GClassifier::GClassifier(std::string name, qreal x, qreal y, qreal width, qreal 
     if(!isInterface)
         attribRect = new QGraphicsRectItem(x,y+2*ROW_HEIGHT, width, ROW_HEIGHT, this);
 
-//    emit centerText();
     contentSaved();
 }
 GClassifier::~GClassifier(){
@@ -71,7 +62,6 @@ void GClassifier::contentSaved(){
 
     loadAttributes();
 
-//    emit gTextChanged();                // Notify text so it can resize rectangle back
     resizeRectangles();
     emit centerText();                  // Title texts centering
     emit gClassifierContentChanged();   // Notify GClassDiagram about UML changes
@@ -100,6 +90,7 @@ void GClassifier::resizeRectangles(){
     height = ROW_HEIGHT*2 + clsCountHeight + infCountHeight;
     setRect(0, 0, width, height);
     titleRect->setRect(0,0,width, ROW_HEIGHT*2);
+    emit gClassifierPositionChanged();
 }
 
 void GClassifier::contentDeleted(){
@@ -110,17 +101,23 @@ void GClassifier::contentDeleted(){
 QVariant GClassifier::itemChange(GraphicsItemChange change, const QVariant &value){
     if(change == QGraphicsItem::ItemSelectedChange){
         if (value == true) {
-            setBrush(QBrush(QColor("#99DCFF")));//  Qt::gray));
+            setBrush(QBrush(QColor(SELECTED_COLOR)));
         }
         else {
-            setBrush(QBrush(Qt::lightGray));
+            setBrush(QBrush(QColor(UNSELECTED_COLOR)));
         }
         emit gClassifierSelectionChanged();
     }
     if(change == ItemPositionChange && scene()) {
         emit gClassifierPositionChanged();
     }
+
     return QGraphicsItem::itemChange(change, value);
+}
+
+void GClassifier::keyReleaseEvent(QKeyEvent *event) {
+    if(event->key() == Qt::Key_Delete)
+        emit gClassifierDeleted();
 }
 
 void GClassifier::loadAttributes(){
@@ -130,17 +127,18 @@ void GClassifier::loadAttributes(){
         // Class Attributes
         for (auto a: cls->attributes()) {
             if (dynamic_cast<UMLOperation *>(a) == nullptr) {
-                auto attrib = new GText(ATTRIB_PREFIX+ QString::fromStdString(a->name()) + QString::fromStdString(":  "+a->type()->name()),
+                auto attrib = new GText(QString::fromStdString(std::string(*a)),
                                         boundingRect().x(),ROW_HEIGHT * 2 + (index++ * ROW_HEIGHT) + boundingRect().x(), attribRect);
                 connect(this, SIGNAL(gTextChanged()), attrib, SLOT(onTextChanged()));
                 gTextAttributes.push_back(attrib);
             }
         }
         // Class operations
-        for (auto op: cls->attributes()) {
-            if(dynamic_cast<UMLOperation *>(op)) {
-                auto attrib = new GText(FUNC_PREFIX + QString::fromStdString(op->name()) + QString::fromStdString("():  "+op->type()->name()),
-                                        boundingRect().x(),ROW_HEIGHT * 2 + (index++ * ROW_HEIGHT) + boundingRect().x(), this);
+        for (auto a: cls->attributes()) {
+            UMLOperation *op = dynamic_cast<UMLOperation *>(a);
+            if(op) {
+                auto attrib = new GText(QString::fromStdString(std::string(*op)),
+                        boundingRect().x(),ROW_HEIGHT * 2 + (index++ * ROW_HEIGHT) + boundingRect().x(), this);
                 connect(this, SIGNAL(gTextChanged()), attrib, SLOT(onTextChanged()));
                 gTextAttributes.push_back(attrib);
             }
@@ -150,9 +148,10 @@ void GClassifier::loadAttributes(){
     if(inf) {
         int index = 0;
         // Interface operations
-        for (auto op: inf->operations()) {
-            if (dynamic_cast<UMLOperation *>(op)) {
-                auto attrib = new GText(FUNC_PREFIX+ QString::fromStdString(op->name()) + QString::fromStdString("():  "+op->type()->name()),
+        for (auto a: inf->operations()) {
+            UMLOperation *op = dynamic_cast<UMLOperation *>(a);
+            if(op) {
+                auto attrib = new GText(QString::fromStdString(std::string(*op)),
                                         boundingRect().x(), ROW_HEIGHT * 2 + (index++ * ROW_HEIGHT) + boundingRect().x(), this);
                 connect(this, SIGNAL(gTextChanged()), attrib, SLOT(onTextChanged()));
                 gTextAttributes.push_back(attrib);

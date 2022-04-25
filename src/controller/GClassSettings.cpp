@@ -16,7 +16,6 @@
 #include "ClassDiagram.h"
 #include "UMLRelation.h"
 
-
 #define SAVE_BUTTON_STYLE "QPushButton { background-color: qlineargradient(x1:0, y1:0, x2:0, y2:1,\n"\
                               "stop:0 #6BD96A, stop:0.05 #2BA94A, stop:0.95 #0B892A, stop:1 #06690F); font-size: 30px; border-radius: 3px;}" \
                               "QPushButton:hover { background-color: #25A545;}"\
@@ -25,8 +24,15 @@
 #define CATEGORY_HEADER_STYLE "QFrame { background-color: qlineargradient(x1:0, y1:0, x2:0, y2:1,\n"\
                               "stop:0 #50555A, stop:0.05 #35383D, stop:0.95 #33363B, stop:1 #152020); }"
 #define DELETE_BUTTON_STYLE "QPushButton { color: #FF4444;}"
-#define RELATION_PARENT_STYLE "QLabel { color: rgb(255,255,255,70); border: 1px solid rgb(0,0,0,70); border-radius: 2px;}"
+#define RELATION_PARENT_STYLE "QLabel { color: rgb(255,255,255,145); border: 1px solid rgb(0,0,0,70); border-radius: 2px;}"
 
+#define RELATION_TYPES " ,0,1,*,0..1,0..*,1..*,◆,◇,◁"
+#define ACCESSIBILITIES "+,-,#,~"
+
+#define GENERAL "General"
+#define ATTRIBUTES "Attributes"
+#define FUNCTIONS "Functions"
+#define RELATIONS "Relations"
 
 GClassSettings::GClassSettings(QTreeWidget *tree,  ClassDiagram *classDiagram): QObject(), classDiagram{classDiagram}{
     this->tree = tree;
@@ -73,50 +79,48 @@ void GClassSettings::loadContent(GClassifier *gClassifier){
         QString categoryName = tree->itemWidget(category, 0)->findChild<QLabel*>()->text();
 
         // LOADING model data -> view
-        if(categoryName.toStdString().find("General") != std::string::npos) {
+        if(categoryName.toStdString().find(GENERAL) != std::string::npos) {
             tree->itemWidget(categories.at(i)->child(0),0)->findChild<QLineEdit*>()->setText(QString::fromStdString(gClassifier->umlClassifier->name()));
-//            tree->itemWidget(categories.at(i)->child(1),0)->findChild<QCheckBox*>()->setChecked(gClassifier->umlClassifier->isAbstract());
         }
-        if(categoryName.toStdString().find("Attributes") != std::string::npos){
+        if(categoryName.toStdString().find(ATTRIBUTES) != std::string::npos){
             UMLClass *cls;
             if((cls = dynamic_cast<UMLClass*>(selectedGClassifier->umlClassifier))) {
                 for(auto a : cls->attributes()) {
                     if(dynamic_cast<UMLOperation*>(a) == nullptr) // Is not operation
-                        addRow((QWidget*)category, QString::fromStdString(a->type()->name()), QString::fromStdString(a->name()));
+                        addRow((QWidget*)category, QString::fromStdString(std::string(1,a->visibility())),
+                               QString::fromStdString(a->type()->name()), QString::fromStdString(a->name()));
                 }
             }
             else
                 keepHidden = true;
         }
-        else if(categoryName.toStdString().find("Functions") != std::string::npos){
+        else if(categoryName.toStdString().find(FUNCTIONS) != std::string::npos){
             UMLClass *cls;
             if((cls = dynamic_cast<UMLClass*>(selectedGClassifier->umlClassifier))) {
                 for(auto a : cls->attributes()) {
                     if(dynamic_cast<UMLOperation*>(a)) // Is operation
-                        addRow((QWidget*)category, QString::fromStdString(a->type()->name()), QString::fromStdString(a->name()));
+                        loadOperation(category, dynamic_cast<UMLOperation*>(a));
                 }
             }
             UMLInterface *inf;
             if((inf = dynamic_cast<UMLInterface*>(selectedGClassifier->umlClassifier))) {
                 for(auto a : inf->operations()) {
-                    if(dynamic_cast<UMLOperation*>(a)) // Is operation
-                        addRow((QWidget*)category, QString::fromStdString(a->type()->name()), QString::fromStdString(a->name()));
+                    if(a) // Is operation
+                        loadOperation(category, a);
                 }
             }
         }
-        else if (categoryName.toStdString().find("Relations") != std::string::npos) {
+        else if (categoryName.toStdString().find(RELATIONS) != std::string::npos) {
             int a = 1; // category child item index to set
             for (UMLRelation *r: selectedGClassifier->umlClassifier->relations()) {
-                addRelationRow((QWidget*)category);
                 // Set the "relation to: " class to dst/src depending on the direction
                 auto inRelationClass = r->dst()->name() == selectedGClassifier->umlClassifier->name()?
                         QString::fromStdString(r->src()->name()): QString::fromStdString(r->dst()->name());
 
-                tree->itemWidget(category->child(a),0)->findChild<QLineEdit*>()->setText(inRelationClass);
                 auto msg1 = r->dst()->name() == selectedGClassifier->umlClassifier->name()? QString::fromStdString(r->dstMsg()): QString::fromStdString(r->srcMsg());
                 auto msg2 = r->src()->name() == selectedGClassifier->umlClassifier->name()? QString::fromStdString(r->dstMsg()): QString::fromStdString(r->srcMsg());
-                tree->itemWidget(category->child(a),0)->findChildren<QComboBox*>()[0]->setCurrentText(msg1);
-                tree->itemWidget(category->child(a),0)->findChildren<QComboBox*>()[1]->setCurrentText(msg2);
+
+                addRelationRow((QWidget*)category, inRelationClass, msg1, msg2);
                 a++;
             }
         }
@@ -133,88 +137,89 @@ void GClassSettings::saveContent(){
         QTreeWidgetItem *category = categories.at(i);
         QString categoryName = tree->itemWidget(category, 0)->findChild<QLabel *>()->text();
 
-        if (categoryName.toStdString().find("General") != std::string::npos) {
+        if (categoryName.toStdString().find(GENERAL) != std::string::npos) {
             // Title
             selectedGClassifier->umlClassifier->setName(
                     tree->itemWidget(category->child(0), 0)->findChild<QLineEdit *>()->text().toStdString());
         }
-        if (categoryName.toStdString().find("Attributes") != std::string::npos) {
+        if (categoryName.toStdString().find(ATTRIBUTES) != std::string::npos) {
             UMLClass *cls;
             if ((cls = dynamic_cast<UMLClass *>(selectedGClassifier->umlClassifier))) {
-                // [0] attributes() is the [1] child in a category
-                // Save attributes to UML
-                int j = 0;
+                // Remove old attributes
+                for(auto a: cls->attributes()) {
+                    if(!dynamic_cast<UMLOperation*>(a))
+                        cls->removeAttribute(a);
+                }
+                // Add from settings panel to UML
                 for (int a = 1; a < category->childCount(); a++) {
-                    // Assign view values from categories to UML
-                    while (j < cls->attributes().size()) {
-                        // Iterate while Attribute is not operation
-                        if (dynamic_cast<UMLOperation *>(cls->attributes()[j]) == nullptr) { // Is not operation
-                            cls->getAttributeAtPosition(j)->setType(new UMLClassifier(
-                                    tree->itemWidget(category->child(a),
-                                                     0)->findChild<QLineEdit *>()->text().toStdString()));
-                            cls->getAttributeAtPosition(j)->setName(tree->itemWidget(category->child(a),0)->findChildren<QLineEdit *>()[1]->text().toStdString());
-                            j++;
-                            break;
-                        }
-                        j++;
+                    std::string name = tree->itemWidget(category->child(a),0)->findChildren<QLineEdit *>()[1]->text().toStdString();
+                    std::string typeName = tree->itemWidget(category->child(a),0)->findChild<QLineEdit *>()->text().toStdString();
+                    UMLClassifier *type = classDiagram->getClassifier(typeName);
+                    if(!type) {
+                        type = new UMLClassifier(typeName);
+                        classDiagram->addClassifier(type);
                     }
-                    // If the attribute is new, add it to UML
-                    if (j >= cls->attributes().size()) {
-                        std::string name = tree->itemWidget(category->child(a),
-                                                            0)->findChildren<QLineEdit *>()[1]->text().toStdString();
-                        UMLClassifier *type = new UMLClassifier(tree->itemWidget(category->child(a),
-                                                                                 0)->findChild<QLineEdit *>()->text().toStdString());
-                        cls->addAttribute(new UMLAttribute(name, type));
+
+                    if(!name.empty()) {
+                        auto attr = UMLClassifier::createAttribute(false, name, type, {});
+                        attr->visibility() = tree->itemWidget(category->child(a),0)->findChild<QComboBox*>()->currentText().toStdString()[0];
+                        cls->addAttribute(attr);
                     }
                 }
             }
-        } else if (categoryName.toStdString().find("Functions") != std::string::npos) {
+        } else if (categoryName.toStdString().find(FUNCTIONS) != std::string::npos) {
             UMLClass *cls;
-            if ((cls = dynamic_cast<UMLClass *>(selectedGClassifier->umlClassifier))) { // TODO "similar" as class attrinutes saving
-                int j = 0;
+            if ((cls = dynamic_cast<UMLClass *>(selectedGClassifier->umlClassifier))) { // TODO "similar" as class attributes saving
+                // Remove old operations
+                for(auto a: cls->attributes()){
+                    if(dynamic_cast<UMLOperation*>(a))
+                        cls->removeAttribute(a);
+                }
+                // Add from settings panel to UML
                 for (int a = 1; a < category->childCount(); a++) {
-                    // Assign view values from categories to UML
-                    while (j < cls->attributes().size()) {
-                        if (dynamic_cast<UMLOperation *>(cls->attributes()[j])) { // Is operation
-                            cls->getAttributeAtPosition(j)->setType(new UMLClassifier(
-                                    tree->itemWidget(category->child(a),
-                                                     0)->findChild<QLineEdit *>()->text().toStdString()));
-                            cls->getAttributeAtPosition(j)->setName(tree->itemWidget(category->child(a),
-                                                                                     0)->findChildren<QLineEdit *>()[1]->text().toStdString());
-                            j++;
-                            break;
+                    std::string typeName = tree->itemWidget(category->child(a),0)->findChild<QLineEdit*>()->text().toStdString();
+                    std::string name = tree->itemWidget(category->child(a),0)->findChildren<QLineEdit*>()[1]->text().toStdString();
+                    if(!typeName.empty() && !name.empty()) {
+                        UMLClassifier *type = classDiagram->getClassifier(typeName);
+                        if (!type) {
+                            type = new UMLClassifier(typeName);
+                            classDiagram->addClassifier(type);
                         }
-                        j++;
-                    }
-                    // If the operation is new, add it to UML
-                    if (j >= cls->attributes().size()) {
-                        std::string name = tree->itemWidget(category->child(a),
-                                                            0)->findChildren<QLineEdit *>()[1]->text().toStdString();
-                        UMLClassifier *type = new UMLClassifier(tree->itemWidget(category->child(a),
-                                                                                 0)->findChild<QLineEdit *>()->text().toStdString());
-                        cls->addAttribute(new UMLOperation(name, type));
+
+                        if (!name.empty()) {
+                            auto attr = dynamic_cast<UMLOperation *>(UMLClassifier::createAttribute(true, name, type,{}));
+                            fillOperation(attr, category, a);
+                            cls->addAttribute(attr);
+                        }
                     }
                 }
             }
             UMLInterface *inf;
             if ((inf = dynamic_cast<UMLInterface *>(selectedGClassifier->umlClassifier))) {
+                // Remove old operations
+                for(auto a: inf->operations())
+                    inf->removeOperation(a);
+                // Add from settings panel to UML
                 for (int a = 1; a < category->childCount(); a++) {
-                    int j = a - 1;
-                    if (j < inf->operations().size()) {
-                        // Assign view values from categories to UML
-                        inf->getOperation(inf->operations()[j]->name())->setType(new UMLClassifier(
-                                tree->itemWidget(category->child(a),0)->findChild<QLineEdit *>()->text().toStdString()));
-                        inf->getOperation(inf->operations()[j]->name())->setName(tree->itemWidget(category->child(a),0)->findChildren<QLineEdit *>()[1]->text().toStdString());
-                    } else {
-                        // If the operation is new, add it to UML
-                        std::string name = tree->itemWidget(category->child(a),0)->findChildren<QLineEdit *>()[1]->text().toStdString();
-                        UMLClassifier *type = new UMLClassifier(tree->itemWidget(category->child(a),0)->findChild<QLineEdit *>()->text().toStdString());
-                        inf->addOperation(new UMLOperation(name, type));
+                    std::string name = tree->itemWidget(category->child(a),0)->findChildren<QLineEdit *>()[1]->text().toStdString();
+                    std::string typeName = tree->itemWidget(category->child(a),0)->findChild<QLineEdit *>()->text().toStdString();
+                    if(!typeName.empty() && !name.empty()) {
+                        UMLClassifier *type = classDiagram->getClassifier(typeName);
+                        if (!type) {
+                            type = new UMLClassifier(typeName);
+                            classDiagram->addClassifier(type);
+                        }
+
+                        if (!name.empty()){
+                            auto attr = dynamic_cast<UMLOperation *>(UMLClassifier::createAttribute(true, name, type,{}));
+                            fillOperation(attr, category, a);
+                            inf->addOperation(attr);
+                        }
                     }
                 }
             }
         }
-        else if (categoryName.toStdString().find("Relations") != std::string::npos) {
+        else if (categoryName.toStdString().find(RELATIONS) != std::string::npos) {
             // remove all? todo
             selectedGClassifier->umlClassifier->clearRelations();
 
@@ -248,20 +253,20 @@ void GClassSettings::deleteRow(){
         QTreeWidgetItem *category = item->parent();
         QString categoryName = tree->itemWidget(category, 0)->findChild<QLabel*>()->text();
 
-        if(categoryName.toStdString().find("Attributes") != std::string::npos ||
-           categoryName.toStdString().find("Functions") != std::string::npos) {
+        if(categoryName.toStdString().find(ATTRIBUTES) != std::string::npos ||
+           categoryName.toStdString().find(FUNCTIONS) != std::string::npos) {
             UMLClass *cls;
             if((cls = dynamic_cast<UMLClass*>(selectedGClassifier->umlClassifier))) {
                 cls->removeAttribute(cls->getAttribute(tree->itemWidget(category->child(category->indexOfChild(item)),0)->findChildren<QLineEdit*>()[1]->text().toStdString()));
             }
         }
-        if(categoryName.toStdString().find("Functions") != std::string::npos) {
+        if(categoryName.toStdString().find(FUNCTIONS) != std::string::npos) {
             UMLInterface *inf;
             if((inf = dynamic_cast<UMLInterface*>(selectedGClassifier->umlClassifier))) {
                 inf->removeOperation(inf->getOperation(tree->itemWidget(category->child(category->indexOfChild(item)),0)->findChildren<QLineEdit*>()[1]->text().toStdString()));
             }
         }
-        else if(categoryName.toStdString().find("Relations") != std::string::npos) {
+        else if(categoryName.toStdString().find(RELATIONS) != std::string::npos) {
             auto name = tree->itemWidget(category->child(category->indexOfChild(item)),0)->findChild<QLineEdit*>()->text().toStdString();
 //            auto rel = selectedGClassifier->umlClassifier->getRelationWith(classDiagram->getClassifier(name));
             selectedGClassifier->umlClassifier->removeRelation(classDiagram->getClassifier(name));
@@ -292,7 +297,7 @@ void GClassSettings::selectionChanged(){
     }
 }
 
-void GClassSettings::addRow(QWidget *obj, const QString &type, const QString &name) {
+void GClassSettings::addRow(QWidget *obj, const QString &access, const QString &type, const QString &name) {
     auto *category = (QTreeWidgetItem*)obj;
 
     // New attribute row
@@ -305,6 +310,14 @@ void GClassSettings::addRow(QWidget *obj, const QString &type, const QString &na
 
     auto *lineEditType = new QLineEdit();
     auto *lineEditContent = new QLineEdit();
+
+    QString x = ACCESSIBILITIES;
+    auto *comboBoxAccess = new QComboBox();
+    comboBoxAccess->addItems(QStringList(x.split(",")));
+    comboBoxAccess->setFixedWidth(50);
+    if(!access.isEmpty())
+        comboBoxAccess->setCurrentText(access);
+    rowLayout->addWidget(comboBoxAccess);
 
     lineEditType->setPlaceholderText("type");
     if(!type.isNull())
@@ -322,8 +335,8 @@ void GClassSettings::addRow(QWidget *obj, const QString &type, const QString &na
     tree->setItemWidget(row, 0, rowFrame);
 }
 
-void GClassSettings::addRelationRow(QWidget *obj) {
-    auto *category = (QTreeWidgetItem *) obj;
+void GClassSettings::addFuncRow(QWidget *obj, const QString &access, const QString &ret, const QString &name, const QString &params) {
+    auto *category = (QTreeWidgetItem*)obj;
 
     // New attribute row
     auto *row = new QTreeWidgetItem();
@@ -345,27 +358,94 @@ void GClassSettings::addRelationRow(QWidget *obj) {
     rowLayoutH1->setContentsMargins(0,0,0,4);
     rowLayoutH2->setContentsMargins(0,0,0,0);
 
+    QString x = ACCESSIBILITIES;
+    auto *comboBoxAccess = new QComboBox();
+    comboBoxAccess->addItems(QStringList(x.split(",")));
+    comboBoxAccess->setFixedWidth(50);
+    if(!access.isEmpty())
+        comboBoxAccess->setCurrentText(access);
+    rowLayoutH1->addWidget(comboBoxAccess);
+
+    auto *lineEditType = new QLineEdit();
+    auto *lineEditContent = new QLineEdit();
+
+    lineEditType->setPlaceholderText("type");
+    if(!ret.isNull())
+        lineEditType->setText(ret);
+    lineEditType->setContentsMargins(0,0,0,0);
+    lineEditType->setMaximumWidth(100);
+    rowLayoutH1->addWidget(lineEditType);
+
+    lineEditContent->setPlaceholderText("name");
+    if(!name.isNull())
+        lineEditContent->setText(name);
+    lineEditContent->setContentsMargins(0,0,0,0);
+    rowLayoutH1->addWidget(lineEditContent);
+
+    auto *lineEditParams = new QLineEdit();
+    lineEditParams->setPlaceholderText("type1 param1, ...");
+    if(!params.isEmpty())
+        lineEditParams->setText(params);
+    lineEditParams->setContentsMargins(0,0,0,0);
+    rowLayoutH2->addWidget(lineEditParams);
+
+    tree->setItemWidget(row, 0, rowFrame);
+
+    category->setExpanded(false); // todo function else overwrites relations category
+    category->setExpanded(true);
+}
+
+void GClassSettings::addRelationRow(QWidget *obj, const QString &dst, const QString &srcMsg, const QString &dstMsg) {
+    auto *category = (QTreeWidgetItem *) obj;
+
+    // New attribute row
+    auto *row = new QTreeWidgetItem();
+    category->addChild(row);
+    // Row Frame-Layout Content
+    auto *rowFrame = new QFrame();
+    QBoxLayout *rowLayoutV = new QVBoxLayout(rowFrame);
+    rowLayoutV->setContentsMargins(10, 3, 9, 7);
+    rowLayoutV->setSpacing(0);
+
+    auto *rowFrame1 = new QFrame();
+    auto *rowFrame2 = new QFrame();
+
+    rowLayoutV->addWidget(rowFrame1);
+    rowLayoutV->addWidget(rowFrame2);
+
+    QBoxLayout *rowLayoutH1 = new QHBoxLayout(rowFrame1);
+    QBoxLayout *rowLayoutH2 = new QHBoxLayout(rowFrame2);
+    rowLayoutH1->setContentsMargins(0,0,0,4);
+    rowLayoutH1->setSpacing(10);
+    rowLayoutH2->setContentsMargins(0,0,0,0);
+    rowLayoutH2->setSpacing(10);
+
     auto *lineEditParent = new QLabel();
     lineEditParent->setText("from: " + QString::fromStdString(selectedGClassifier->umlClassifier->name()));
     lineEditParent->setStyleSheet(RELATION_PARENT_STYLE);
-    lineEditParent->setFixedWidth(162);
+    lineEditParent->setFixedWidth(185);
+    lineEditParent->setContentsMargins(0,0,0,0);
     rowLayoutH1->addWidget(lineEditParent);
 
     auto *lineEditTarget = new QLineEdit();
     lineEditTarget->setPlaceholderText("to: ");
+    if(!dst.isEmpty())
+        lineEditTarget->setText(dst);
     lineEditTarget->setContentsMargins(0,0,0,0);
-    lineEditTarget->setFixedWidth(162);
     rowLayoutH1->addWidget(lineEditTarget);
 
-    QString x = " ,0,1,*,0..1,0..*,1..*,◆,◇,◁";
+    QString x = RELATION_TYPES;
     auto *comboBoxParent = new QComboBox();
     comboBoxParent->addItems(QStringList(x.split(",")));
-    comboBoxParent->setFixedWidth(162);
+    comboBoxParent->setFixedWidth(185);
+    if(!srcMsg.isEmpty())
+        comboBoxParent->setCurrentText(srcMsg);
     rowLayoutH2->addWidget(comboBoxParent);
 
     auto *comboBoxTarget = new QComboBox();
     comboBoxTarget->addItems(QStringList(x.split(",")));
-    comboBoxTarget->setFixedWidth(162);
+    if(!dstMsg.isEmpty())
+        comboBoxTarget->setCurrentText(dstMsg);
     rowLayoutH2->addWidget(comboBoxTarget);
 
     tree->setItemWidget(row, 0, rowFrame);
@@ -406,10 +486,12 @@ void GClassSettings::addDeleteAndAddRow(QTreeWidgetItem *category) {
     auto *addButton = new QPushButton("➕");
     addButton->setFixedWidth(50);
     auto *mapper = new QSignalMapper(this);
-    connect(addButton, SIGNAL(pressed()), mapper, SLOT(map()));
+    connect(addButton, SIGNAL(released()), mapper, SLOT(map()));
     mapper->setMapping(addButton, (QWidget*)category);
-    if(categoryName.toStdString().find("Relations") != std::string::npos)
+    if(categoryName.toStdString().find(RELATIONS) != std::string::npos)
         connect(mapper, SIGNAL(mapped(QWidget*)), this, SLOT(addRelationRow(QWidget*)));
+    else if(categoryName.toStdString().find(FUNCTIONS) != std::string::npos)
+        connect(mapper, SIGNAL(mapped(QWidget*)), this, SLOT(addFuncRow(QWidget*)));
     else
         connect(mapper, SIGNAL(mapped(QWidget*)), this, SLOT(addRow(QWidget*)));
 
@@ -439,7 +521,7 @@ QTreeWidgetItem *GClassSettings::addCategoryHeader(const QString name){
 
 QTreeWidgetItem *GClassSettings::addCategoryGeneral() {
     // Category 'General'
-    auto *category = addCategoryHeader("General");
+    auto *category = addCategoryHeader(GENERAL);
 
     // Title
     auto *row = new QTreeWidgetItem();
@@ -461,7 +543,7 @@ QTreeWidgetItem *GClassSettings::addCategoryGeneral() {
 
 QTreeWidgetItem *GClassSettings::addCategoryAttributes() {
     // Category 'Attributes'
-    auto *categoryAttributes = addCategoryHeader("Attributes");
+    auto *categoryAttributes = addCategoryHeader(ATTRIBUTES);
 
     // Attach buttons 'X' and '+' row
     addDeleteAndAddRow(categoryAttributes);
@@ -471,7 +553,7 @@ QTreeWidgetItem *GClassSettings::addCategoryAttributes() {
 
 QTreeWidgetItem *GClassSettings::addCategoryFunctions() {
     // Category 'Functions'
-    auto *categoryAttributes = addCategoryHeader("Functions");
+    auto *categoryAttributes = addCategoryHeader(FUNCTIONS);
 
     // Attach buttons 'X' and '+' row
     addDeleteAndAddRow(categoryAttributes);
@@ -481,10 +563,41 @@ QTreeWidgetItem *GClassSettings::addCategoryFunctions() {
 
 QTreeWidgetItem *GClassSettings::addCategoryRelations() {
     // Category 'Relations'
-    auto *categoryAttributes = addCategoryHeader("Relations");
+    auto *categoryAttributes = addCategoryHeader(RELATIONS);
 
     // Attach buttons 'X' and '+' row
     addDeleteAndAddRow(categoryAttributes);
 
     return categoryAttributes;
+}
+
+void GClassSettings::fillOperation(UMLOperation *attr, QTreeWidgetItem *category, int index){
+    QString params = tree->itemWidget(category->child(index),0)->findChildren<QLineEdit *>()[2]->text();
+    for (auto paramText: QStringList(params.split(","))) {
+        if(paramText.isEmpty()) continue;
+
+        paramText = paramText.trimmed();
+        auto paramAndType = QStringList(paramText.split(" "));
+        if(paramAndType.size() >= 2) {
+            auto parType = classDiagram->getClassifier(paramAndType[0].toStdString());
+            if (!parType) { // Then create
+                parType = new UMLClassifier(paramAndType[0].toStdString());
+                classDiagram->addClassifier(parType);
+            }
+            auto parName = paramAndType[1];
+            for(int i = 1; i < paramAndType.size() && parName.isEmpty(); i++)
+                parName = paramAndType[i];
+            attr->addParameter(UMLAttribute{parName.toStdString(), parType});
+        }
+    }
+    attr->visibility() = tree->itemWidget(category->child(index),0)->findChild<QComboBox*>()->currentText().toStdString()[0];
+}
+
+void GClassSettings::loadOperation(QTreeWidgetItem *category, UMLOperation *a){
+    std::string paramsText = "";
+    for(auto param: a->parameters())
+        paramsText += param.type()->name()+" "+param.name()+",";
+    paramsText.erase(paramsText.end()-1);
+    addFuncRow((QWidget *) category, QString::fromStdString(std::string(1,a->visibility())),
+               QString::fromStdString(a->type()->name()),QString::fromStdString(a->name()), QString::fromStdString(paramsText));
 }
