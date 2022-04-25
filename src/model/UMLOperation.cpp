@@ -104,7 +104,7 @@ UMLOperation::operator std::string() const {
     stream << type_->name() << " " << name_ << "(";
     for (auto i = parameters_.begin(); i != parameters_.end(); ++i) {
         if (i != parameters_.begin())
-            stream << " ";
+            stream << ",";
         stream << *i;
     }
     stream << ")";

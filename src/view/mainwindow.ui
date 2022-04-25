@@ -81,7 +81,7 @@
           </property>
           <property name="maximumSize">
            <size>
-            <width>350</width>
+            <width>400</width>
             <height>16777215</height>
            </size>
           </property>
@@ -141,7 +141,7 @@ QHeaderView::section {
           </property>
           <property name="maximumSize">
            <size>
-            <width>350</width>
+            <width>400</width>
             <height>16777215</height>
            </size>
           </property>
@@ -153,16 +153,16 @@ QHeaderView::section {
           </property>
           <layout class="QHBoxLayout" name="horizontalLayout_2">
            <property name="spacing">
-            <number>0</number>
+            <number>2</number>
            </property>
            <property name="leftMargin">
-            <number>0</number>
+            <number>2</number>
            </property>
            <property name="topMargin">
             <number>0</number>
            </property>
            <property name="rightMargin">
-            <number>0</number>
+            <number>2</number>
            </property>
            <property name="bottomMargin">
             <number>10</number>
@@ -182,7 +182,7 @@ QHeaderView::section {
                </property>
                <property name="minimumSize">
                 <size>
-                 <width>174</width>
+                 <width>197</width>
                  <height>35</height>
                 </size>
                </property>
@@ -198,7 +198,7 @@ QHeaderView::section {
               <widget class="QPushButton" name="addInterfaceButton">
                <property name="minimumSize">
                 <size>
-                 <width>174</width>
+                 <width>197</width>
                  <height>35</height>
                 </size>
                </property>

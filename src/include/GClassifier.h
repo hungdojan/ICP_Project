@@ -25,6 +25,7 @@ signals:
     qreal gTextChanged();
     void centerText();
     void gClassifierContentChanged();
+    void gClassifierDeleted();
 private:
     GText *title;
     GText *classificType;
@@ -38,6 +39,9 @@ private:
     void resizeRectangles();
     qreal width;
     qreal height;
+    qreal x;
+    qreal y;
+    void keyReleaseEvent(QKeyEvent *event);
 private slots:
     void contentSaved();
     void contentDeleted();
