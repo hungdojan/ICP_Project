@@ -587,7 +587,7 @@ void GClassSettings::fillOperation(UMLOperation *attr, QTreeWidgetItem *category
             auto parName = paramAndType[1];
             for(int i = 1; i < paramAndType.size() && parName.isEmpty(); i++)
                 parName = paramAndType[i];
-            attr->addParameter(UMLAttribute{parName.toStdString(), parType});
+            attr->addParameter(new UMLAttribute(parName.toStdString(), parType));
         }
     }
     attr->visibility() = tree->itemWidget(category->child(index),0)->findChild<QComboBox*>()->currentText().toStdString()[0];
@@ -596,7 +596,7 @@ void GClassSettings::fillOperation(UMLOperation *attr, QTreeWidgetItem *category
 void GClassSettings::loadOperation(QTreeWidgetItem *category, UMLOperation *a){
     std::string paramsText = "";
     for(auto param: a->parameters())
-        paramsText += param.type()->name()+" "+param.name()+",";
+        paramsText += param->type()->name()+" "+param->name()+",";
     paramsText.erase(paramsText.end()-1);
     addFuncRow((QWidget *) category, QString::fromStdString(std::string(1,a->visibility())),
                QString::fromStdString(a->type()->name()),QString::fromStdString(a->name()), QString::fromStdString(paramsText));

@@ -34,7 +34,7 @@ bool &UMLClassifier::isAbstract() {
 }
 
 UMLAttribute *UMLClassifier::createAttribute(bool isOperation, const std::string &name, UMLClassifier *type,
-                                             const std::vector<UMLAttribute> &params) {
+                                             const std::vector<UMLAttribute *> &params) {
     if (isOperation)
         return new UMLOperation(name, type, params);
     return new UMLAttribute(name, type);
@@ -122,6 +122,7 @@ UMLClassifier::~UMLClassifier() {
         r->removeRelationDependency(this);
         delete r;
     }
+    notify("DELETE");
 }
 
 void UMLClassifier::createJsonObject(QJsonObject &object) {
@@ -133,4 +134,22 @@ void UMLClassifier::createJsonObject(QJsonObject &object) {
 
 std::unordered_set<UMLOperation *> UMLClassifier::getOperations() const {
     return {};
+}
+
+void UMLClassifier::attach(IObserver *observer) {
+    observers_.insert(observer);
+}
+
+void UMLClassifier::detach(IObserver *observer) {
+    observers_.erase(observer);
+}
+
+void UMLClassifier::notify(const std::string &msg) {
+    for (auto o : observers_) {
+        o->update(msg);
+    }
+}
+
+unsigned long UMLClassifier::observerCount() const {
+    return observers_.size();
 }

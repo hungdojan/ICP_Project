@@ -7,30 +7,31 @@
 #include <vector>
 #include "Element.h"
 #include "UMLAttribute.h"
+#include "IObserver.h"
 
 class UMLOperation : public UMLAttribute {
 protected:
-    std::vector<UMLAttribute> parameters_;
+    std::vector<UMLAttribute*> parameters_;
 public:
     UMLOperation() =delete;
     // Class constructor
     UMLOperation(const std::string &name, UMLClassifier *type) : UMLAttribute(name, type) { }
     // Class constructor
-    UMLOperation(const std::string &name, UMLClassifier *type, std::vector<UMLAttribute>parameters);
+    UMLOperation(const std::string &name, UMLClassifier *type, const std::vector<UMLAttribute*> &parameters);
     // Returns collection of parameters of this operation
-    const std::vector<UMLAttribute> &parameters() const;
+    const std::vector<UMLAttribute*> &parameters() const;
     // Adds new parameter to the operation
-    bool addParameter(const UMLAttribute &parameter);
+    bool addParameter(UMLAttribute *parameter);
     // Adds new parameter to the operation
-    bool addOrReplaceParameter(const UMLAttribute &parameter, UMLAttribute *oldInstance);
+    UMLAttribute *addOrReplaceParameter(UMLAttribute *parameter);
     // Returns parameter with given name
-    bool getParameterByName(const std::string &name, UMLAttribute *found);
+    UMLAttribute *getParameterByName(const std::string &name) const;
     // Removes parameter with given name
-    bool removeParameter(const std::string &name, UMLAttribute *removed);
+    bool removeParameter(const std::string &name);
     // Removes instance of parameter from the operation
-    bool removeParameter(const UMLAttribute &parameter);
+    bool removeParameter(UMLAttribute *parameter);
     // Clear collection of operation parameters
-    void clearParameters(std::vector<UMLAttribute> *vectorContent);
+    void clearParameters(std::vector<UMLAttribute *> *vectorContent);
 
     /**
      * @brief Creates JSON representation of element's content.

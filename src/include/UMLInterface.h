@@ -4,9 +4,11 @@
 #include <unordered_set>
 #include "UMLClassifier.h"
 #include "UMLOperation.h"
+#include "ISubject.h"
 
 class UMLInterface : public UMLClassifier {
 protected:
+    std::unordered_set<IObserver *> observers_;
     std::vector<UMLOperation *> operations_;
     using UMLClassifier::isAbstract;
 public:
@@ -29,6 +31,7 @@ public:
     UMLRelation *addRelation(UMLClassifier *dst) override;
     bool removeRelation(UMLRelation *relation) override;
     bool removeRelation(UMLClassifier *dstClass) override;
+
     /**
      * @brief Creates JSON representation of element's content.
      * @param object Reference to QJsonObject instance.

@@ -69,8 +69,8 @@ void loadOperation(QJsonObject &qOperation, UMLOperation &operation,
     QJsonArray qParameters = qOperation["parameters"].toArray();
     for (auto param : qParameters) {
         QJsonObject qParam = param.toObject();
-        UMLAttribute parameter{"", nullptr};
-        loadAttribute(qParam, parameter, mapOfClassifiers);
+        auto *parameter = new UMLAttribute("", nullptr);
+        loadAttribute(qParam, *parameter, mapOfClassifiers);
         operation.addParameter(parameter);
     }
 }

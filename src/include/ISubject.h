@@ -11,7 +11,7 @@ public:
     virtual ~ISubject() =default;
     virtual void attach(IObserver *observer) =0;
     virtual void detach(IObserver *observer) =0;
-    virtual void notify();
+    virtual void notify(const std::string &msg) =0;
 };
 
 #endif //DIAGRAMEDITOR_ISUBJECT_H

@@ -30,6 +30,9 @@ protected:
     /** Collection of sequence diagrams */
     std::vector<SequenceDiagram *> sequenceDiagrams_;
 public:
+    /** Pointer to undefined classifiers */
+    static UMLClassifier *undefClassifier_;
+
     /**
      * @brief Types of class element.
      */
@@ -44,7 +47,7 @@ public:
      * @brief Class constructor
      * @param name Class diagram's name.
      */
-    explicit ClassDiagram(const std::string& name) : Element{name}, classElements_{}, sequenceDiagrams_{} { };
+    explicit ClassDiagram(const std::string& name) : Element{name}, classElements_{}, sequenceDiagrams_{} { }
 
     /**
      * @brief Updates ClassDiagram's name.

@@ -30,11 +30,11 @@ public:
     const std::vector<UMLMessage> &messages() const;
     const ClassDiagram &model() const;
 
-    UMLObject &addObject(UMLClass *instanceOfClass, const std::string &objName);
-    UMLObject &getObject(const std::string &name) const;
+    bool addObject(UMLClass *instanceOfClass, const std::string &objName);
+    const UMLObject *getObject(const std::string &name) const;
     bool removeObject(const std::string &name);
 
-    UMLMessage &addMessage(UMLObject *src, UMLObject *dst);
+    bool addMessage(UMLObject &src, UMLObject &dst);
     UMLMessage &getMessage();
     int getMessagePosition(const UMLMessage &msg);
     bool moveMessageIntoPosition();

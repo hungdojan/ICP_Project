@@ -122,3 +122,4 @@ std::unordered_set<UMLOperation *> UMLInterface::getOperations() const {
     }
     return operations;
 }
+

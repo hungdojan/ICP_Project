@@ -22,17 +22,20 @@
 #include <vector>
 #include <unordered_set>
 #include <QJsonObject>
+#include "ISubject.h"
 
 // Declaration of classes that are implemented in different source file
 class UMLAttribute;
 class UMLRelation;
 class UMLOperation;
 
-class UMLClassifier : public Element {
+class UMLClassifier : public Element, public ISubject {
 protected:
     // set visibility for other classes
     friend class ClassDiagram;
     friend class UMLRelation;
+    /** Collection of observers */
+    std::unordered_set<IObserver *> observers_;
     /**
      * Separates user-defined classes from
      * built-in or primitive data types (for example used in attributes and methods
@@ -99,7 +102,7 @@ public:
      * @param params Vector of parameters
      * @return Created instance of attribute/operation.
      */
-    static UMLAttribute *createAttribute(bool isOperation, const std::string &name, UMLClassifier *type, const std::vector<UMLAttribute> &params);
+    static UMLAttribute *createAttribute(bool isOperation, const std::string &name, UMLClassifier *type, const std::vector<UMLAttribute *> &params);
 
     /**
      * @brief Returns value of isUserDefined_.
@@ -203,6 +206,11 @@ public:
      * @brief Clear all relations in the classifier.
      */
     virtual void clearRelations();
+
+    void attach(IObserver *observer) override;
+    void detach(IObserver *observer) override;
+    void notify(const std::string &msg) final;
+    unsigned long observerCount() const;
 
     /**
      * @brief Creates JSON representation of element's content.

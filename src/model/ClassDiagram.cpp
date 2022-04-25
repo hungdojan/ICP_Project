@@ -20,6 +20,8 @@
 #include <QJsonArray>
 #include <fstream>
 
+UMLClassifier *ClassDiagram::undefClassifier_ = new UMLClassifier("#UNDEF", true);
+
 void ClassDiagram::setName(const std::string& newName) {
     Element::setName(newName);
 }
@@ -61,6 +63,10 @@ bool ClassDiagram::addClassifier(UMLClassifier *classifier) {
 UMLClassifier *ClassDiagram::addOrReplaceClassifier(UMLClassifier *classifier) {
     // search for class element with given name
     // remove it and replace it with _classifier_ when instance found
+    // forbidden to modify undefined classifier
+    if (classifier->name() == "#UNDEF")
+        return nullptr;
+
     auto iter{ std::find_if(classElements_.begin(), classElements_.end(),
                             [classifier](UMLClassifier *c) { return c->name() == classifier->name(); })};
 
@@ -94,6 +100,9 @@ bool ClassDiagram::changeClassifierName(UMLClassifier *classifier, const std::st
                                         [name](UMLClassifier *c) { return c->name() == name; })};
 
     if (existenceOfItem != classElements_.end() && itemIdenticalName == classElements_.end()) {
+        // forbidden to modify undefined classifier
+        if (*existenceOfItem == undefClassifier_)
+            return false;
         (*existenceOfItem)->setName(name);
         return true;
     }
@@ -109,6 +118,9 @@ bool ClassDiagram::changeClassifierName(const std::string& oldName, const std::s
     auto itemIdenticalName{std::find_if(classElements_.begin(), classElements_.end(),
                                         [newName](UMLClassifier *c) { return c->name() == newName; })};
     if (existenceOfItem != classElements_.end() && itemIdenticalName == classElements_.end()) {
+        // forbidden to modify undefined classifier
+        if (*existenceOfItem == undefClassifier_)
+            return false;
         (*existenceOfItem)->setName(newName);
         return true;
     }
@@ -132,6 +144,10 @@ bool ClassDiagram::isInClassDiagram(const UMLClassifier *classifier) const {
 UMLClassifier *ClassDiagram::removeClassElement(const std::string &name) {
     // if search for class element ends up successfully
     // remove it and return in to user to handle resources
+
+    // forbidden to modify undefined classifier
+    if (name == "#UNDEF")
+        return nullptr;
     auto iter{std::find_if(classElements_.begin(), classElements_.end(),
                            [name](UMLClassifier *c) { return c->name() == name; })};
     if (iter == classElements_.end())
@@ -141,6 +157,9 @@ UMLClassifier *ClassDiagram::removeClassElement(const std::string &name) {
 }
 
 bool ClassDiagram::removeClassElement(UMLClassifier *classifier) {
+    // forbidden to modify undefined classifier
+    if (classifier == undefClassifier_)
+        return false;
     auto iter{std::find(classElements_.begin(), classElements_.end(), classifier)};
     if (iter == classElements_.end())
         return false;
@@ -153,7 +172,11 @@ void ClassDiagram::createJsonObject(QJsonObject &object) {
     object.insert("name", QString::fromStdString(name_));
     QJsonArray qClassElements, qSequenceDiagram, qRelations;
     std::unordered_set<UMLRelation *> setOfRelations;
+    // insert class elements
     for (auto classifier : classElements_) {
+        if (dynamic_cast<UMLClass*>(classifier) == nullptr &&
+            dynamic_cast<UMLInterface*>(classifier) == nullptr && classifier->observerCount() < 1)
+            continue;
         QJsonObject obj;
         classifier->createJsonObject(obj);
         qClassElements.push_back(obj);
@@ -163,9 +186,10 @@ void ClassDiagram::createJsonObject(QJsonObject &object) {
     }
     object.insert("classElements", qClassElements);
 
-    // TODO: sequence diagram
+    // insert sequence diagram
     object.insert("sequenceDiagrams", qSequenceDiagram);
 
+    // insert relations
     for (auto r : setOfRelations) {
         QJsonObject obj;
         r->createObject(obj);
