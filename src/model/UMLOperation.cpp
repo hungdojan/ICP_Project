@@ -25,7 +25,7 @@ const std::vector<UMLAttribute> &UMLOperation::parameters() const {
 
 bool UMLOperation::addParameter(const UMLAttribute &parameter) {
     auto iter{std::find_if(parameters_.begin(), parameters_.end(),
-                           [parameter](const UMLAttribute &attr) { return attr.name() == parameter.name(); })};
+                           [&parameter](const UMLAttribute &attr) { return attr.name() == parameter.name(); })};
 
     if (iter != parameters_.end())
         return false;
@@ -99,14 +99,16 @@ void UMLOperation::clearParameters(std::vector<UMLAttribute> *vectorContent) {
 
 UMLOperation::operator std::string() const {
     std::ostringstream stream;
-    stream << visibility_ << type_->name() << " " << name_ << "(";
+    if (visibility_ != 0)
+        stream << visibility_;
+    stream << type_->name() << " " << name_ << "(";
     for (auto i = parameters_.begin(); i != parameters_.end(); ++i) {
         if (i != parameters_.begin())
             stream << " ";
         stream << *i;
     }
     stream << ")";
-    return UMLAttribute::operator std::string();
+    return stream.str();
 }
 
 std::ostream &operator<<(std::ostream &strm, const UMLOperation &operation) {
@@ -115,8 +117,8 @@ std::ostream &operator<<(std::ostream &strm, const UMLOperation &operation) {
 }
 
 UMLOperation::~UMLOperation() {
-    if (!type_->isUserDefined())
-        delete type_;
+    // if (!type_->isUserDefined())
+    //     delete type_;
 }
 
 void UMLOperation::createJsonObject(QJsonObject &object) {
