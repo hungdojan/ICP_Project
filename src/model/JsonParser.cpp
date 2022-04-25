@@ -234,7 +234,7 @@ void JsonParser::initFromFile(ClassDiagram &classDiagram, const std::string &fil
 void JsonParser::saveToFile(ClassDiagram &classDiagram, const std::string &filePath) {
     // load class diagram content
     QJsonObject mainObject;
-    classDiagram.createObject(mainObject);
+    classDiagram.createJsonObject(mainObject);
 
     // write to file
     QJsonDocument doc;

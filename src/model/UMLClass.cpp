@@ -17,8 +17,7 @@
 
 UMLClass::UMLClass(const std::string& name, const std::vector<UMLAttribute *>& attributes) : UMLClassifier{name} {
     for (auto attribute : attributes) {
-        // TODO: call addAttribute function
-        this->attributes_.push_back(attribute);
+        addAttribute(attribute);
     }
 }
 
@@ -60,6 +59,16 @@ UMLAttribute *UMLClass::addOrReplaceAttribute(UMLAttribute *attr) {
     }
     attributes_.push_back(attr);
     return found;
+}
+
+void UMLClass::addAttributes(const std::vector<UMLAttribute *> &attributes, bool cleanUnsuccessful) {
+    for (auto attr : attributes) {
+        if (attr == nullptr)
+            continue;
+        if (!addAttribute(attr) && cleanUnsuccessful) {
+            delete attr;
+        }
+    }
 }
 
 UMLAttribute *UMLClass::getAttribute(const std::string &name) {
@@ -183,7 +192,7 @@ UMLClass::~UMLClass() {
     }
 }
 
-void UMLClass::createObject(QJsonObject &object) {
+void UMLClass::createJsonObject(QJsonObject &object) {
     object.insert("_class", "UMLClass");
     object.insert("name", QString::fromStdString(name_));
     object.insert("isUserDefined", isUserDefined_);
@@ -191,7 +200,7 @@ void UMLClass::createObject(QJsonObject &object) {
     QJsonArray lofAttributes;
     for (auto attr : attributes_) {
         QJsonObject obj;
-        attr->createObject(obj);
+        attr->createJsonObject(obj);
         lofAttributes.push_back(obj);
     }
     object.insert("attributes", lofAttributes);

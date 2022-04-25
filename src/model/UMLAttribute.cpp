@@ -48,7 +48,7 @@ UMLAttribute::~UMLAttribute() {
         delete type_;
 }
 
-void UMLAttribute::createObject(QJsonObject &object) {
+void UMLAttribute::createJsonObject(QJsonObject &object) {
     object.insert("_class", "UMLAttribute");
     object.insert("name", QString::fromStdString(name_));
     object.insert("type", QString::fromStdString(type_->name()));

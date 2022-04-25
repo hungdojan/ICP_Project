@@ -12,7 +12,7 @@ public:
      * @brief Creates JSON representation of element's content.
      * @param object Reference to QJsonObject instance.
      */
-    virtual void createObject(QJsonObject &object) { /* TODO: */ };
+    void createJsonObject(QJsonObject &object) override { /* TODO: */ };
 
 
 };

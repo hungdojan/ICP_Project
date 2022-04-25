@@ -119,7 +119,7 @@ UMLOperation::~UMLOperation() {
         delete type_;
 }
 
-void UMLOperation::createObject(QJsonObject &object) {
+void UMLOperation::createJsonObject(QJsonObject &object) {
     object.insert("_class", "UMLOperation");
     object.insert("name", QString::fromStdString(name_));
     object.insert("type", QString::fromStdString(type_->name()));
@@ -127,7 +127,7 @@ void UMLOperation::createObject(QJsonObject &object) {
     QJsonArray paramsArray;
     for (auto param : parameters_) {
         QJsonObject qParam;
-        param.createObject(qParam);
+        param.createJsonObject(qParam);
         paramsArray.push_back(qParam);
     }
     object.insert("parameters", paramsArray);

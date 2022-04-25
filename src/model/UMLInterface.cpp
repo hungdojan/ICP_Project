@@ -96,7 +96,7 @@ UMLInterface::~UMLInterface() {
         delete o;
 }
 
-void UMLInterface::createObject(QJsonObject &object) {
+void UMLInterface::createJsonObject(QJsonObject &object) {
     object.insert("_class", "UMLInterface");
     object.insert("name", QString::fromStdString(name_));
     object.insert("isUserDefined", isUserDefined_);
@@ -104,7 +104,7 @@ void UMLInterface::createObject(QJsonObject &object) {
     QJsonArray lofOperations;
     for (auto o : operations_) {
         QJsonObject obj;
-        o->createObject(obj);
+        o->createJsonObject(obj);
         lofOperations.push_back(obj);
     }
     object.insert("operations", lofOperations);

@@ -148,14 +148,14 @@ bool ClassDiagram::removeClassElement(UMLClassifier *classifier) {
     return true;
 }
 
-void ClassDiagram::createObject(QJsonObject &object) {
+void ClassDiagram::createJsonObject(QJsonObject &object) {
     object.insert("_class", "ClassDiagram");
     object.insert("name", QString::fromStdString(name_));
     QJsonArray qClassElements, qSequenceDiagram, qRelations;
     std::unordered_set<UMLRelation *> setOfRelations;
     for (auto classifier : classElements_) {
         QJsonObject obj;
-        classifier->createObject(obj);
+        classifier->createJsonObject(obj);
         qClassElements.push_back(obj);
         for (auto r : classifier->relations()) {
             setOfRelations.insert(r);
