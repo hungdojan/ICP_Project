@@ -124,7 +124,7 @@ UMLClassifier::~UMLClassifier() {
     }
 }
 
-void UMLClassifier::createObject(QJsonObject &object) {
+void UMLClassifier::createJsonObject(QJsonObject &object) {
     object.insert("_class", "UMLClassifier");
     object.insert("name", QString::fromStdString(name_));
     object.insert("isUserDefined", isUserDefined_);

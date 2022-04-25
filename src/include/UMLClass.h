@@ -81,6 +81,15 @@ public:
     UMLAttribute *addOrReplaceAttribute(UMLAttribute *attr);
 
     /**
+     * @brief Adds multiple attributes into the class.
+     * When collection of attribute contains some duplicities (meaning two attributes have identical names), function
+     * only adds the first instance and other instances are ignored. Allocated resources are NOT cleared if cleanUnsuccessful
+     * parameter is set to false.
+     * @param attributes Collection of attributes.
+     * @param cleanUnsuccessful Whether to clear attributes that were not added.
+     */
+    void addAttributes(const std::vector<UMLAttribute *> &attributes, bool cleanUnsuccessful);
+    /**
      * @brief Returns instance of UMLAttribute in the class by given name.
      * @param name Attribute's name.
      * @return Instance of found attribute, nullptr otherwise.
@@ -177,7 +186,7 @@ public:
      * @brief Creates JSON representation of element's content.
      * @param object Reference to QJsonObject instance.
      */
-    void createObject(QJsonObject &object) override;
+    void createJsonObject(QJsonObject &object) override;
 
     /**
      * Class destructor

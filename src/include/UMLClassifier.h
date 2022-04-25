@@ -207,7 +207,7 @@ public:
      * @brief Creates JSON representation of element's content.
      * @param object Reference to QJsonObject instance.
      */
-    void createObject(QJsonObject &object) override;
+    void createJsonObject(QJsonObject &object) override;
 
     /**
      * @brief Class destructor.

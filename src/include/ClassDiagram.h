@@ -163,7 +163,7 @@ public:
     /**
      * @brief Creates JSON representation of element's content.
      */
-    void createObject(QJsonObject &object) override;
+    void createJsonObject(QJsonObject &object) override;
 
     // sequence diagram methods
     // TODO: add, search, remove
