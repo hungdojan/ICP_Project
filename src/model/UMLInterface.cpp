@@ -86,8 +86,9 @@ bool UMLInterface::removeRelation(UMLClassifier *dstClass) {
     if (iter == relations_.end())
         return false;
     (*iter)->removeRelationDependency(this);
+    auto tmpRel{*iter};
     relations_.erase(iter);
-    delete *iter;
+    delete tmpRel;
     return true;
 }
 
@@ -110,14 +111,13 @@ void UMLInterface::createJsonObject(QJsonObject &object) {
     object.insert("operations", lofOperations);
 }
 
-std::unordered_set<UMLAttribute *> UMLInterface::getOperations() const {
-    std::unordered_set<UMLAttribute *> operations;
+std::unordered_set<UMLOperation *> UMLInterface::getOperations() const {
+    std::unordered_set<UMLOperation *> operations;
     operations.insert(operations_.begin(), operations_.end());
     // get operations from base classes
     for (auto cls : parentClasses_) {
         for (auto a : cls->getOperations()) {
-            if (dynamic_cast<UMLOperation *>(a) != nullptr)
-                operations.insert(a);
+            operations.insert(a);
         }
     }
     return operations;

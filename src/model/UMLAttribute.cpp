@@ -34,7 +34,9 @@ bool UMLAttribute::operator==(UMLAttribute &attr) const {
 
 UMLAttribute::operator std::string() const {
     std::ostringstream stream;
-    stream << visibility_ << type_->name() << " " << name_;
+    if (visibility_ != 0)
+        stream << visibility_;
+    stream << type_->name() << " " << name_;
     return stream.str();
 }
 
@@ -44,8 +46,8 @@ std::ostream &operator<<(std::ostream &strm, const UMLAttribute &attr) {
 }
 
 UMLAttribute::~UMLAttribute() {
-    if (!type_->isUserDefined())
-        delete type_;
+    // if (!type_->isUserDefined())
+    //     delete type_;
 }
 
 void UMLAttribute::createJsonObject(QJsonObject &object) {

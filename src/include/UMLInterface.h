@@ -24,7 +24,7 @@ public:
      * @brief Returns collection of callable operations of this class.
      * @return Collection of callable operations.
      */
-    std::unordered_set<UMLAttribute *> getOperations() const override;
+    std::unordered_set<UMLOperation *> getOperations() const override;
 
     UMLRelation *addRelation(UMLClassifier *dst) override;
     bool removeRelation(UMLRelation *relation) override;
@@ -35,7 +35,6 @@ public:
      */
     void createJsonObject(QJsonObject &object) override;
 
-    // TODO: destructor
     ~UMLInterface() override;
 };
 

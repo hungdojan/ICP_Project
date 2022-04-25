@@ -111,12 +111,12 @@ void UMLRelation::removeRelationDependency(UMLClassifier *src) {
     if (src == src_) {
         auto dstRelation{std::find(dst_->relations_.begin(), dst_->relations_.end(), this)};
         if (dstRelation != dst_->relations_.end())
-            dst_->relations_.erase(dstRelation);
+            dst_->relations_.erase(this);
     }
     else {
         auto srcRelation{std::find(src_->relations_.begin(), src_->relations_.end(), this)};
         if (srcRelation != src_->relations_.end())
-            src_->relations_.erase(srcRelation);
+            src_->relations_.erase(this);
     }
 }
 

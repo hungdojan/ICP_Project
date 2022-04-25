@@ -80,17 +80,16 @@ UMLAttribute *UMLClass::getAttribute(const std::string &name) {
     return nullptr;
 }
 
-std::unordered_set<UMLAttribute *> UMLClass::getOperations() const {
-    std::unordered_set<UMLAttribute *> operations;
+std::unordered_set<UMLOperation *> UMLClass::getOperations() const {
+    std::unordered_set<UMLOperation *> operations;
     for (auto a : attributes_) {
         if (dynamic_cast<UMLOperation *>(a) != nullptr)
-            operations.insert(a);
+            operations.insert(dynamic_cast<UMLOperation *>(a));
     }
     // get operations from base classes
     for (auto cls : parentClasses_) {
         for (auto a : cls->getOperations()) {
-            if (dynamic_cast<UMLOperation *>(a) != nullptr)
-                operations.insert(a);
+            operations.insert(a);
         }
     }
     return operations;
@@ -181,8 +180,9 @@ bool UMLClass::removeRelation(UMLClassifier *dstClass) {
     if (iter == relations_.end())
         return false;
     (*iter)->removeRelationDependency(this);
+    auto tmpRel{*iter};
     relations_.erase(iter);
-    delete *iter;
+    delete tmpRel;
     return true;
 }
 

@@ -131,6 +131,6 @@ void UMLClassifier::createJsonObject(QJsonObject &object) {
     object.insert("isAbstract", isAbstract_);
 }
 
-std::unordered_set<UMLAttribute *> UMLClassifier::getOperations() const {
+std::unordered_set<UMLOperation *> UMLClassifier::getOperations() const {
     return {};
 }

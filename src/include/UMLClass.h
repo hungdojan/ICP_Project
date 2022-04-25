@@ -17,6 +17,7 @@
 #define DIAGRAMEDITOR_UMLCLASS_H
 #include "UMLClassifier.h"
 #include "UMLAttribute.h"
+#include "UMLOperation.h"
 #include <vector>
 #include <list>
 #include <unordered_set>
@@ -100,7 +101,7 @@ public:
      * @brief Returns collection of callable operations of this class.
      * @return Collection of callable operations.
      */
-    std::unordered_set<UMLAttribute *> getOperations() const override;
+    std::unordered_set<UMLOperation *> getOperations() const override;
 
     // Returns attribute from a given position
     /**

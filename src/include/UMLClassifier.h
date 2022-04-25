@@ -26,6 +26,7 @@
 // Declaration of classes that are implemented in different source file
 class UMLAttribute;
 class UMLRelation;
+class UMLOperation;
 
 class UMLClassifier : public Element {
 protected:
@@ -143,7 +144,7 @@ public:
      * @brief Returns collection of callable operations of this class.
      * @return Collection of callable operations.
      */
-    virtual std::unordered_set<UMLAttribute *> getOperations() const;
+    virtual std::unordered_set<UMLOperation *> getOperations() const;
 
     /**
      * @brief Checks if this class derive from given classifier.
