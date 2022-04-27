@@ -103,7 +103,12 @@ std::ostream &operator<<(std::ostream &strm, const UMLOperation &operation) {
     return strm << str;
 }
 
-UMLOperation::~UMLOperation() =default;
+UMLOperation::~UMLOperation() {
+    for (auto p : parameters_) {
+        delete p;
+    }
+    notify("DELETE");
+}
 
 void UMLOperation::createJsonObject(QJsonObject &object) {
     object.insert("_class", "UMLOperation");
@@ -117,4 +122,18 @@ void UMLOperation::createJsonObject(QJsonObject &object) {
         paramsArray.push_back(qParam);
     }
     object.insert("parameters", paramsArray);
+}
+
+void UMLOperation::attach(IObserver *observer) {
+    observers_.insert(observer);
+}
+
+void UMLOperation::detach(IObserver *observer) {
+    observers_.erase(observer);
+}
+
+void UMLOperation::notify(const std::string &msg) {
+    for (auto o : observers_) {
+        o->update(msg);
+    }
 }

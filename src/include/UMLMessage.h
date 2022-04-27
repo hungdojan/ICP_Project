@@ -4,25 +4,31 @@
 #include "UMLOperation.h"
 #include "UMLObject.h"
 
-class UMLMessage : public Element {
-    UMLObject src_;
-    UMLObject dst_;
+class UMLMessage : public Element, public IObserver {
+    UMLObject *src_;
+    UMLObject *dst_;
     UMLOperation *baseOperation_;
 public:
     UMLMessage() =delete;
-    explicit UMLMessage(UMLOperation *baseOperation, UMLObject &src, UMLObject &dst)
-            : Element{""}, src_{src}, dst_{dst}, baseOperation_{baseOperation} { }
+    explicit UMLMessage(UMLOperation *baseOperation, UMLObject *src, UMLObject *dst);
+    explicit UMLMessage(const std::string &name, UMLObject *src, UMLObject *dst);
 
-    const UMLObject &dst() const;
-    const UMLObject &src() const;
+    std::string text() const;
+    void setText(const std::string &text);
+
+    const UMLObject *dst() const;
+    const UMLObject *src() const;
     const UMLOperation *baseOperation() const;
     bool setOperation(UMLOperation *operation);
     bool setOperation(const std::string &operationName);
+    void update(const std::string& msg) override;
 
     /**
      * @brief Creates JSON representation of element's content.
      * @param object Reference to QJsonObject instance.
      */
-    void createJsonObject(QJsonObject &object) override { /* TODO: */ };
+    void createJsonObject(QJsonObject &object) override;
+
+    void createJsonObject(QJsonObject &object, int index);
 };
 #endif //DIAGRAMEDITOR_UMLMESSAGE

@@ -11,6 +11,8 @@
 UMLAttribute::UMLAttribute(const std::string &name, UMLClassifier *classifier) : Element(name), type_{classifier} {
     if (classifier != nullptr)
         classifier->attach(this);
+    else
+        type_ = ClassDiagram::undefClassifier_;
 }
 
 void UMLAttribute::setName(const std::string &name) {
@@ -65,8 +67,7 @@ void UMLAttribute::update(const std::string &msg) {
 }
 
 UMLAttribute::~UMLAttribute() {
-    // if (!type_->isUserDefined())
-    //     delete type_;
+    type_->detach(this);
 }
 
 void UMLAttribute::createJsonObject(QJsonObject &object) {

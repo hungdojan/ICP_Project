@@ -19,6 +19,7 @@
 #include <QJsonDocument>
 #include <QJsonArray>
 #include <fstream>
+#include <vector>
 
 UMLClassifier *ClassDiagram::undefClassifier_ = new UMLClassifier("#UNDEF", true);
 
@@ -35,6 +36,9 @@ const std::vector<SequenceDiagram *>& ClassDiagram::sequenceDiagrams() const {
 }
 
 UMLClassifier *ClassDiagram::createClassifier(const std::string& name, ClassElementType classElementType) {
+    if (name == "#UNDEF")
+        throw std::invalid_argument("Cannot create classifier named #UNDEF, this classifier is reserved!");
+
     switch(classElementType) {
         case CLASSIFIER:
             return new UMLClassifier(name, true);
@@ -187,6 +191,11 @@ void ClassDiagram::createJsonObject(QJsonObject &object) {
     object.insert("classElements", qClassElements);
 
     // insert sequence diagram
+    for (auto sd : sequenceDiagrams_) {
+        QJsonObject obj;
+        sd->createJsonObject(obj);
+        qSequenceDiagram.push_back(obj);
+    }
     object.insert("sequenceDiagrams", qSequenceDiagram);
 
     // insert relations
@@ -199,12 +208,83 @@ void ClassDiagram::createJsonObject(QJsonObject &object) {
 }
 
 ClassDiagram::~ClassDiagram() {
-    for (auto i : classElements_) {
+    for (auto i : sequenceDiagrams_) {
         delete i;
     }
-    for (auto i : sequenceDiagrams_) {
+    for (auto i : classElements_) {
         delete i;
     }
     classElements_.clear();
     sequenceDiagrams_.clear();
+}
+
+void ClassDiagram::clearSequenceDiagrams() {
+    for (auto sd : sequenceDiagrams_) {
+        delete sd;
+    }
+    sequenceDiagrams_.clear();
+}
+
+SequenceDiagram *ClassDiagram::addSequenceDiagram(const std::string &name) {
+    auto iter{std::find_if(sequenceDiagrams_.begin(), sequenceDiagrams_.end(),
+                           [name](SequenceDiagram *s) { return s->name() == name; })};
+    if (iter != sequenceDiagrams_.end())
+        return nullptr;
+    auto sd = new SequenceDiagram(name, *this);
+    sequenceDiagrams_.push_back(sd);
+    return sd;
+}
+
+SequenceDiagram *ClassDiagram::getSequenceDiagram(const std::string &name) {
+    auto iter{std::find_if(sequenceDiagrams_.begin(), sequenceDiagrams_.end(),
+                           [name](SequenceDiagram *s) { return s->name() == name; })};
+    if (iter != sequenceDiagrams_.end())
+        return nullptr;
+    return *iter;
+}
+
+bool ClassDiagram::addSequenceDiagram(SequenceDiagram *sequenceDiagram) {
+    auto iter{std::find(sequenceDiagrams_.begin(), sequenceDiagrams_.end(), sequenceDiagram)};
+    if (iter != sequenceDiagrams_.end())
+        return false;
+    sequenceDiagrams_.push_back(sequenceDiagram);
+    return true;
+}
+
+void ClassDiagram::addSequenceDiagrams(const std::vector<SequenceDiagram *> &sequenceDiagrams, bool clearUnsuccessful) {
+    for (auto sd : sequenceDiagrams) {
+        if (sd == nullptr)
+            continue;
+        if (!addSequenceDiagram(sd) && clearUnsuccessful)
+            delete sd;
+    }
+
+}
+
+bool ClassDiagram::removeSequenceDiagram(SequenceDiagram *s) {
+    auto iter{std::find(sequenceDiagrams_.begin(), sequenceDiagrams_.end(), s)};
+    if (iter == sequenceDiagrams_.end())
+        return false;
+    sequenceDiagrams_.erase(iter);
+    return true;
+}
+
+bool ClassDiagram::removeSequenceDiagram(const std::string &name) {
+    auto iter{std::find_if(sequenceDiagrams_.begin(), sequenceDiagrams_.end(),
+                           [name](SequenceDiagram *s) { return s->name() == name; })};
+    if (iter == sequenceDiagrams_.end())
+        return false;
+    auto tmp = *iter;
+    sequenceDiagrams_.erase(iter);
+    delete tmp;
+    return true;
+}
+
+const std::vector<UMLClass *> ClassDiagram::getClasses() const {
+    std::vector<UMLClass *> classFound;
+    for (auto i : classElements_) {
+        if (dynamic_cast<UMLClass *>(i) != nullptr)
+            classFound.push_back(dynamic_cast<UMLClass *>(i));
+    }
+    return classFound;
 }

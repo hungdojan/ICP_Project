@@ -9,9 +9,10 @@
 #include "UMLAttribute.h"
 #include "IObserver.h"
 
-class UMLOperation : public UMLAttribute {
+class UMLOperation : public UMLAttribute, public ISubject {
 protected:
     std::vector<UMLAttribute*> parameters_;
+    std::unordered_set<IObserver *> observers_;
 public:
     UMLOperation() =delete;
     // Class constructor
@@ -33,6 +34,9 @@ public:
     // Clear collection of operation parameters
     void clearParameters(std::vector<UMLAttribute *> *vectorContent);
 
+    void attach(IObserver *observer) override;
+    void detach(IObserver *observer) override;
+    void notify(const std::string &msg) override;
     /**
      * @brief Creates JSON representation of element's content.
      * @param object Reference to QJsonObject instance.

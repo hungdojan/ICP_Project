@@ -16,13 +16,14 @@
 #include "Element.h"
 #include "UMLClass.h"
 
-class UMLObject : public Element {
+class UMLObject : public Element, public IObserver {
     UMLClass *model_;
 public:
     UMLObject() =delete;
     explicit UMLObject(const std::string &name, UMLClass *instanceOfClass) : Element{name}, model_{instanceOfClass} { }
-    const UMLClass *model() const;
+    UMLClass *model() const;
     void setModel(UMLClass *model);
+    void update(const std::string &msg) override;
 
     /**
      * @brief Creates JSON representation of element's content.

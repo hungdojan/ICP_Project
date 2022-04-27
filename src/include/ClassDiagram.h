@@ -135,6 +135,8 @@ public:
      */
     UMLClassifier *getClassifier(const std::string &name) const ;
 
+    const std::vector<UMLClass *> getClasses() const;
+
     /**
      * @brief Checks if given classifier is in the class diagram.
      * @param classifier Instance of classifier.
@@ -171,6 +173,14 @@ public:
     // sequence diagram methods
     // TODO: add, search, remove
     // Class destructor
+    SequenceDiagram *addSequenceDiagram(const std::string &name);
+    bool addSequenceDiagram(SequenceDiagram *sequenceDiagram);
+    SequenceDiagram *getSequenceDiagram(const std::string &name);
+    void addSequenceDiagrams(const std::vector<SequenceDiagram *> &sequenceDiagrams, bool clearUnsuccessful);
+    bool removeSequenceDiagram(SequenceDiagram *s);
+    bool removeSequenceDiagram(const std::string &name);
+    void clearSequenceDiagrams();
+
     ~ClassDiagram() override;
 };
 

@@ -20,25 +20,30 @@
 class ClassDiagram;
 
 class SequenceDiagram : public Element {
-    std::vector<UMLObject> objects_;
-    std::vector<UMLMessage> messages_;
+    std::vector<UMLObject *> objects_;
+    std::vector<UMLMessage *> messages_;
     ClassDiagram &model_;
 public:
+    static UMLClass *undefClass;
+    static UMLOperation *undefOperation;
+    static UMLObject *undefObject;
     SequenceDiagram() =delete;
     explicit SequenceDiagram(const std::string &name, ClassDiagram &model) : Element{name}, model_{model} { }
-    const std::vector<UMLObject> &objects() const;
-    const std::vector<UMLMessage> &messages() const;
+    const std::vector<UMLObject *> &objects() const;
+    const std::vector<UMLMessage *> &messages() const;
     const ClassDiagram &model() const;
 
-    bool addObject(UMLClass *instanceOfClass, const std::string &objName);
-    const UMLObject *getObject(const std::string &name) const;
+    UMLObject *addObject(UMLClass *instanceOfClass, const std::string &objName);
+    UMLObject *getObject(const std::string &name) const;
     bool removeObject(const std::string &name);
 
-    bool addMessage(UMLObject &src, UMLObject &dst);
-    UMLMessage &getMessage();
-    int getMessagePosition(const UMLMessage &msg);
-    bool moveMessageIntoPosition();
-    bool removeMessage();
+    UMLMessage *addMessage(UMLObject *src, UMLObject *dst);
+    bool addMessage(UMLMessage *msg);
+    UMLMessage *getMessageAt(int pos);
+    long getMessagePosition(UMLMessage *msg);
+    bool moveMessageIntoPosition(UMLMessage *msg, int pos);
+    bool removeMessage(UMLMessage *msg);
+    bool removeMessage(int pos);
 
     /**
      * @brief Creates JSON representation of element's content.

@@ -22,6 +22,7 @@
 #include "UMLOperation.h"
 #include "UMLAttribute.h"
 #include "UMLRelation.h"
+#include "UMLMessage.h"
 
 /**
  * @brief Loads attributes from the JSON file.
@@ -35,7 +36,7 @@ void loadAttribute(QJsonObject &qAttribute, UMLAttribute &attribute,
     if (qAttribute["_class"].toString().toStdString() != "UMLAttribute")
         throw std::invalid_argument("Expected UMLAttribute, received something else!");
 
-    auto iter = mapOfClassifiers.find(qAttribute["name"].toString().toStdString());
+    auto iter = mapOfClassifiers.find(qAttribute["type"].toString().toStdString());
     // class element not found
     if (iter == mapOfClassifiers.end())
         return;
@@ -167,7 +168,63 @@ void loadClassElements(ClassDiagram &classDiagram, QJsonArray &buffer) {
 }
 
 void loadSequenceDiagrams(ClassDiagram &classDiagram, QJsonArray &buffer) {
-    // TODO:
+    for (auto sd : buffer) {
+        std::map<int, UMLMessage *> messages;
+        QJsonObject qSequenceDiagram = sd.toObject();
+        if (qSequenceDiagram["_class"] != "SequenceDiagram")
+            throw std::invalid_argument("Expected SequenceDiagram, received something else!");
+        std::string name{qSequenceDiagram["name"].toString().toStdString()};
+        auto sequenceDiagram = new SequenceDiagram(name, classDiagram);
+        for (auto o : qSequenceDiagram["objects"].toArray()) {
+            QJsonObject qObject = o.toObject();
+            if (qObject["_class"] != "UMLObject")
+                throw std::invalid_argument("Expected UMLObject, received something else!");
+            std::string objName{qObject["name"].toString().toStdString()};
+            UMLClass *baseModel;
+            if (qObject["model"].toString().toStdString() == "#UNDEF")
+                baseModel = SequenceDiagram::undefClass;
+            else
+                baseModel = dynamic_cast<UMLClass*>(classDiagram.getClassifier(qObject["model"].toString().toStdString()));
+
+            if (baseModel == nullptr)
+                continue;
+            sequenceDiagram->addObject(baseModel, objName);
+        }
+        for (auto m : qSequenceDiagram["messages"].toArray()) {
+            QJsonObject qMessage = m.toObject();
+            if (qMessage["_class"] != "UMLMessage")
+                throw std::invalid_argument("Expected UMLMessage, received something else!");
+
+            std::string msgName = qMessage["name"].toString().toStdString();
+            UMLObject *src = nullptr;
+            UMLObject *dst = nullptr;
+            UMLOperation *baseOperation = nullptr;
+            std::string msgSrc = qMessage["src"].toString().toStdString();
+            if (msgSrc != "#UNDEF") {
+                src = sequenceDiagram->getObject(msgSrc);
+            }
+            std::string msgDst = qMessage["dst"].toString().toStdString();
+            if (msgDst != "#UNDEF") {
+                dst = sequenceDiagram->getObject(msgDst);
+            }
+            std::string msgBaseOperation = qMessage["baseOperation"].toString().toStdString();
+            if (msgBaseOperation != "#UNDEF" && dst != nullptr) {
+                baseOperation = dynamic_cast<UMLOperation *>(dst->model()->getAttribute(msgBaseOperation));
+            }
+            try {
+                auto message = new UMLMessage(baseOperation, src, dst);
+                message->setText(msgName);
+                messages.insert({qMessage["index"].toInt(), message});
+            } catch (std::invalid_argument &e) { }
+        }
+        for (auto m : messages) {
+            if (!sequenceDiagram->addMessage(m.second))
+                delete m.second;
+        }
+        if (!classDiagram.addSequenceDiagram(sequenceDiagram)) {
+            delete sequenceDiagram;
+        }
+    }
 }
 
 /**
@@ -223,7 +280,7 @@ void JsonParser::initFromFile(ClassDiagram &classDiagram, const std::string &fil
     loadClassElements(classDiagram, qClassElements);
 
     // load sequence diagrams
-    QJsonArray qSequenceDiagrams;
+    QJsonArray qSequenceDiagrams = qClassDiagram["sequenceDiagrams"].toArray();
     loadSequenceDiagrams(classDiagram, qSequenceDiagrams);
 
     // load relations
