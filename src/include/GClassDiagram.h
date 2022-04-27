@@ -20,6 +20,9 @@ public:
     const ClassDiagram *model() const;
     void scene(GraphicsScene *scene);
     const GraphicsScene *scene() const;
+signals:
+    void updateUndefTypes();
+    void classDiagramUpdated();
 //    ~GClassDiagram();
 private slots:
     void addClassifier();
@@ -35,6 +38,7 @@ private:
     GClassSettings *gClassSettings;
     int name_index{0};
     void addGClassifier(GClassifier *g);
+    std::string getIndexed(std::string classifierName);
 };
 
 #endif //DIAGRAMEDITOR_GCLASSDIAGRAM_H

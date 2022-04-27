@@ -139,8 +139,9 @@ void GClassSettings::saveContent(){
 
         if (categoryName.toStdString().find(GENERAL) != std::string::npos) {
             // Title
-            selectedGClassifier->umlClassifier->setName(
-                    tree->itemWidget(category->child(0), 0)->findChild<QLineEdit *>()->text().toStdString());
+            std::string name = tree->itemWidget(category->child(0), 0)->findChild<QLineEdit *>()->text().toStdString();
+            if(!name.empty() && !classDiagram->getClassifier(name))
+                selectedGClassifier->umlClassifier->setName(name);
         }
         if (categoryName.toStdString().find(ATTRIBUTES) != std::string::npos) {
             UMLClass *cls;
@@ -597,7 +598,8 @@ void GClassSettings::loadOperation(QTreeWidgetItem *category, UMLOperation *a){
     std::string paramsText = "";
     for(auto param: a->parameters())
         paramsText += param->type()->name()+" "+param->name()+",";
-    paramsText.erase(paramsText.end()-1);
+    if(paramsText.size() > 0)
+        paramsText.erase(paramsText.end()-1);
     addFuncRow((QWidget *) category, QString::fromStdString(std::string(1,a->visibility())),
                QString::fromStdString(a->type()->name()),QString::fromStdString(a->name()), QString::fromStdString(paramsText));
 }

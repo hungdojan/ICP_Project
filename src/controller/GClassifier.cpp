@@ -21,7 +21,7 @@
 #define UNSELECTED_COLOR "#CFCFDD"
 
 GClassifier::GClassifier(std::string name, qreal x, qreal y, qreal width, qreal height, ClassDiagram *classDiagram, bool isInterface, QGraphicsItem *parent) :
-        QGraphicsRectItem(x, y, width, height, parent), QObject(), classDiagram{classDiagram}, isInterface{isInterface}, width{width}, height{height}{
+        QGraphicsRectItem(x, y, width, height, parent), QObject(), classDiagram{classDiagram}, isInterface{isInterface}, width{width}, height{height}, x{x}, y{y}{
 
     setFlag(QGraphicsItem::ItemIsMovable);
     setFlag(QGraphicsItem::ItemIsSelectable);
@@ -37,8 +37,8 @@ GClassifier::GClassifier(std::string name, qreal x, qreal y, qreal width, qreal 
     classDiagram->addClassifier(umlClassifier);
 
     titleRect = new QGraphicsRectItem(x,y, width, ROW_HEIGHT*2, this);
-    title = new GText(QString::fromStdString(umlClassifier->name()), titleRect->x(), titleRect->y(), titleRect);
-    classificType = new GText(isInterface? "<interface>": "<class>", titleRect->x(), titleRect->y()+title->sceneBoundingRect().height(), titleRect);
+    title = new GText(QString::fromStdString(umlClassifier->name()), x, y, titleRect);
+    classificType = new GText(isInterface? "<interface>": "<class>", x, y+title->sceneBoundingRect().height(), titleRect);
 
     connect(this, SIGNAL(gTextChanged()), title, SLOT(onTextChanged()));
     connect(this, SIGNAL(gTextChanged()), classificType, SLOT(onTextChanged()));
@@ -49,8 +49,13 @@ GClassifier::GClassifier(std::string name, qreal x, qreal y, qreal width, qreal 
         attribRect = new QGraphicsRectItem(x,y+2*ROW_HEIGHT, width, ROW_HEIGHT, this);
 
     contentSaved();
+
 }
 GClassifier::~GClassifier(){
+}
+
+void GClassifier::onUpdateUndefTypes(){
+    contentSaved();
 }
 
 void GClassifier::contentSaved(){
@@ -81,16 +86,18 @@ void GClassifier::resizeRectangles(){
     UMLClass *cls;
     if(cls = dynamic_cast<UMLClass*>(umlClassifier)) {
         clsCountHeight += cls->attributes().size() * ROW_HEIGHT;
-        attribRect->setRect(0, ROW_HEIGHT*2, width, attribRect->childItems().size()*ROW_HEIGHT);
+        attribRect->setRect(x, y+ROW_HEIGHT*2, width, attribRect->childItems().size()*ROW_HEIGHT);
     }
     UMLInterface *inf;
     if(inf = dynamic_cast<UMLInterface*>(umlClassifier))
         infCountHeight += inf->operations().size() * ROW_HEIGHT;
 
     height = ROW_HEIGHT*2 + clsCountHeight + infCountHeight;
-    setRect(0, 0, width, height);
-    titleRect->setRect(0,0,width, ROW_HEIGHT*2);
+    setRect(x, y, width, height);
+    titleRect->setRect(x, y, width, ROW_HEIGHT*2);
     emit gClassifierPositionChanged();
+
+//    qDebug() << sceneBoundingRect().x() << " " << sceneBoundingRect().y(); todo save as x, y??
 }
 
 void GClassifier::contentDeleted(){

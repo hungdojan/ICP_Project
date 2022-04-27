@@ -16,6 +16,7 @@
 #include <fstream>
 #include <unordered_map>
 #include <sstream>
+#include <map>
 #include "UMLClassifier.h"
 #include "UMLClass.h"
 #include "UMLInterface.h"

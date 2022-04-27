@@ -14,7 +14,8 @@ GText::GText(const QString &text, qreal x, qreal y, QGraphicsItem *parent): QGra
 
 void GText::centerText() {
     // Horizontal center in a parent
-    setPos(parent->boundingRect().x() + (parent->boundingRect().center().x() - sceneBoundingRect().width()/2.0), y());
+//    setPos(parent->boundingRect().x() + (parent->boundingRect().center().x() - sceneBoundingRect().width()/2.0), y());
+    setPos(boundingRect().x() + (parent->boundingRect().center().x() - sceneBoundingRect().width()/2.0), y());
 }
 
 void GText::onTextChanged(){

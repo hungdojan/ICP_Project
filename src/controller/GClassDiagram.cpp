@@ -18,19 +18,31 @@ GClassDiagram::GClassDiagram(GraphicsScene *scene, ClassDiagram *model) : scene_
 }
 
 void GClassDiagram::addClassifier() {
-    addGClassifier(new GClassifier("class"+std::to_string(name_index++), 0+name_index, 0+name_index, 100, 150, classDiagramModel));
+    addGClassifier(new GClassifier(getIndexed("class"), 2*name_index, 2*name_index, 100, 150, classDiagramModel));
 }
 
 void GClassDiagram::addClassifierInterface() {
-    addGClassifier(new GClassifier("interface"+std::to_string(name_index++), 0, 0, 100, 150, classDiagramModel, true));
+    addGClassifier(new GClassifier(getIndexed("interface"), 2*name_index, 2*name_index, 100, 150, classDiagramModel, true));
 }
+
+std::string GClassDiagram::getIndexed(std::string classifierName){
+    std::string name = classifierName+std::to_string(name_index++);
+    while(classDiagramModel->getClassifier(name)){
+        name = classifierName+std::to_string(name_index++);
+    }
+    return name;
+}
+
 void GClassDiagram::addGClassifier(GClassifier *gRect){
     scene_->addItem(gRect);
     connect(gRect, SIGNAL(gClassifierSelectionChanged()), this, SLOT(onGClassifierSelectionChanged()));
     connect(gRect, SIGNAL(gClassifierContentChanged()), this, SLOT(onGClassifierContentChanged()));
     connect(gRect, SIGNAL(gClassifierDeleted()), this, SLOT(onGClassifierDeleted()));
+    connect(this, SIGNAL(updateUndefTypes()), gRect, SLOT(onUpdateUndefTypes()));
 
     gClassifiers.push_back(gRect);
+    // gRects cannot emit from constructor initialization
+    emit classDiagramUpdated(); // todo was not there Notify SequenceDiagram
 }
 
 void GClassDiagram::onGClassifierSelectionChanged(){
@@ -43,16 +55,12 @@ void GClassDiagram::onGClassifierSelectionChanged(){
 void GClassDiagram::onGClassifierDeleted(){
     auto src = (GClassifier*)sender();
 
-    std::vector<GRelation*>toRem; // GRelations to remove
-
-    for(auto gR: gRelations) {
-        if (dynamic_cast<GClassifier *>(gR->getDst()) == src || dynamic_cast<GClassifier *>(gR->getSrc()) == src) {
-            toRem.push_back(gR);
+    for(int i = gRelations.size()-1; i >= 0; i--){
+        if(dynamic_cast<GClassifier *>(gRelations.at(i)->getDst()) == src || dynamic_cast<GClassifier *>(gRelations.at(i)->getSrc()) == src) {
+            auto gR = gRelations.at(i);
+            gRelations.erase(gRelations.begin() + i);
             delete gR;
         }
-    }
-    for(auto r: toRem){
-        gRelations.erase(std::find(gRelations.begin(), gRelations.end(), r));
     }
 
     gClassifiers.erase(std::find(gClassifiers.begin(), gClassifiers.end(), src));
@@ -62,6 +70,8 @@ void GClassDiagram::onGClassifierDeleted(){
     delete src;
 
     gClassSettings->hideContent();
+    emit updateUndefTypes();
+    emit classDiagramUpdated(); // Notify SequenceDiagram
 }
 
 void GClassDiagram::onGClassifierContentChanged(){
@@ -96,7 +106,7 @@ void GClassDiagram::onGClassifierContentChanged(){
             gRelations.push_back(newRel);
         }
     }
-//     If GRelation exists but UML not
+    // If GRelation exists but UML not
     for(auto gR: gRelations){
         GClassifier *inRelItem = nullptr;
         if(dynamic_cast<GClassifier *>(gR->getSrc()) == src)
@@ -109,4 +119,6 @@ void GClassDiagram::onGClassifierContentChanged(){
             delete gR;
         }
     }
+
+    emit classDiagramUpdated(); // Notify SequenceDiagram
 }
