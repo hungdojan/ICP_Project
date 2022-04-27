@@ -238,7 +238,7 @@ SequenceDiagram *ClassDiagram::addSequenceDiagram(const std::string &name) {
 SequenceDiagram *ClassDiagram::getSequenceDiagram(const std::string &name) {
     auto iter{std::find_if(sequenceDiagrams_.begin(), sequenceDiagrams_.end(),
                            [name](SequenceDiagram *s) { return s->name() == name; })};
-    if (iter != sequenceDiagrams_.end())
+    if (iter == sequenceDiagrams_.end())
         return nullptr;
     return *iter;
 }

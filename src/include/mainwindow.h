@@ -14,6 +14,7 @@
 #include <QTreeWidget>
 #include "GraphicsScene.h"
 #include "GClassDiagram.h"
+#include "GSequenceDiagram.h"
 
 QT_BEGIN_NAMESPACE
 namespace Ui { class MainWindow; }
@@ -27,13 +28,17 @@ public:
     ~MainWindow() override;
     QTreeWidget *getCategoryTree();
 
-//private slots:
-//    void addClass();
+private slots:
+    void clickedDiagram(QAction *a);
+    void deleteDiagram();
+    void onTests();
 
 private:
     Ui::MainWindow *ui;
     GraphicsScene *scene;
     GClassDiagram *gClassDiagram;
+    std::vector<GSequenceDiagram*> gSequenceDiagrams;
+    ClassDiagram *classDiagram;
 };
 
 

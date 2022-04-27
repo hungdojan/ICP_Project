@@ -45,6 +45,7 @@ private:
 private slots:
     void contentSaved();
     void contentDeleted();
+    void onUpdateUndefTypes();
 };
 
 #endif //DIAGRAMEDITOR_GCLASIFIER_H
