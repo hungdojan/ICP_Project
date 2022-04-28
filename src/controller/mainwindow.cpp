@@ -86,7 +86,7 @@ void MainWindow::clickedDiagram(QAction *a){
 }
 
 void MainWindow::saveClassDiagram() {
-    QString filePath = QFileDialog::getSaveFileName(this, tr("Save file"), QDir::currentPath(), ".json");
+    QString filePath = QFileDialog::getSaveFileName(this, tr("Save file"), QDir::currentPath(), "JSON file (*.json)");
     if (filePath == "")
         return;
 

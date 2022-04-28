@@ -19,12 +19,35 @@ GClassDiagram::GClassDiagram(GraphicsScene *scene, ClassDiagram *model) : scene_
     if (model == nullptr) {
         model = new ClassDiagram("");
     }
+    // load classifiers
     for (auto classifier : model->classElements()) {
         if (dynamic_cast<UMLClass *>(classifier) != nullptr || dynamic_cast<UMLInterface *>(classifier) != nullptr) {
             addGClassifier(new GClassifier(classifier, 2*name_index, 2*name_index, 100, 150, classDiagramModel));
         }
     }
-    // TODO: add relations
+    // collection of already initialized relations
+    std::vector<UMLRelation *> relationsUsed;
+
+    for (auto classifier : model->classElements()) {
+        // skip basic classifiers
+        if (dynamic_cast<UMLClass *>(classifier) == nullptr && dynamic_cast<UMLInterface *>(classifier) == nullptr)
+            continue;
+
+        // iterate over relations of the classifier
+        // when current relation is not found in relationUsed meaning that it wasn't initialized yet
+        // new instance of GRelation is created and added to the list
+        for (auto relation : classifier->relations()) {
+            auto iter {std::find(relationsUsed.begin(), relationsUsed.end(), relation)};
+            if (iter != relationsUsed.end())
+                continue;
+            auto srcGClassifier = *(std::find_if(gClassifiers.begin(), gClassifiers.end(),
+                                                 [relation](GClassifier *gClassifier) { return relation->src() == gClassifier->umlClassifier; }));
+            auto dstGClassifier = *(std::find_if(gClassifiers.begin(), gClassifiers.end(),
+                                                 [relation](GClassifier *gClassifier) { return relation->dst() == gClassifier->umlClassifier; }));
+            gRelations.push_back(new GRelation(srcGClassifier, dstGClassifier,
+                                               QString::fromStdString(relation->srcMsg()), QString::fromStdString(relation->dstMsg())));
+        }
+    }
 }
 
 void GClassDiagram::addClassifier() {
