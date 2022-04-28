@@ -87,12 +87,12 @@ void GSequenceDiagram::addSettings(){
     hLayoutMsg1->addWidget(labelTo);
     QComboBox *comboBoxDst = new QComboBox();
     comboBoxDst->setFixedWidth(145);
-    connect(comboBoxDst, SIGNAL(currentTextChanged(const QString &)), this, SLOT(onFuncUpdate()));
 
     hLayoutMsg1->addWidget(comboBoxDst);
     for(auto cls: classDiagram->classElements()){
         comboBoxDst->addItem(QString::fromStdString(cls->name()));
     }
+    connect(comboBoxDst, SIGNAL(currentTextChanged(const QString &)), this, SLOT(onFuncUpdate()));
 
     // Message frame horizontal 2
     QFrame *hFrame2 = new QFrame();
