@@ -20,19 +20,24 @@ public:
     GTimeline *dst;
     std::vector<QGraphicsLineItem*>getItems();
     int index;
-signals:
-    void responseClosed();
+    QString getFuncName();
+    void warn();
 private:
     GraphicsScene *scene;
     QGraphicsLineItem *line;
     QGraphicsLineItem *lineH;
     QGraphicsLineItem *lineBack;
     QString name;
+    qreal posY;
+    QGraphicsTextItem *text;
+    direction dir;
 
-    void addLtoR(qreal x1, qreal x2, qreal y, enum direction dir);
     void addLine(qreal x1, qreal x2, qreal y, enum direction dir);
     void addLtoL(qreal x1, qreal y1, enum direction dir);
     void addArrow(QGraphicsLineItem *line, enum direction dir, qreal x1, qreal x2, qreal y);
+    void addText();
+private slots:
+    void onUpdateMsgPos();
 };
 
 #endif //DIAGRAMEDITOR_GMESSAGE_H

@@ -14,6 +14,9 @@
 #include "GObject.h"
 #include <QLineEdit>
 #include <QLabel>
+#include <QTreeWidget>
+#include <QHeaderView>
+#include <QListWidget>
 
 #define HORIZONTAL_GAP 350
 #define NUM_INDEXES 5
@@ -23,10 +26,6 @@ GSequenceDiagram::GSequenceDiagram(GraphicsScene *scene, std::string name, Class
 
     addSettings();
     sequanceDiagram = classDiagram->getSequenceDiagram(name);
-
-//    for(auto item: msg2->getItems())
-//        scene->removeItem(item);
-//    delete msg2;
 }
 
 void GSequenceDiagram::addSettings(){
@@ -68,6 +67,14 @@ void GSequenceDiagram::addSettings(){
     QVBoxLayout *vLayoutMsg = new QVBoxLayout(frameMsg);
     QFrame *vFrameMsg = new QFrame();
     vLayoutMsg->addWidget(vFrameMsg);
+    vLayoutMsg->setSpacing(0);
+
+    QFrame *hFrame0 = new QFrame();
+    vLayoutMsg->addWidget(hFrame0);
+    QHBoxLayout *hLayoutMsg0 = new QHBoxLayout(hFrame0);
+    QLabel *labelMessage = new QLabel("New message");
+    labelMessage->setFont(QFont("Ubuntu", 15, 380));
+    hLayoutMsg0->addWidget(labelMessage);
 
     // Message frame horizontal 1
     QFrame *hFrame1 = new QFrame();
@@ -98,10 +105,6 @@ void GSequenceDiagram::addSettings(){
     QFrame *hFrame2 = new QFrame();
     vLayoutMsg->addWidget(hFrame2);
     QHBoxLayout *hLayoutMsg2 = new QHBoxLayout(hFrame2);
-
-//    QLineEdit *lineEdit = new QLineEdit();
-//    lineEdit->setPlaceholderText("message text");
-//    hLayoutMsg2->addWidget(lineEdit);
     QComboBox *comboBoxFuncs = new QComboBox();
     hLayoutMsg2->addWidget(comboBoxFuncs);
 
@@ -109,19 +112,132 @@ void GSequenceDiagram::addSettings(){
     QFrame *hFrame3 = new QFrame();
     vLayoutMsg->addWidget(hFrame3);
     QHBoxLayout *hLayoutMsg3 = new QHBoxLayout(hFrame3);
+    hLayoutMsg3->setSpacing(130);
 
     QComboBox *comboBoxTypes = new QComboBox();
     comboBoxTypes->addItems(QStringList(QString("sync,async,response,create,delete").split(",")));
     hLayoutMsg3->addWidget(comboBoxTypes);
 
     QPushButton *saveMsg = new QPushButton("Save");
-    saveMsg->setFixedWidth(90);
+    saveMsg->setFixedWidth(100);
     saveMsg->setFixedHeight(24);
     saveMsg->setStyleSheet("background-color: qlineargradient(x1:0, y1:0, x2:0, y2:1,\n"\
                            "stop:0 #6BD96A, stop:0.05 #2BA94A, stop:0.95 #0B892A, stop:1 #06690F); border-radius: 3px;");
     hLayoutMsg3->addWidget(saveMsg);
     connect(saveMsg, SIGNAL(pressed()), this, SLOT(onSaveMsg()));
 
+
+    // ---- Messages Title + List ----
+    QFrame *messagesTitle = new QFrame();
+    vLayout->addWidget(messagesTitle);
+    QHBoxLayout *hLayoutMessages = new QHBoxLayout(messagesTitle);
+    QLabel *labelMessages = new QLabel("Messages");
+    labelMessages->setContentsMargins(9,0,0,0);
+    labelMessages->setFont(QFont("Ubuntu", 15, 380));
+    hLayoutMessages->addWidget(labelMessages);
+
+    QFrame *frameList = new QFrame();
+    frameList->setContentsMargins(14,0,14,0);
+    QVBoxLayout *vLayoutTree = new QVBoxLayout(frameList);
+    vLayoutTree->setContentsMargins(0,5,0,0);
+    vLayout->addWidget(frameList);
+
+    msgList = new QListWidget();
+    msgList->setStyleSheet("QListWidget { background-color: #32373C; border-top-left-radius: 7px; border-top-right-radius: 7px; }"
+                         "QListWidget::item { height: 25px; }");
+    vLayoutTree->addWidget(msgList);
+
+    msgList->setDragDropMode(QAbstractItemView::DragDrop);
+    msgList->setDefaultDropAction(Qt::MoveAction);
+    connect(msgList->model(), SIGNAL(rowsMoved(const QModelIndex &, int, int, const QModelIndex &, int)), this,
+            SLOT(msgDropped(const QModelIndex &, int, int, const QModelIndex &, int)));
+    connect(msgList, SIGNAL(doubleClicked(const QModelIndex &)), this, SLOT(onMsgDoubleClick(const QModelIndex &)));
+}
+
+void GSequenceDiagram::onMsgDoubleClick(const QModelIndex &ix){
+    // Delete message
+    auto msg = gMessages.at(msgList->currentRow());
+    gMessages.erase(std::find(gMessages.begin(), gMessages.end(), gMessages.at(msgList->currentRow())));
+    auto msgWidget = msgList->currentItem();
+    msgList->removeItemWidget(msgWidget);
+    delete msg;
+    delete msgWidget;
+
+    index--;
+    updateAfterMsgDelete();
+}
+
+void GSequenceDiagram::msgDropped(const QModelIndex &parent, int start, int end, const QModelIndex &destination, int row){
+    std::vector<GMessage*> newOrder;
+    for(int i = 0; i < msgList->count(); i++){
+        QString textIndex = msgList->itemWidget(msgList->item(i))->findChild<QLabel*>()->text();
+        int index = textIndex.remove(textIndex.size()-1, 1).toInt();
+
+        GMessage *old = gMessages.at(index-1);
+        newOrder.push_back(old); // Push msg at the old index to a new one
+        old->index = i+1;
+        msgList->itemWidget(msgList->item(i))->findChild<QLabel*>()->setText(QString::number(i+1)+"."); // Text index update
+    }
+    gMessages.erase(gMessages.begin(), gMessages.end());
+    for(auto msg: newOrder){
+        gMessages.push_back(msg);
+    }
+    emit updateMsgPos();
+}
+
+void GSequenceDiagram::updateAfterMsgDelete(){
+    for(int i = 0; i < msgList->count(); i++){
+        QString textIndex = msgList->itemWidget(msgList->item(i))->findChild<QLabel*>()->text();
+        int index = textIndex.remove(textIndex.size()-1, 1).toInt();
+
+        if(index > i+1){
+            msgList->itemWidget(msgList->item(i))->findChild<QLabel*>()->setText(QString::number(i + 1)+".");
+            gMessages.at(i)->index = i + 1;
+        }
+        else
+            msgList->itemWidget(msgList->item(i))->findChild<QLabel *>()->setText(QString::number(index) + ".");
+    }
+
+    emit updateMsgPos();
+}
+
+void GSequenceDiagram::addMsgItem(QListWidget *qList, GMessage *gMsg){
+    QListWidgetItem *item = new QListWidgetItem();
+    QFrame *itemFrame = new QFrame();
+    itemFrame->setStyleSheet("QFrame { background-color: qlineargradient(x1:0, y1:0, x2:0, y2:1,\n"\
+                             "stop:0 #383C41, stop:0.92 #2A2F35, stop:1 #383C41);}");
+    QHBoxLayout *itemLayout = new QHBoxLayout(itemFrame);
+    itemLayout->setContentsMargins(0,0,0,0);
+    itemLayout->setAlignment(Qt::AlignLeft);
+
+    QLabel *indexLabel = new QLabel();
+    indexLabel->setText(QString::number(gMsg->index)+"."); //gMsg->index
+    indexLabel->setFixedWidth(23);
+    indexLabel->setStyleSheet("QLabel { color: #F2804A;}");
+    itemLayout->addWidget(indexLabel);
+
+    QLabel *srcLabel = new QLabel();
+    srcLabel->setText(gMsg->src->getName());
+    srcLabel->setFixedWidth(70);
+    itemLayout->addWidget(srcLabel);
+
+    QLabel *arrowLabel = new QLabel();
+    arrowLabel->setText(" -➤ ");
+    arrowLabel->setFixedWidth(20);
+    itemLayout->addWidget(arrowLabel);
+
+    QLabel *dstLabel = new QLabel();
+    dstLabel->setText(gMsg->dst->getName());
+    dstLabel->setFixedWidth(70);
+    itemLayout->addWidget(dstLabel);
+
+    QLabel *funcLabel = new QLabel();
+    funcLabel->setText(gMsg->getFuncName());
+    funcLabel->setStyleSheet("QLabel { color: #4585CF;}");
+    itemLayout->addWidget(funcLabel);
+
+    qList->addItem(item);
+    qList->setItemWidget(item, itemFrame);
 }
 
 void GSequenceDiagram::onSaveMsg(){
@@ -146,12 +262,24 @@ void GSequenceDiagram::onSaveMsg(){
             index++;
         }
     }
+    if(!src || !dst)
+        return;
+
     GMessage::direction dir = GMessage::LTOL;
     if(srcIndex < dstIndex)
         dir = GMessage::LTOR_SEND;
     else if(srcIndex > dstIndex)
-        dir = GMessage::RTOL_SEND;
-    gMessages.push_back(src->addMsg(boxes[3]->currentText(), dst, dir, index++)); // Msg name boxes[3]
+        dir = GMessage::RTOL_SEND;//todo
+
+    // Add the message to gMessages vector and to a QListWidget
+    auto funcName = boxes[3]->currentText();
+    if(!funcName.isEmpty()) {
+        auto gMsg = src->addMsg(funcName, dst, dir, index++);
+        gMessages.push_back(gMsg); // Msg name boxes[3]
+        addMsgItem(msgList, gMsg);
+
+        connect(this, SIGNAL(updateMsgPos()), gMsg, SLOT(onUpdateMsgPos()));
+    }
 }
 
 void GSequenceDiagram::onClassDiagramUpdated(){
@@ -172,12 +300,7 @@ void GSequenceDiagram::onClassDiagramUpdated(){
             }
             else if(i == 3 && !gTimelines.empty()){
                 // Update fuction list of the class of the instance at boxes[2]
-                auto instName = boxes[2]->currentText().toStdString();
-                UMLClassifier *cls;
-                for(auto tl: gTimelines){
-                    if(tl->getName().toStdString() == instName)
-                        cls = tl->cls;
-                }
+                UMLClassifier *cls = getClassifByInst(boxes[2]->currentText());
                 if(cls) {
                     for (auto funcs: cls->getOperations()) { // call 'to:' obj methods
                         boxes[i]->addItem(QString::fromStdString(std::string(*funcs)));
@@ -186,18 +309,40 @@ void GSequenceDiagram::onClassDiagramUpdated(){
             }
         }
     }
-    // todo emit
     emit classContentUpdated();
+
+    // If a class function changed, text goes red
+    for(auto msg: gMessages){
+        bool containsFunc = false;
+        for(auto op: getClassifByInst(msg->src->getName())->getOperations()){
+            if(std::string(*op) == msg->getFuncName().toStdString())
+                containsFunc = true;
+        }
+        if(!containsFunc)
+            msg->warn();
+    }
+}
+
+UMLClassifier *GSequenceDiagram::getClassifByInst(QString instName){
+    UMLClassifier *cls = nullptr;
+    if(!gTimelines.empty()) {
+        for (auto tl: gTimelines) {
+            if (tl->getName() == instName)
+                cls = tl->cls;
+        }
+    }
+    return cls;
 }
 
 void GSequenceDiagram::onFuncUpdate(){
     auto boxes = settings->findChildren<QComboBox *>();
-    if(classDiagram->getClassifier(boxes[2]->currentText().toStdString())) { // classifier 'to:'
+    UMLClassifier *cls = getClassifByInst(boxes[2]->currentText());
+    if(cls) { // classifier 'to:'
         boxes[3]->clear();
         // Its methods
-        for (auto funcs: classDiagram->getClassifier(boxes[2]->currentText().toStdString())->getOperations()) { // call 'to:' obj methods
+        for (auto func: cls->getOperations()) { // call 'to:' obj methods
             // Combo box of functions
-            boxes[3]->addItem(QString::fromStdString(std::string(*funcs)));
+            boxes[3]->addItem(QString::fromStdString(std::string(*func)));
         }
     }
 }
@@ -205,7 +350,7 @@ void GSequenceDiagram::onFuncUpdate(){
 void GSequenceDiagram::onAddPressed(){
     if(!settings->findChild<QComboBox*>()->currentText().isEmpty()) {
         auto instName = settings->findChild<QLineEdit*>()->text();
-        if(!instName.isEmpty()){
+        if(!instName.isEmpty() && !getClassifByInst(instName)){
             auto tl = new GTimeline(dynamic_cast<UMLClass*>(classDiagram->getClassifier(settings->findChild<QComboBox *>()->currentText().toStdString())),
                                     instName, scene, gTimelines.size() * HORIZONTAL_GAP, 0, NUM_INDEXES);
             gTimelines.push_back(tl);
@@ -217,10 +362,12 @@ void GSequenceDiagram::onAddPressed(){
             onClassDiagramUpdated();
         }
     }
+    settings->findChild<QLineEdit*>()->setText(""); // Clear instance name QLineEdit content
 }
 
 void GSequenceDiagram::onGTimelineDeleted() {
     auto tl = dynamic_cast<GTimeline *>(sender());
+
     if(!gTimelines.empty()) {
         gTimelines.erase(std::find(gTimelines.begin(), gTimelines.end(), tl));
 
@@ -228,10 +375,31 @@ void GSequenceDiagram::onGTimelineDeleted() {
             // Delete timelines messages
             if(gMessages.at(i)->src == tl || gMessages.at(i)->dst == tl) {
                 auto m = gMessages.at(i);
+
+                for(int j = 0; j < msgList->count(); j++){
+                    QString textIndex = msgList->itemWidget(msgList->item(j))->findChild<QLabel*>()->text();
+                    int msgIndex = textIndex.remove(textIndex.size()-1, 1).toInt(); // Remove dot
+                    if(msgIndex == m->index){
+                        auto msgWidget = msgList->item(j);
+                        msgList->removeItemWidget(msgWidget);
+                        delete msgWidget;
+                        break;
+                    }
+                }
+
                 gMessages.erase(gMessages.begin() + i);
                 delete m;
+                index--; // Lower index for new messages
             }
         }
     }
     delete tl;
+
+    for(int i = 0; i < gTimelines.size(); i++){
+        // Change positions of timelines, when some of them is removed
+        gTimelines.at(i)->changePos(i*HORIZONTAL_GAP, 0);
+    }
+
+    // Recalculate message indexes
+    updateAfterMsgDelete();
 }
