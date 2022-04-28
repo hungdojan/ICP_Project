@@ -12,9 +12,19 @@
 #include "mainwindow.h"
 #include "UMLRelation.h"
 #include "GRelation.h"
+#include "UMLInterface.h"
 
 GClassDiagram::GClassDiagram(GraphicsScene *scene, ClassDiagram *model) : scene_{scene}, classDiagramModel{model} {
     gClassSettings = new GClassSettings(((MainWindow*)scene->parent())->getCategoryTree(), classDiagramModel);
+    if (model == nullptr) {
+        model = new ClassDiagram("");
+    }
+    for (auto classifier : model->classElements()) {
+        if (dynamic_cast<UMLClass *>(classifier) != nullptr || dynamic_cast<UMLInterface *>(classifier) != nullptr) {
+            addGClassifier(new GClassifier(classifier, 2*name_index, 2*name_index, 100, 150, classDiagramModel));
+        }
+    }
+    // TODO: add relations
 }
 
 void GClassDiagram::addClassifier() {

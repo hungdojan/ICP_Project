@@ -16,6 +16,7 @@ class GClassifier: public QObject, public QGraphicsRectItem{
 Q_OBJECT
 public:
     GClassifier(std::string name, qreal x, qreal y, qreal width, qreal height, ClassDiagram *classDiagram, bool isInterface = false, QGraphicsItem *parent = nullptr);
+    GClassifier(UMLClassifier *model, qreal x, qreal y, qreal width, qreal height, ClassDiagram *classDiagram, QGraphicsItem *parent = nullptr);
     ~GClassifier();
     QVariant itemChange(GraphicsItemChange change, const QVariant & value);
     UMLClassifier *umlClassifier;

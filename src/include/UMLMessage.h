@@ -30,5 +30,6 @@ public:
     void createJsonObject(QJsonObject &object) override;
 
     void createJsonObject(QJsonObject &object, int index);
+    ~UMLMessage() override;
 };
 #endif //DIAGRAMEDITOR_UMLMESSAGE

@@ -67,7 +67,8 @@ void UMLAttribute::update(const std::string &msg) {
 }
 
 UMLAttribute::~UMLAttribute() {
-    type_->detach(this);
+    if (type_ != nullptr)
+        type_->detach(this);
 }
 
 void UMLAttribute::createJsonObject(QJsonObject &object) {

@@ -51,6 +51,31 @@ GClassifier::GClassifier(std::string name, qreal x, qreal y, qreal width, qreal 
     contentSaved();
 
 }
+
+GClassifier::GClassifier(UMLClassifier *model, qreal x, qreal y, qreal width, qreal height, ClassDiagram *classDiagram, QGraphicsItem *parent) :
+        QGraphicsRectItem(x, y, width, height, parent), QObject(), umlClassifier{model}, classDiagram{classDiagram}, isInterface{dynamic_cast<UMLInterface *>(model) != nullptr}, width{width}, height{height}, x{x}, y{y}{
+
+    setFlag(QGraphicsItem::ItemIsMovable);
+    setFlag(QGraphicsItem::ItemIsSelectable);
+    setFlag(QGraphicsItem::ItemSendsScenePositionChanges);
+    setFlag(QGraphicsItem::ItemIsFocusable);
+    setBrush(QBrush(QColor(UNSELECTED_COLOR)));
+
+    titleRect = new QGraphicsRectItem(x,y, width, ROW_HEIGHT*2, this);
+    title = new GText(QString::fromStdString(umlClassifier->name()), x, y, titleRect);
+    classificType = new GText(isInterface? "<interface>": "<class>", x, y+title->sceneBoundingRect().height(), titleRect);
+
+    connect(this, SIGNAL(gTextChanged()), title, SLOT(onTextChanged()));
+    connect(this, SIGNAL(gTextChanged()), classificType, SLOT(onTextChanged()));
+    connect(this, SIGNAL(centerText()), title, SLOT(centerText()));
+    connect(this, SIGNAL(centerText()), classificType, SLOT(centerText()));
+
+    if(!isInterface)
+        attribRect = new QGraphicsRectItem(x,y+2*ROW_HEIGHT, width, ROW_HEIGHT, this);
+
+    contentSaved();
+
+}
 GClassifier::~GClassifier(){
 }
 

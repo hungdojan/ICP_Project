@@ -99,3 +99,9 @@ void UMLMessage::createJsonObject(QJsonObject &object) {
     object.insert("baseOperation", QString::fromStdString(baseOperation_->name()));
 
 }
+
+UMLMessage::~UMLMessage() {
+    if (baseOperation_ != nullptr) {
+        baseOperation_->detach(this);
+    }
+}

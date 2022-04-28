@@ -32,6 +32,9 @@ private slots:
     void clickedDiagram(QAction *a);
     void deleteDiagram();
     void onTests();
+    void newClassDiagram();
+    void loadClassDiagram();
+    void saveClassDiagram();
 
 private:
     Ui::MainWindow *ui;
