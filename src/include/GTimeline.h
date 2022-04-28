@@ -19,9 +19,10 @@ public:
     ~GTimeline();
     qreal getX();
     GMessage *addMsg(QString name, GTimeline *target, enum GMessage::direction dir, int index);
-    void frameCreate(int index);
+    void frameCreate(int index, bool isSelected = false);
     QString getName();
     UMLClass *cls;
+    void changePos(qreal x, qreal y);
 signals:
     void gTimelineDeleted();
     void gObjectResize();
@@ -31,8 +32,12 @@ private:
     QGraphicsLineItem *dashedLine;
     GObject *head;
     std::vector<QGraphicsRectItem*> frames;
-    bool infFrame;
     qreal dashHeight;
+    QString name;
+    GObject *createHead(qreal x, qreal y);
+    QGraphicsLineItem *createDashedLine();
+    int indexes;
+    std::vector<bool> oldSelected;
 private slots:
     void onFrameSelected();
     void onGObjectDeleted();

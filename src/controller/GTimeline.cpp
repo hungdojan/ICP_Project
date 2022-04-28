@@ -11,17 +11,37 @@
 #define DASH_WIDTH 3
 #define MSG_GAP 100
 #define SELECTED_COLOR "#9999A9"
+#define HEAD_W 120
+#define HEAD_H 50
+#define FRAME_W 13
 
+GTimeline::GTimeline(UMLClass *cls, QString name, GraphicsScene *scene, qreal x, qreal y, int indexes): scene{scene},
+    dashHeight{1.0 * indexes * MSG_GAP}, cls{cls}, name{name}, indexes{indexes}{
 
-GTimeline::GTimeline(UMLClass *cls, QString name, GraphicsScene *scene, qreal x, qreal y, int indexes): scene{scene}, infFrame{false},
-    dashHeight{1.0 * indexes * MSG_GAP}, cls{cls}{
+    head = createHead(x, y);
 
-    head = new GObject(QString::fromStdString(cls->name()), name, x, y, 120, 50);
+    dashedLine = createDashedLine();
+
+    for(int i = 0; i < indexes; i++)
+        frameCreate(i);
+
+    connect(scene, SIGNAL(selectionChanged()), this, SLOT(onFrameSelected()));
+}
+
+qreal GTimeline::getX(){
+    return dashedLine->sceneBoundingRect().x();
+}
+
+GObject *GTimeline::createHead(qreal x, qreal y){
+    auto head = new GObject(QString::fromStdString(cls->name()), name, x, y, HEAD_W, HEAD_H);
     connect(head, SIGNAL(gObjectDeleted()), this, SLOT(onGObjectDeleted()));
     connect(this, SIGNAL(gObjectResize()), head, SLOT(onGObjectResize()));
     scene->addItem(head);
+    return head;
+}
 
-    dashedLine = new QGraphicsLineItem(head);
+QGraphicsLineItem *GTimeline::createDashedLine(){
+    auto dashedLine = new QGraphicsLineItem(head);
     dashedLine->setLine(head->boundingRect().center().x(), head->boundingRect().center().y(),
                         head->boundingRect().center().x(), head->boundingRect().center().y()+dashHeight);
     dashedLine->setZValue(-1);
@@ -31,14 +51,7 @@ GTimeline::GTimeline(UMLClass *cls, QString name, GraphicsScene *scene, qreal x,
     pen.setWidth(DASH_WIDTH);
     pen.setDashPattern({ 5, 3});
     dashedLine->setPen(pen);
-
-    for(int i = 0; i < indexes; i++){
-        frameCreate(i);
-    }
-}
-
-qreal GTimeline::getX(){
-    return dashedLine->sceneBoundingRect().x();
+    return dashedLine;
 }
 
 void GTimeline::onGObjectDeleted(){
@@ -52,25 +65,49 @@ GMessage *GTimeline::addMsg(QString name, GTimeline *target, enum GMessage::dire
     return msg;
 }
 
+void GTimeline::changePos(qreal x, qreal y){
+    // Remember old frame selections before move
+    for(auto f: frames) {
+        oldSelected.push_back(f->brush() == QBrush(QColor(SELECTED_COLOR))); // isSelected bool
+    }
+    frames.clear();
+    // delete dashedLine;
+    delete head;
+    head = createHead(x, y);
+    dashedLine = createDashedLine();
+    for(int i = 0; i < indexes; i++) {
+        frameCreate(i, oldSelected[i]);
+    }
+}
 
-void GTimeline::frameCreate(int index){
-    const qreal rectWidth = 13;
-    auto msgRect = new QGraphicsRectItem(this->getX() - rectWidth / 2.0 + 3 / 2.0, MSG_GAP * index, rectWidth,MSG_GAP, dashedLine);
-    msgRect->setBrush(QBrush(QColor("#FFFFFF")));
+void GTimeline::frameCreate(int index, bool isSelected){
+    auto msgRect = new QGraphicsRectItem(getX() - FRAME_W / 2.0 + 3 / 2.0, MSG_GAP * index, FRAME_W, MSG_GAP, dashedLine);
     frames.push_back(msgRect);
     msgRect->setFlag(QGraphicsItem::ItemIsSelectable);
     msgRect->setPen(Qt::NoPen);
     msgRect->setBrush(QBrush(Qt::transparent));
-    connect(scene, SIGNAL(selectionChanged()), this, SLOT(onFrameSelected()));
+
+    if(isSelected)
+        msgRect->setBrush(QBrush(QColor(SELECTED_COLOR)));
 }
 
 void GTimeline::onFrameSelected() {
     if (!frames.empty()){
         for (auto rect: frames) {
-            if(rect->isSelected() && rect->brush() == QBrush(QColor(SELECTED_COLOR)))
-                rect->setBrush(QBrush(QBrush(Qt::transparent)));
-            else if(rect->isSelected())
-                rect->setBrush(QBrush(QColor(SELECTED_COLOR)));
+            if(scene->selectedItems().contains(rect)){
+                if(rect->brush() == QBrush(QColor(SELECTED_COLOR))) {
+                    rect->setBrush(QBrush(Qt::transparent));
+                }
+                else
+                    rect->setBrush(QBrush(QColor(SELECTED_COLOR)));
+            }
+
+//            if(rect->isSelected() && rect->brush() == QBrush(QColor(SELECTED_COLOR))) {
+//                rect->setBrush(QBrush(QBrush(Qt::transparent)));
+//                qDebug() << rect;
+//            }
+//            else if(rect->isSelected())
+//                rect->setBrush(QBrush(QColor(SELECTED_COLOR)));
         }
     }
 }
@@ -86,7 +123,6 @@ QString GTimeline::getName(){
 }
 
 void GTimeline::onClassContentUpdated(){
-    //todo gtimeline resize rect??";
     head->gClassName->setPlainText(QString::fromStdString("("+cls->name())+")");
     emit gObjectResize();
 }

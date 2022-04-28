@@ -10,6 +10,7 @@
 #include "ClassDiagram.h"
 #include "GTimeline.h"
 #include <QFrame>
+#include <QListWidget>
 
 class GSequenceDiagram: public QObject{
 Q_OBJECT
@@ -18,6 +19,7 @@ public:
     GSequenceDiagram(GraphicsScene *scene, std::string name, ClassDiagram *classDiagram, QFrame *settings);
 signals:
     void classContentUpdated();
+    void updateMsgPos();
 private:
     ClassDiagram *classDiagram;
     SequenceDiagram *sequanceDiagram;
@@ -27,13 +29,18 @@ private:
     std::vector<GMessage*> gMessages;
     int index;
     GraphicsScene *scene;
+    UMLClassifier *getClassifByInst(QString instName);
+    void addMsgItem(QListWidget *qList, GMessage *gMsg);
+    QListWidget *msgList;
+    void updateAfterMsgDelete();
 private slots:
     void onClassDiagramUpdated();
     void onAddPressed();
-//    void onDeletePressed();
     void onFuncUpdate();
     void onGTimelineDeleted();
     void onSaveMsg();
+    void msgDropped(const QModelIndex &parent, int start, int end, const QModelIndex &destination, int row);
+    void onMsgDoubleClick(const QModelIndex &ix);
 };
 
 #endif //DIAGRAMEDITOR_GSEQUENCEDIAGRAM_H
