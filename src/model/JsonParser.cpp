@@ -44,7 +44,7 @@ void loadAttribute(QJsonObject &qAttribute, UMLAttribute &attribute,
 
     attribute.setName(qAttribute["name"].toString().toStdString());
     attribute.setType(iter->second);
-    attribute.visibility() = qAttribute["visibility"].toString().toStdString()[0];
+    attribute.visibility() = qAttribute["visibility"].toInt();
 }
 
 /**
@@ -65,7 +65,7 @@ void loadOperation(QJsonObject &qOperation, UMLOperation &operation,
     // setup operation
     operation.setName(qOperation["name"].toString().toStdString());
     operation.setType(iterType->second);
-    operation.visibility() = qOperation["visibility"].toString().toStdString()[0];
+    operation.visibility() = qOperation["visibility"].toInt();
 
     // add parameters
     QJsonArray qParameters = qOperation["parameters"].toArray();
@@ -140,6 +140,8 @@ void loadClassElements(ClassDiagram &classDiagram, QJsonArray &buffer) {
         QJsonObject qClassElement{item.toObject()};
         std::string name{qClassElement["name"].toString().toStdString()};
         bool isAbstract = qClassElement["isAbstract"].toBool();
+        double x = qClassElement["x"].toDouble();
+        double y = qClassElement["y"].toDouble();
 
         // create instance of classifier and add to class diagram
         UMLClassifier *element;
@@ -153,6 +155,8 @@ void loadClassElements(ClassDiagram &classDiagram, QJsonArray &buffer) {
             element = ClassDiagram::createClassifier(name, ClassDiagram::CLASSIFIER);
         }
         element->isAbstract() = isAbstract;
+        element->x() = x;
+        element->y() = y;
         mapOfClassifiers.insert({name, element});
         classDiagram.addClassifier(element);
     }

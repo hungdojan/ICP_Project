@@ -193,10 +193,8 @@ UMLClass::~UMLClass() {
 }
 
 void UMLClass::createJsonObject(QJsonObject &object) {
-    object.insert("_class", "UMLClass");
-    object.insert("name", QString::fromStdString(name_));
-    object.insert("isUserDefined", isUserDefined_);
-    object.insert("isAbstract", isAbstract_);
+    UMLClassifier::createJsonObject(object);
+    object["_class"] = "UMLClass";
     QJsonArray lofAttributes;
     for (auto attr : attributes_) {
         QJsonObject obj;

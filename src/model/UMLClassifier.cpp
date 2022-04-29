@@ -48,6 +48,22 @@ const std::unordered_set<UMLRelation *> &UMLClassifier::relations() const {
     return relations_;
 }
 
+const double &UMLClassifier::x() const {
+    return x_;
+}
+
+const double &UMLClassifier::y() const {
+    return y_;
+}
+
+double &UMLClassifier::x() {
+    return x_;
+}
+
+double &UMLClassifier::y() {
+    return y_;
+}
+
 bool UMLClassifier::addParentClass(UMLClassifier *parentClass) {
     if (parentClass == nullptr)
         return false;
@@ -130,6 +146,8 @@ void UMLClassifier::createJsonObject(QJsonObject &object) {
     object.insert("name", QString::fromStdString(name_));
     object.insert("isUserDefined", isUserDefined_);
     object.insert("isAbstract", isAbstract_);
+    object.insert("x", x_);
+    object.insert("y", y_);
 }
 
 std::unordered_set<UMLOperation *> UMLClassifier::getOperations() const {

@@ -47,13 +47,15 @@ protected:
     std::unordered_set<UMLClassifier *> parentClasses_;
     /** Collection of relations created between this and other (user-defined) classifier */
     std::unordered_set<UMLRelation *> relations_;
+    /** X and Y coordinates of their gElement instances. */
+    double x_, y_;
 
     /**
      * @brief Class constructor.
      * @param name Classifier's name.
      * @param isUserDefined Whether classifier is user-defined or not.
      */
-    explicit UMLClassifier(std::string name, bool isUserDefined) : Element{std::move(name)}, isUserDefined_{isUserDefined} { }
+    explicit UMLClassifier(std::string name, bool isUserDefined) : Element{std::move(name)}, isUserDefined_{isUserDefined}, x_{0}, y_{0} { }
 
     /**
      * @brief Adds direct base class to the collection.
@@ -88,7 +90,15 @@ public:
      * @brief Class constructor.
      * @param name Classifier's name.
      */
-    explicit UMLClassifier(std::string name) : Element{std::move(name)}, isUserDefined_{false} { };
+    explicit UMLClassifier(std::string name) : Element{std::move(name)}, isUserDefined_{false}, x_{0}, y_{0} { };
+
+    /**
+     * @brief Class constructor.
+     * @param name Classifier's name.
+     * @param x Classifier's x-coordinate.
+     * @param y Classifier's y-coordinate.
+     */
+    explicit UMLClassifier(std::string name, double x, double y) : Element{std::move(name)}, isUserDefined_{false}, x_{x}, y_{y} { };
 
     /**
      * @brief Factory method to create attribute and operation/method.
@@ -133,6 +143,30 @@ public:
      * @return Read-only collection of relations.
      */
     const std::unordered_set<UMLRelation *> &relations() const;
+
+    /**
+     * @brief Returns read-only value of element's x-coordinate.
+     * @return Read-only value of x-coordinate.
+     */
+    const double &x() const;
+
+    /**
+     * @brief Returns read-only value of element's y-coordinate.
+     * @return Read-only value of y-coordinate.
+     */
+    const double &y() const;
+
+    /**
+     * @brief Returns reference to element's x-coordinate.
+     * @return Reference to x-coordinate.
+     */
+    double &x();
+
+    /**
+     * @brief Returns reference to element's y-coordinate.
+     * @return Reference to y-coordinate.
+     */
+    double &y();
 
     /**
      * @brief Updates classifier's name.
