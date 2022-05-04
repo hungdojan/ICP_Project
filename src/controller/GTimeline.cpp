@@ -9,7 +9,7 @@
 #include <QDebug>
 
 #define DASH_WIDTH 3
-#define MSG_GAP 100
+#define MSG_GAP 90
 #define SELECTED_COLOR "#9999A9"
 #define HEAD_W 120
 #define HEAD_H 50
@@ -59,8 +59,15 @@ void GTimeline::onGObjectDeleted(){
     emit gTimelineDeleted();
 }
 
-GMessage *GTimeline::addMsg(QString name, GTimeline *target, enum GMessage::direction dir, int index){
-    auto msg = new GMessage(scene, name, dir, this, target, index);
+GMessage *GTimeline::addMsg(QString name, GTimeline *target, enum GMessage::direction dir, QString type, int index){
+//    if(indexes < index){
+//        indexes = index;
+//        dashHeight = indexes * MSG_GAP;
+//        dashedLine->setLine(head->boundingRect().center().x(), head->boundingRect().center().y(),
+//                            head->boundingRect().center().x(), head->boundingRect().center().y()+dashHeight);
+//    }
+
+    auto msg = new GMessage(scene, name, dir, this, target, type, index);
 
     return msg;
 }
@@ -101,13 +108,6 @@ void GTimeline::onFrameSelected() {
                 else
                     rect->setBrush(QBrush(QColor(SELECTED_COLOR)));
             }
-
-//            if(rect->isSelected() && rect->brush() == QBrush(QColor(SELECTED_COLOR))) {
-//                rect->setBrush(QBrush(QBrush(Qt::transparent)));
-//                qDebug() << rect;
-//            }
-//            else if(rect->isSelected())
-//                rect->setBrush(QBrush(QColor(SELECTED_COLOR)));
         }
     }
 }

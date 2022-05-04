@@ -13,8 +13,8 @@ class GTimeline;
 class GMessage: public QObject{
 Q_OBJECT
 public:
-    enum direction{LTOR_SEND, RTOL_SEND, LTOR_RESPONSE, RTOL_RESPONSE, LTOL};
-    GMessage(GraphicsScene *scene, QString name, enum direction dir, GTimeline *src, GTimeline *dst, int index);
+    enum direction{LTOR, RTOL, LTOL};
+    GMessage(GraphicsScene *scene, QString name, enum direction dir, GTimeline *src, GTimeline *dst, QString type, int index);
     ~GMessage();
     GTimeline *src;
     GTimeline *dst;
@@ -31,6 +31,7 @@ private:
     qreal posY;
     QGraphicsTextItem *text;
     direction dir;
+    QString type;
 
     void addLine(qreal x1, qreal x2, qreal y, enum direction dir);
     void addLtoL(qreal x1, qreal y1, enum direction dir);

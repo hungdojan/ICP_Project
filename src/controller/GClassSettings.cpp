@@ -27,6 +27,7 @@
 #define RELATION_PARENT_STYLE "QLabel { color: rgb(255,255,255,145); border: 1px solid rgb(0,0,0,70); border-radius: 2px;}"
 
 #define RELATION_TYPES " ,0,1,*,0..1,0..*,1..*,◆,◇,◁"
+#define INHERITANCE_SYMB "◁"
 #define ACCESSIBILITIES "+,-,#,~"
 
 #define GENERAL "General"
@@ -233,6 +234,9 @@ void GClassSettings::saveContent(){
                     auto rel = selectedGClassifier->umlClassifier->getRelationWith(classDiagram->getClassifier(name));
                     rel->srcMsg() = tree->itemWidget(category->child(a),0)->findChildren<QComboBox*>()[0]->currentText().toStdString();
                     rel->dstMsg() = tree->itemWidget(category->child(a),0)->findChildren<QComboBox*>()[1]->currentText().toStdString();
+//                    if(rel->dstMsg() == INHERITANCE_SYMB) {
+//                        rel->setRelationType(UMLRelation::INHERITANCE); //todo
+//                    }
                 }
             }
         }

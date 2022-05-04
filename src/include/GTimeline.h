@@ -18,7 +18,7 @@ public:
     GTimeline(UMLClass *cls, QString name, GraphicsScene *scene, qreal x, qreal y, int indexes);
     ~GTimeline();
     qreal getX();
-    GMessage *addMsg(QString name, GTimeline *target, enum GMessage::direction dir, int index);
+    GMessage *addMsg(QString name, GTimeline *target, enum GMessage::direction dir, QString type, int index);
     void frameCreate(int index, bool isSelected = false);
     QString getName();
     UMLClass *cls;

@@ -22,7 +22,7 @@ GClassDiagram::GClassDiagram(GraphicsScene *scene, ClassDiagram *model) : scene_
     // load classifiers
     for (auto classifier : model->classElements()) {
         if (dynamic_cast<UMLClass *>(classifier) != nullptr || dynamic_cast<UMLInterface *>(classifier) != nullptr) {
-            addGClassifier(new GClassifier(classifier, 2*name_index, 2*name_index, 100, 150, classDiagramModel));
+            addGClassifier(new GClassifier(classifier, classifier->x(), classifier->y(), 100, 150, classDiagramModel));
         }
     }
     // collection of already initialized relations
