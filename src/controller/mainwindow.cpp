@@ -34,12 +34,6 @@ MainWindow::MainWindow(QWidget *parent) :
     connect(ui->actionNew, SIGNAL(triggered()), this, SLOT(newClassDiagram()));
     connect(ui->actionLoad_from, SIGNAL(triggered()), this, SLOT(loadClassDiagram()));
     connect(ui->actionSave_to, SIGNAL(triggered()), this, SLOT(saveClassDiagram()));
-
-    clickedDiagram(new QAction()); // TODO remove
-}
-
-void MainWindow::onTests() {
-//    qDebug() << "todo";
 }
 
 MainWindow::~MainWindow() {

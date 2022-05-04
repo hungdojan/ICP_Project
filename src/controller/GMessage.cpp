@@ -6,16 +6,22 @@
 #include <QGraphicsLineItem>
 #include "GraphicsScene.h"
 #include "GTimeline.h"
+#include <QDebug>
 
 #define ARROW_FONT_SIZE 20
 #define LINE_WIDTH 2
 #define BACK_LINE_LEN 250
 #define BACK_LINE_HEIGHT 25
-
 #define MSG_GAP 100
 
-GMessage::GMessage(GraphicsScene *scene, QString name, enum direction dir, GTimeline *src, GTimeline *dst, int index):
-        QObject(), scene{scene}, src{src}, dst{dst}, line{nullptr}, lineH{nullptr}, lineBack{nullptr}, index{index}, name{name}, dir{dir}{
+#define T_RESPONSE "response"
+#define T_SYNC "sync"
+#define T_ASYNC "async"
+#define T_CREATE "create"
+#define T_DELETE "delete"
+
+GMessage::GMessage(GraphicsScene *scene, QString name, enum direction dir, GTimeline *src, GTimeline *dst, QString type, int index):
+        QObject(), scene{scene}, src{src}, dst{dst}, line{nullptr}, lineH{nullptr}, lineBack{nullptr}, index{index}, name{name}, dir{dir}, type{type}{
 
     posY = MSG_GAP*index;
     if(dir == GMessage::LTOL)
@@ -71,11 +77,9 @@ void GMessage::addLine(qreal x1, qreal x2, qreal y, enum direction dir){
 
     QPen pen;
     pen.setWidth(LINE_WIDTH);
-    if(dir == GMessage::LTOR_RESPONSE || dir == GMessage::RTOL_RESPONSE) {
-//        connect(this, SIGNAL(responseClosed()), src, SLOT(onResponseClosed()));
-//        emit responseClosed();
+    if(type == T_RESPONSE)
         pen.setDashPattern({0, 1, 5, 6});
-    }
+
     line->setPen(pen);
 }
 
@@ -98,7 +102,20 @@ void GMessage::addLtoL(qreal x1, qreal y1, enum direction dir){
 }
 
 void GMessage::addArrow(QGraphicsLineItem *line, enum GMessage::direction dir, qreal x1, qreal x2, qreal y){
-    QString sign = dir == GMessage::LTOR_RESPONSE || dir == GMessage::LTOR_SEND? "►":"◄";
+//    QString sign = dir == GMessage::LTOR? "►":"◄";
+    QString sign = "";
+    if(type == T_SYNC)
+        sign = dir == GMessage::LTOR? "►":"◄";
+    else if(type == T_ASYNC || type == T_RESPONSE)
+        sign = dir == GMessage::LTOR? ">":"<";
+    else if(type == T_CREATE) {
+        sign = dir == GMessage::LTOR ? "▣" : "▣";//
+        name = "CREATE";
+    }
+    else if(type == T_DELETE) {
+        sign = dir == GMessage::LTOR ? "╳" : "╳";
+        name = "DELETE";
+    }
 
     auto arrow = new QGraphicsTextItem(sign, line);
     auto font = QFont();
@@ -107,9 +124,9 @@ void GMessage::addArrow(QGraphicsLineItem *line, enum GMessage::direction dir, q
 
     line->setZValue(1);
 
-    const qreal textOffset = 2.5;
+    const qreal textOffset = 2.0;
 
-    if(dir == GMessage::LTOR_RESPONSE || dir == GMessage::LTOR_SEND)
+    if(dir == GMessage::LTOR)
         arrow->setPos(x2 - arrow->sceneBoundingRect().width() + textOffset*2, y - textOffset - arrow->sceneBoundingRect().height()/2.0);
     else
         arrow->setPos(x2 - textOffset*2, y - textOffset - arrow->sceneBoundingRect().height()/2.0);

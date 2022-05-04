@@ -19,7 +19,7 @@
 #include <QListWidget>
 
 #define HORIZONTAL_GAP 350
-#define NUM_INDEXES 5
+#define NUM_INDEXES 20
 
 GSequenceDiagram::GSequenceDiagram(GraphicsScene *scene, std::string name, ClassDiagram *classDiagram, QFrame *settings):
     QObject(), classDiagram{classDiagram}, settings{settings}, index{1}, scene{scene}{
@@ -44,7 +44,7 @@ void GSequenceDiagram::addSettings(){
 
     QComboBox *comboBoxClassifiers = new QComboBox();
     qHBoxLayout->addWidget(comboBoxClassifiers);
-    for(auto cls: classDiagram->classElements()){
+    for(auto cls: classDiagram->getClasses()){
         comboBoxClassifiers->addItem(QString::fromStdString(cls->name()));
     }
     comboBoxClassifiers->setFixedWidth(90);
@@ -86,7 +86,7 @@ void GSequenceDiagram::addSettings(){
     QComboBox *comboBoxSrc = new QComboBox();
     comboBoxSrc->setFixedWidth(145);
     hLayoutMsg1->addWidget(comboBoxSrc);
-    for(auto cls: classDiagram->classElements()){
+    for(auto cls: classDiagram->getClasses()){
         comboBoxSrc->addItem(QString::fromStdString(cls->name()));
     }
     // Message frame horizontal 1 - combo dst
@@ -96,7 +96,7 @@ void GSequenceDiagram::addSettings(){
     comboBoxDst->setFixedWidth(145);
 
     hLayoutMsg1->addWidget(comboBoxDst);
-    for(auto cls: classDiagram->classElements()){
+    for(auto cls: classDiagram->getClasses()){
         comboBoxDst->addItem(QString::fromStdString(cls->name()));
     }
     connect(comboBoxDst, SIGNAL(currentTextChanged(const QString &)), this, SLOT(onFuncUpdate()));
@@ -267,18 +267,22 @@ void GSequenceDiagram::onSaveMsg(){
 
     GMessage::direction dir = GMessage::LTOL;
     if(srcIndex < dstIndex)
-        dir = GMessage::LTOR_SEND;
+        dir = GMessage::LTOR;
     else if(srcIndex > dstIndex)
-        dir = GMessage::RTOL_SEND;//todo
+        dir = GMessage::RTOL;//todo
 
     // Add the message to gMessages vector and to a QListWidget
     auto funcName = boxes[3]->currentText();
-    if(!funcName.isEmpty()) {
-        auto gMsg = src->addMsg(funcName, dst, dir, index++);
+    if((!funcName.isEmpty() && boxes[4]->currentText() != "create" && boxes[4]->currentText() != "delete") ||
+        (boxes[4]->currentText() == "create" || boxes[4]->currentText() == "delete")) {
+        auto gMsg = src->addMsg(funcName, dst, dir, boxes[4]->currentText(), index++);
         gMessages.push_back(gMsg); // Msg name boxes[3]
         addMsgItem(msgList, gMsg);
 
         connect(this, SIGNAL(updateMsgPos()), gMsg, SLOT(onUpdateMsgPos()));
+    }
+    else if(boxes[4]->currentText() != "create" || boxes[3]->currentText() != "delete"){
+
     }
 }
 
@@ -289,7 +293,7 @@ void GSequenceDiagram::onClassDiagramUpdated(){
         for(int i = 0; i < 4 && i < boxes.size(); i++) { // do not fill comboBoxTypes
             boxes[i]->clear();
             if(i == 0){
-                for (auto cls: classDiagram->classElements()) {
+                for (auto cls: classDiagram->getClasses()) {
                     boxes[i]->addItem(QString::fromStdString(cls->name()));
                 }
             }
@@ -318,7 +322,7 @@ void GSequenceDiagram::onClassDiagramUpdated(){
             if(std::string(*op) == msg->getFuncName().toStdString())
                 containsFunc = true;
         }
-        if(!containsFunc)
+        if(!containsFunc && msg->getFuncName() != "DELETE" && msg->getFuncName() != "CREATE")
             msg->warn();
     }
 }

@@ -122,7 +122,8 @@ void GClassifier::resizeRectangles(){
     titleRect->setRect(x, y, width, ROW_HEIGHT*2);
     emit gClassifierPositionChanged();
 
-//    qDebug() << sceneBoundingRect().x() << " " << sceneBoundingRect().y(); todo save as x, y??
+    umlClassifier->x() = sceneBoundingRect().x();
+    umlClassifier->y() = sceneBoundingRect().y();
 }
 
 void GClassifier::contentDeleted(){
@@ -159,18 +160,19 @@ void GClassifier::loadAttributes(){
         // Class Attributes
         for (auto a: cls->attributes()) {
             if (dynamic_cast<UMLOperation *>(a) == nullptr) {
-                auto attrib = new GText(QString::fromStdString(std::string(*a)),
-                                        boundingRect().x(),ROW_HEIGHT * 2 + (index++ * ROW_HEIGHT) + boundingRect().x(), attribRect);
+                auto attrib = new GText(QString::fromStdString(std::string(*a)),boundingRect().x(),
+                                        ROW_HEIGHT * 2 + (index++ * ROW_HEIGHT) + boundingRect().y(), attribRect);
                 connect(this, SIGNAL(gTextChanged()), attrib, SLOT(onTextChanged()));
                 gTextAttributes.push_back(attrib);
             }
         }
+
         // Class operations
         for (auto a: cls->attributes()) {
             UMLOperation *op = dynamic_cast<UMLOperation *>(a);
             if(op) {
                 auto attrib = new GText(QString::fromStdString(std::string(*op)),
-                        boundingRect().x(),ROW_HEIGHT * 2 + (index++ * ROW_HEIGHT) + boundingRect().x(), this);
+                        boundingRect().x(),ROW_HEIGHT * 2 + (index++ * ROW_HEIGHT) + boundingRect().y(), this);
                 connect(this, SIGNAL(gTextChanged()), attrib, SLOT(onTextChanged()));
                 gTextAttributes.push_back(attrib);
             }
@@ -184,7 +186,7 @@ void GClassifier::loadAttributes(){
             UMLOperation *op = dynamic_cast<UMLOperation *>(a);
             if(op) {
                 auto attrib = new GText(QString::fromStdString(std::string(*op)),
-                                        boundingRect().x(), ROW_HEIGHT * 2 + (index++ * ROW_HEIGHT) + boundingRect().x(), this);
+                                        boundingRect().x(), ROW_HEIGHT * 2 + (index++ * ROW_HEIGHT) + boundingRect().y(), this);
                 connect(this, SIGNAL(gTextChanged()), attrib, SLOT(onTextChanged()));
                 gTextAttributes.push_back(attrib);
             }
