@@ -222,27 +222,46 @@ void GClassSettings::saveContent(){
             }
         }
         else if (categoryName.toStdString().find(RELATIONS) != std::string::npos) {
-            // remove all? todo
             selectedGClassifier->umlClassifier->clearRelations();
 
             for (int a = 1; a < category->childCount(); a++) {
+                // Dst name
                 std::string name = tree->itemWidget(category->child(a),0)->findChild<QLineEdit*>()->text().toStdString();
                 // If classifier exists and is not already in the relation
                 if(classDiagram->getClassifier(name) && !selectedGClassifier->umlClassifier->inRelationWith(classDiagram->getClassifier(name)) &&
                         name != selectedGClassifier->umlClassifier->name()) {
-                    selectedGClassifier->umlClassifier->addRelation(classDiagram->getClassifier(name));
-                    auto rel = selectedGClassifier->umlClassifier->getRelationWith(classDiagram->getClassifier(name));
-                    rel->srcMsg() = tree->itemWidget(category->child(a),0)->findChildren<QComboBox*>()[0]->currentText().toStdString();
-                    rel->dstMsg() = tree->itemWidget(category->child(a),0)->findChildren<QComboBox*>()[1]->currentText().toStdString();
-//                    if(rel->dstMsg() == INHERITANCE_SYMB) {
-//                        rel->setRelationType(UMLRelation::INHERITANCE); //todo
-//                    }
+
+                    // UMLRelation
+                    auto msgL = tree->itemWidget(category->child(a),0)->findChildren<QComboBox*>()[0]->currentText().toStdString();
+                    auto msgR = tree->itemWidget(category->child(a),0)->findChildren<QComboBox*>()[1]->currentText().toStdString();
+                    UMLRelation *rel;
+
+                    //todo
+                    // If the source does not have INHERITANCE_SYMB
+                    if(msgL != INHERITANCE_SYMB){
+                        rel = selectedGClassifier->umlClassifier->addRelation(classDiagram->getClassifier(name));
+                        rel->srcMsg() = msgL;
+                        rel->dstMsg() = msgR;
+                        rel->setRelationType(UMLRelation::ASSOCIATION);
+
+                        if(msgR == INHERITANCE_SYMB)
+                            rel->setRelationType(UMLRelation::INHERITANCE);
+                    }
+
+                    // If the source has INHERITANCE_SYMB, relation must be inverted from 'dst' to 'src'
+                    if(msgL == INHERITANCE_SYMB){
+                        auto rightSource = dynamic_cast<UMLClass*>(classDiagram->getClassifier(name));
+                        rel = rightSource->addRelation(selectedGClassifier->umlClassifier);
+                        rel->srcMsg() = msgR;
+                        rel->dstMsg() = msgL;
+                        rel->setRelationType(UMLRelation::INHERITANCE);
+                    }
                 }
             }
         }
     }
-    // notify GClassifier
-    connect(this, SIGNAL(contentSaved()), selectedGClassifier, SLOT(contentSaved()));
+//    // notify GClassifier
+    connect(this, SIGNAL(contentSaved()), selectedGClassifier, SLOT(contentSaved()), Qt::UniqueConnection);
     emit contentSaved();
 }
 
@@ -281,7 +300,7 @@ void GClassSettings::deleteRow(){
     }
 
     // notify GClassifier
-    connect(this, SIGNAL(contentDeleted()), selectedGClassifier, SLOT(contentDeleted()));
+    connect(this, SIGNAL(contentDeleted()), selectedGClassifier, SLOT(contentDeleted()), Qt::UniqueConnection);
     emit contentDeleted();
 }
 
@@ -446,6 +465,7 @@ void GClassSettings::addRelationRow(QWidget *obj, const QString &dst, const QStr
     if(!srcMsg.isEmpty())
         comboBoxParent->setCurrentText(srcMsg);
     rowLayoutH2->addWidget(comboBoxParent);
+    comboBoxParent->setDisabled(true); //todo
 
     auto *comboBoxTarget = new QComboBox();
     comboBoxTarget->addItems(QStringList(x.split(",")));
