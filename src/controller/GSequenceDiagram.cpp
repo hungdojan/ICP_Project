@@ -393,11 +393,7 @@ void GSequenceDiagram::onGTimelineDeleted() {
 }
 
 void GSequenceDiagram::deleteBeforeClass(UMLClassifier *classifier){
-//    for(auto tl: gTimelines){
-//        if(tl->model()->model()->name() == classifier->name()){
-//            deleteTimeline(tl);
-//        }
-//    }
+    // Delete all gTimelines depending on the deleting class
     std::vector<GTimeline*> toDelete;
     for(auto tl: gTimelines) {
         if(tl->model()->model()->name() == classifier->name())
@@ -406,12 +402,6 @@ void GSequenceDiagram::deleteBeforeClass(UMLClassifier *classifier){
     for(auto td: toDelete){
         deleteTimeline(td);
     }
-
-//    for(int i = gTimelines.size()-1; i >= 0; i--){
-//        if(gTimelines.at(i)->model()->name() == classifier->name()){
-//            deleteTimeline(gTimelines.at(i));
-//        }
-//    }
 }
 
 void GSequenceDiagram::deleteTimeline(GTimeline *tl){
