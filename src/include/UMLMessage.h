@@ -8,6 +8,7 @@ class UMLMessage : public Element, public IObserver {
     UMLObject *src_;
     UMLObject *dst_;
     UMLOperation *baseOperation_;
+    std::string messageType_;
 public:
     UMLMessage() =delete;
     explicit UMLMessage(UMLOperation *baseOperation, UMLObject *src, UMLObject *dst);
@@ -15,6 +16,8 @@ public:
 
     std::string text() const;
     void setText(const std::string &text);
+    const std::string &messageType() const;
+    std::string &messageType();
 
     const UMLObject *dst() const;
     const UMLObject *src() const;

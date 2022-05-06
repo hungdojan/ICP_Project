@@ -274,6 +274,14 @@ void GSequenceDiagram::onSaveMsg(){
     auto funcName = boxes[3]->currentText();
     if((!funcName.isEmpty() && boxes[4]->currentText() != "create" && boxes[4]->currentText() != "delete") ||
         (boxes[4]->currentText() == "create" || boxes[4]->currentText() == "delete")) {
+        auto operation = dynamic_cast<UMLOperation*>(dst->model()->model()->getAttribute(funcName.toStdString()));
+        UMLMessage *messageModel;
+        if (operation != nullptr)
+            messageModel = new UMLMessage(operation, src->model(), dst->model());
+        else
+            messageModel = new UMLMessage(boxes[4]->currentText().toStdString(), src->model(), dst->model());
+//        messageModel->messageType() = bo
+//        GMessage gMessage = new GMessage()
         auto gMsg = src->addMsg(funcName, dst, dir, boxes[4]->currentText(), index++);
         gMessages.push_back(gMsg); // Msg name boxes[3]
         addMsgItem(msgList, gMsg);
@@ -298,7 +306,7 @@ void GSequenceDiagram::onClassDiagramUpdated(){
             }
             if(i == 1 || i == 2 && !gTimelines.empty()){
                 for (auto tl: gTimelines) {
-                    boxes[i]->addItem(tl->getName());
+                    boxes[i]->addItem(QString::fromStdString(tl->model()->name()));
                 }
             }
             else if(i == 3 && !gTimelines.empty()){
@@ -327,14 +335,19 @@ void GSequenceDiagram::onClassDiagramUpdated(){
 }
 
 UMLClassifier *GSequenceDiagram::getClassifByInst(QString instName){
-    UMLClassifier *cls = nullptr;
-    if(!gTimelines.empty()) {
-        for (auto tl: gTimelines) {
-            if (tl->getName() == instName)
-                cls = tl->cls;
-        }
-    }
-    return cls;
+    // UMLClassifier *cls = nullptr;
+    // if(!gTimelines.empty()) {
+    //     for (auto tl: gTimelines) {
+    //         if (tl->model()->name() == instName.toStdString())
+    //             cls = tl->cls;
+    //     }
+    // }
+//    return cls;
+    auto iter {std::find_if(gTimelines.begin(), gTimelines.end(),
+        [instName](GTimeline *gt){ return gt->model()->name() == instName.toStdString(); })};
+    if (iter == gTimelines.end())
+        return nullptr;
+    return (*iter)->model()->model();
 }
 
 void GSequenceDiagram::onFuncUpdate(){
@@ -349,7 +362,6 @@ void GSequenceDiagram::onFuncUpdate(){
         }
     }
 }
-
 void GSequenceDiagram::onAddPressed(){
     if(!settings->findChild<QComboBox*>()->currentText().isEmpty()) {
         auto instName = settings->findChild<QLineEdit*>()->text();
@@ -417,13 +429,13 @@ void GSequenceDiagram::deleteTimeline(GTimeline *tl){
                         break;
                     }
                 }
-
                 gMessages.erase(gMessages.begin() + i);
                 delete m;
                 index--; // Lower index for new messages
             }
         }
     }
+    sequanceDiagram->removeObject(tl->model()->name());
     delete tl;
 
     for(int i = 0; i < gTimelines.size(); i++){

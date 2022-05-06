@@ -31,6 +31,17 @@ GMessage::GMessage(GraphicsScene *scene, QString name, enum direction dir, GTime
 
     addText();
 }
+GMessage::GMessage(GraphicsScene *scene, UMLMessage *model, enum direction dir, GTimeline *src, GTimeline *dst, int index) :
+    QObject(), scene{scene}, src{src}, dst{dst}, line{nullptr}, lineH{nullptr}, lineBack{nullptr}, index{index}, model_{model}, dir{dir} {
+        posY = MSG_GAP*index;
+    if(dir == GMessage::LTOL)
+        addLtoL(src->getX(), posY, dir);
+    else
+        addLine(src->getX(), dst->getX(), posY, dir);
+
+    addText();
+
+}
 
 GMessage::~GMessage(){
     delete line;
@@ -39,7 +50,7 @@ GMessage::~GMessage(){
 }
 
 void GMessage::addText(){
-    text = new QGraphicsTextItem(name, line);
+    text = new QGraphicsTextItem(QString::fromStdString(model_->text()), line);
     text->setPos(line->boundingRect().center().x() - text->sceneBoundingRect().width()/2.0, posY - text->sceneBoundingRect().height());
     text->setHtml("<div style='background-color:#FFFFFF;'>" + text->toPlainText() + "</div>");
 }

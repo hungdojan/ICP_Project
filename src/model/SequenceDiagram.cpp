@@ -67,6 +67,19 @@ UMLObject *SequenceDiagram::getObject(const std::string &name) const {
     return *iter;
 }
 
+UMLObject *SequenceDiagram::getObject(QString name) const {
+//    auto iter{std::find_if(objects_.begin(), objects_.end(),
+//                           [name](UMLObject *obj) { return name.toStdString() == obj->name(); })};
+//    if (iter == objects_.end())
+//        return nullptr;
+//    return *iter;
+    for (auto o : objects_) {
+        if (o->name() == name.toStdString())
+            return o;
+    }
+    return nullptr;
+}
+
 bool SequenceDiagram::removeObject(const std::string &name) {
     auto iter{std::find_if(objects_.begin(), objects_.end(),
                            [name](UMLObject *obj) { return name == obj->name(); })};

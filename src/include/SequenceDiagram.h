@@ -51,6 +51,8 @@ public:
      */
     void createJsonObject(QJsonObject &object) override;
     ~SequenceDiagram() override;
+
+    UMLObject *getObject(QString name) const;
 };
 
 

@@ -9,7 +9,9 @@
 #include "GraphicsScene.h"
 #include "ClassDiagram.h"
 #include "GClassSettings.h"
+#include "GSequenceDiagram.h"
 
+class MainWindow;
 
 class GClassDiagram: public QObject{
 Q_OBJECT
@@ -35,6 +37,8 @@ private:
     GraphicsScene *scene_;
     std::vector<GClassifier*> gClassifiers;
     std::vector<GRelation*> gRelations;
+//    std::vector<GSequenceDiagram *> *gSequenceDiagrams;
+    MainWindow *mainWindow;
     GClassSettings *gClassSettings;
     int name_index{0};
     void addGClassifier(GClassifier *g);

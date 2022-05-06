@@ -16,6 +16,7 @@ Q_OBJECT
 public:
     enum type{SEND, RECEIVE, SELF};
     GTimeline(UMLClass *cls, QString name, GraphicsScene *scene, qreal x, qreal y, int indexes);
+    GTimeline(UMLObject *model, GraphicsScene *scene, qreal x, qreal y, int indexes);
     ~GTimeline();
     qreal getX();
     GMessage *addMsg(QString name, GTimeline *target, enum GMessage::direction dir, QString type, int index);
@@ -23,11 +24,13 @@ public:
     QString getName();
     UMLClass *cls;
     void changePos(qreal x, qreal y);
+    UMLObject *model();
 signals:
     void gTimelineDeleted();
     void gObjectResize();
 
 private:
+    UMLObject *model_;
     GraphicsScene *scene;
     QGraphicsLineItem *dashedLine;
     GObject *head;
