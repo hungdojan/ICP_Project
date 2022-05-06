@@ -151,6 +151,7 @@ void UMLClassifier::createJsonObject(QJsonObject &object) {
 }
 
 std::unordered_set<UMLOperation *> UMLClassifier::getOperations() const {
+    // TODO:
     return {};
 }
 

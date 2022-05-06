@@ -20,6 +20,8 @@ public:
     ~GClassifier();
     QVariant itemChange(GraphicsItemChange change, const QVariant & value);
     UMLClassifier *umlClassifier;
+    void mousePressEvent(QGraphicsSceneMouseEvent *event) override;
+    void mouseReleaseEvent(QGraphicsSceneMouseEvent *event) override;
 signals:
     void gClassifierPositionChanged();
     void gClassifierSelectionChanged();
@@ -47,6 +49,8 @@ private slots:
     void contentSaved();
     void contentDeleted();
     void onUpdateUndefTypes();
+
+    void mouseMoveEvent(QGraphicsSceneMouseEvent *event);
 };
 
 #endif //DIAGRAMEDITOR_GCLASIFIER_H

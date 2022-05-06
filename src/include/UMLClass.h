@@ -7,7 +7,7 @@
  *
  * This source code serves as submission for semester assignment of class ICP at FIT, BUT 2021/22.
  *
- * @file UMLClassifier.h
+ * @file UMLClass.h
  * @date 22/04/2022
  * @authors Hung Do     (xdohun00)
  *          David Kedra (xkedra00)
@@ -103,7 +103,6 @@ public:
      */
     std::unordered_set<UMLOperation *> getOperations() const override;
 
-    // Returns attribute from a given position
     /**
      * @brief Returns attribute that is in given position.
      * Nullptr is returned when given position is out of range of the set.
@@ -112,7 +111,6 @@ public:
      */
     UMLAttribute *getAttributeAtPosition(int pos);
 
-    // Get attributes position in the class
     /**
      * @brief Returns attribute's position.
      * When attribute is not found in the class, -1 value is returned.

@@ -108,7 +108,6 @@ QHeaderView::section {
            <property name="font">
             <font>
              <pointsize>15</pointsize>
-             <weight>75</weight>
              <bold>true</bold>
             </font>
            </property>
@@ -227,7 +226,7 @@ QHeaderView::section {
      <x>0</x>
      <y>0</y>
      <width>960</width>
-     <height>28</height>
+     <height>22</height>
     </rect>
    </property>
    <property name="sizePolicy">
@@ -250,6 +249,9 @@ QHeaderView::section {
     <addaction name="separator"/>
     <addaction name="actionLoad_from"/>
     <addaction name="actionSave_to"/>
+    <addaction name="separator"/>
+    <addaction name="actionRedo"/>
+    <addaction name="actionUndo"/>
     <addaction name="separator"/>
     <addaction name="actionExit"/>
    </widget>
@@ -300,6 +302,22 @@ QHeaderView::section {
   <action name="actionExit">
    <property name="text">
     <string>Exit</string>
+   </property>
+  </action>
+  <action name="actionUndo">
+   <property name="text">
+    <string>Undo</string>
+   </property>
+   <property name="shortcut">
+    <string>Ctrl+Z</string>
+   </property>
+  </action>
+  <action name="actionRedo">
+   <property name="text">
+    <string>Redo</string>
+   </property>
+   <property name="shortcut">
+    <string>Ctrl+Y</string>
    </property>
   </action>
  </widget>

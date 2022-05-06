@@ -36,6 +36,7 @@ private slots:
     void saveClassDiagram();
 
 private:
+    static int index;
     Ui::MainWindow *ui;
     GraphicsScene *scene;
     GClassDiagram *gClassDiagram;

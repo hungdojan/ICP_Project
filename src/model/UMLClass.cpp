@@ -116,6 +116,7 @@ bool UMLClass::updateAttributeName(UMLAttribute *attribute, const std::string &n
     if (attribute == nullptr)
         return false;
 
+    // check if attribute exists in class
     auto iterAttr{std::find(attributes_.begin(), attributes_.end(), attribute)};
     if (iterAttr == attributes_.end())
         return false;
@@ -167,6 +168,7 @@ bool UMLClass::removeRelation(UMLRelation *relation) {
     if (iter == relations_.end())
         return false;
     relations_.erase(iter);
+    // clear relation from both sides before deletion
     relation->removeRelationDependency(this);
     delete relation;
     return true;

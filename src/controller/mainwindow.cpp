@@ -17,7 +17,9 @@
 #include "SequenceDiagram.h"
 #include <QFileDialog>
 #include "JsonParser.h"
+#include "CommandBuilder.h"
 
+int MainWindow::index = 1;
 MainWindow::MainWindow(QWidget *parent) :
         QMainWindow(parent), ui(new Ui::MainWindow) {
     ui->setupUi(this);
@@ -34,6 +36,8 @@ MainWindow::MainWindow(QWidget *parent) :
     connect(ui->actionNew, SIGNAL(triggered()), this, SLOT(newClassDiagram()));
     connect(ui->actionLoad_from, SIGNAL(triggered()), this, SLOT(loadClassDiagram()));
     connect(ui->actionSave_to, SIGNAL(triggered()), this, SLOT(saveClassDiagram()));
+    connect(ui->actionRedo, SIGNAL(triggered()), &CommandBuilder::get_commander(), SLOT(redoSlot()));
+    connect(ui->actionUndo, SIGNAL(triggered()), &CommandBuilder::get_commander(), SLOT(undoSlot()));
 }
 
 MainWindow::~MainWindow() {
@@ -71,9 +75,10 @@ void MainWindow::clickedDiagram(QAction *a){
     QFrame *rightPanelSettings = new QFrame();
     hLayout->addWidget(rightPanelSettings);
 
-    ui->diagramsTabs->addTab(seq, "seq1");
-    classDiagram->addSequenceDiagram("seq1");
-    GSequenceDiagram *gSeqDiag = new GSequenceDiagram(seqScene, "seq1", classDiagram, rightPanelSettings);
+    QString tabName = "SequenceDiagram" + QString::number(MainWindow::index++);
+    ui->diagramsTabs->addTab(seq, tabName);
+    auto sequenceDiagramModel = classDiagram->addSequenceDiagram(tabName.toStdString());
+    GSequenceDiagram *gSeqDiag = new GSequenceDiagram(seqScene, sequenceDiagramModel, classDiagram, rightPanelSettings);
     gSequenceDiagrams.push_back(gSeqDiag);
 
     connect(gClassDiagram, SIGNAL(classDiagramUpdated()), gSeqDiag, SLOT(onClassDiagramUpdated()));
@@ -84,7 +89,6 @@ void MainWindow::saveClassDiagram() {
     if (filePath == "")
         return;
 
-    qDebug() << filePath;
     if (!filePath.endsWith(".json")) {
         filePath += ".json";
     }
@@ -99,31 +103,34 @@ void MainWindow::loadClassDiagram() {
     // TODO: warning dialog popup
     // ask user to save current work
     // exit if user cancel
-    qDebug() << filePath;
     // TODO: clean current and load from file
+    for (int i = ui->diagramsTabs->count(); i >= 1; i--)
+        ui->diagramsTabs->removeTab(i);
     delete scene;
     delete gClassDiagram;
     delete classDiagram;
     classDiagram = new ClassDiagram("temporary class diagram");
     JsonParser::initFromFile(*classDiagram, filePath.toStdString());
 
-    // TODO: make better code
+    index = static_cast<int>(classDiagram->sequenceDiagrams().size());
 
     scene = new GraphicsScene(ui->graphicsView, this);
+
     ui->graphicsView->setScene(scene);
 
     gClassDiagram = new GClassDiagram(scene, classDiagram);
     connect(ui->addClassButton, SIGNAL(pressed()), gClassDiagram, SLOT(addClassifier()));
     connect(ui->addInterfaceButton, SIGNAL(pressed()), gClassDiagram, SLOT(addClassifierInterface()));
-    connect(ui->menuDiagram, SIGNAL(triggered(QAction *)), this, SLOT(clickedDiagram(QAction *)));
-    connect(ui->actionNew, SIGNAL(triggered()), this, SLOT(newClassDiagram()));
 }
 
 void MainWindow::newClassDiagram() {
-    qDebug() << ui->diagramsTabs->children().count();
+    // clean up and set default values
+    for (int i = ui->diagramsTabs->count(); i >= 1; i--)
+        ui->diagramsTabs->removeTab(i);
     delete scene;
     delete gClassDiagram;
     delete classDiagram;
+    index = 1;
 
     scene = new GraphicsScene(ui->graphicsView, this);
     ui->graphicsView->setScene(scene);
@@ -132,8 +139,6 @@ void MainWindow::newClassDiagram() {
     gClassDiagram = new GClassDiagram(scene, classDiagram);
     connect(ui->addClassButton, SIGNAL(pressed()), gClassDiagram, SLOT(addClassifier()));
     connect(ui->addInterfaceButton, SIGNAL(pressed()), gClassDiagram, SLOT(addClassifierInterface()));
-    connect(ui->menuDiagram, SIGNAL(triggered(QAction *)), this, SLOT(clickedDiagram(QAction *)));
-    connect(ui->actionNew, SIGNAL(triggered()), this, SLOT(newClassDiagram()));
     // clickedDiagram(new QAction()); // TODO remove
 }
 

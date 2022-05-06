@@ -21,7 +21,7 @@
 #define UNSELECTED_COLOR "#CFCFDD"
 
 GClassifier::GClassifier(std::string name, qreal x, qreal y, qreal width, qreal height, ClassDiagram *classDiagram, bool isInterface, QGraphicsItem *parent) :
-        QGraphicsRectItem(x, y, width, height, parent), QObject(), classDiagram{classDiagram}, isInterface{isInterface}, width{width}, height{height}, x{x}, y{y}{
+        QGraphicsRectItem(x, y, width, height, parent), QObject(), classDiagram{classDiagram}, isInterface{isInterface}, width{width}, height{height}, x{0}, y{0}{
 
     setFlag(QGraphicsItem::ItemIsMovable);
     setFlag(QGraphicsItem::ItemIsSelectable);
@@ -35,10 +35,12 @@ GClassifier::GClassifier(std::string name, qreal x, qreal y, qreal width, qreal 
         umlClassifier = ClassDiagram::createClassifier(name, ClassDiagram::CLASS);
 
     classDiagram->addClassifier(umlClassifier);
+//    x = 0;
+//    y = 0;
 
-    titleRect = new QGraphicsRectItem(x,y, width, ROW_HEIGHT*2, this);
-    title = new GText(QString::fromStdString(umlClassifier->name()), x, y, titleRect);
-    classificType = new GText(isInterface? "<interface>": "<class>", x, y+title->sceneBoundingRect().height(), titleRect);
+    titleRect = new QGraphicsRectItem(this->x,this->y, width, ROW_HEIGHT*2, this);
+    title = new GText(QString::fromStdString(umlClassifier->name()), this->x, this->y, titleRect);
+    classificType = new GText(isInterface? "<interface>": "<class>", this->x, this->y+title->sceneBoundingRect().height(), titleRect);
 
     connect(this, SIGNAL(gTextChanged()), title, SLOT(onTextChanged()));
     connect(this, SIGNAL(gTextChanged()), classificType, SLOT(onTextChanged()));
@@ -46,14 +48,19 @@ GClassifier::GClassifier(std::string name, qreal x, qreal y, qreal width, qreal 
     connect(this, SIGNAL(centerText()), classificType, SLOT(centerText()));
 
     if(!isInterface)
-        attribRect = new QGraphicsRectItem(x,y+2*ROW_HEIGHT, width, ROW_HEIGHT, this);
+        attribRect = new QGraphicsRectItem(this->x,this->y+2*ROW_HEIGHT, width, ROW_HEIGHT, this);
+    setPos(x, y);
+    umlClassifier->x() = x;
+    umlClassifier->y() = y;
+//    this->x = 0;
+//    this->y = 0;
 
     contentSaved();
 
 }
 
 GClassifier::GClassifier(UMLClassifier *model, qreal x, qreal y, qreal width, qreal height, ClassDiagram *classDiagram, QGraphicsItem *parent) :
-        QGraphicsRectItem(x, y, width, height, parent), QObject(), umlClassifier{model}, classDiagram{classDiagram}, isInterface{dynamic_cast<UMLInterface *>(model) != nullptr}, width{width}, height{height}, x{x}, y{y}{
+        QGraphicsRectItem(x, y, width, height, parent), QObject(), umlClassifier{model}, classDiagram{classDiagram}, isInterface{dynamic_cast<UMLInterface *>(model) != nullptr}, width{width}, height{height}, x{0}, y{0}{
 
     setFlag(QGraphicsItem::ItemIsMovable);
     setFlag(QGraphicsItem::ItemIsSelectable);
@@ -61,9 +68,9 @@ GClassifier::GClassifier(UMLClassifier *model, qreal x, qreal y, qreal width, qr
     setFlag(QGraphicsItem::ItemIsFocusable);
     setBrush(QBrush(QColor(UNSELECTED_COLOR)));
 
-    titleRect = new QGraphicsRectItem(x,y, width, ROW_HEIGHT*2, this);
-    title = new GText(QString::fromStdString(umlClassifier->name()), x, y, titleRect);
-    classificType = new GText(isInterface? "<interface>": "<class>", x, y+title->sceneBoundingRect().height(), titleRect);
+    titleRect = new QGraphicsRectItem(this->x,this->y, width, ROW_HEIGHT*2, this);
+    title = new GText(QString::fromStdString(umlClassifier->name()), this->x, this->y, titleRect);
+    classificType = new GText(isInterface? "<interface>": "<class>", this->x, this->y+title->sceneBoundingRect().height(), titleRect);
 
     connect(this, SIGNAL(gTextChanged()), title, SLOT(onTextChanged()));
     connect(this, SIGNAL(gTextChanged()), classificType, SLOT(onTextChanged()));
@@ -71,10 +78,12 @@ GClassifier::GClassifier(UMLClassifier *model, qreal x, qreal y, qreal width, qr
     connect(this, SIGNAL(centerText()), classificType, SLOT(centerText()));
 
     if(!isInterface)
-        attribRect = new QGraphicsRectItem(x,y+2*ROW_HEIGHT, width, ROW_HEIGHT, this);
+        attribRect = new QGraphicsRectItem(this->x,this->y+2*ROW_HEIGHT, width, ROW_HEIGHT, this);
+    // this->x = 0;
+    // this->y = 0;
 
     contentSaved();
-
+    setPos(x, y);
 }
 GClassifier::~GClassifier(){
 }
@@ -130,7 +139,8 @@ void GClassifier::contentDeleted(){
     contentSaved();
     emit gClassifierContentChanged();
 }
-
+#include "ICommand.h"
+#include "CommandBuilder.h"
 QVariant GClassifier::itemChange(GraphicsItemChange change, const QVariant &value){
     if(change == QGraphicsItem::ItemSelectedChange){
         if (value == true) {
@@ -160,8 +170,8 @@ void GClassifier::loadAttributes(){
         // Class Attributes
         for (auto a: cls->attributes()) {
             if (dynamic_cast<UMLOperation *>(a) == nullptr) {
-                auto attrib = new GText(QString::fromStdString(std::string(*a)),boundingRect().x(),
-                                        ROW_HEIGHT * 2 + (index++ * ROW_HEIGHT) + boundingRect().y(), attribRect);
+                auto attrib = new GText(QString::fromStdString(std::string(*a)),x,
+                                        ROW_HEIGHT * 2 + (index++ * ROW_HEIGHT) + y, attribRect);
                 connect(this, SIGNAL(gTextChanged()), attrib, SLOT(onTextChanged()));
                 gTextAttributes.push_back(attrib);
             }
@@ -172,7 +182,7 @@ void GClassifier::loadAttributes(){
             UMLOperation *op = dynamic_cast<UMLOperation *>(a);
             if(op) {
                 auto attrib = new GText(QString::fromStdString(std::string(*op)),
-                        boundingRect().x(),ROW_HEIGHT * 2 + (index++ * ROW_HEIGHT) + boundingRect().y(), this);
+                        x,ROW_HEIGHT * 2 + (index++ * ROW_HEIGHT) + y, this);
                 connect(this, SIGNAL(gTextChanged()), attrib, SLOT(onTextChanged()));
                 gTextAttributes.push_back(attrib);
             }
@@ -186,10 +196,61 @@ void GClassifier::loadAttributes(){
             UMLOperation *op = dynamic_cast<UMLOperation *>(a);
             if(op) {
                 auto attrib = new GText(QString::fromStdString(std::string(*op)),
-                                        boundingRect().x(), ROW_HEIGHT * 2 + (index++ * ROW_HEIGHT) + boundingRect().y(), this);
+                                        x, ROW_HEIGHT * 2 + (index++ * ROW_HEIGHT) + y, this);
                 connect(this, SIGNAL(gTextChanged()), attrib, SLOT(onTextChanged()));
                 gTextAttributes.push_back(attrib);
             }
         }
     }
+}
+
+void GClassifier::mousePressEvent(QGraphicsSceneMouseEvent *event) {
+    QGraphicsItem::mousePressEvent(event);
+}
+
+void GClassifier::mouseMoveEvent(QGraphicsSceneMouseEvent *event) {
+    QGraphicsItem::mouseMoveEvent(event);
+}
+
+void GClassifier::mouseReleaseEvent(QGraphicsSceneMouseEvent *event) {
+    QGraphicsItem::mouseReleaseEvent(event);
+    auto pos = this->pos();
+    umlClassifier->x() = pos.x();
+    umlClassifier->y() = pos.y();
+//    class Cmd : public ICommand {
+//        GClassifier *cls;
+//        double origX = 0;
+//        double origY = 0;
+//        double newX = 0;
+//        double newY = 0;
+//    public:
+//        explicit Cmd(GClassifier *c) : cls{c} {
+//            origX = cls->umlClassifier->x();
+//            origY = cls->umlClassifier->y();
+//            auto pos = cls->pos();
+//            newX = pos.x();
+//            newY = pos.y();
+//        }
+//        void execute() override {
+//            cls->setPos(newX, newY);
+//            cls->umlClassifier->x() = newX;
+//            cls->umlClassifier->y() = newY;
+//            emit cls->gClassifierPositionChanged();
+//        }
+//        void undo() override {
+//            cls->setPos(origX, origY);
+//            cls->umlClassifier->x() = origX;
+//            cls->umlClassifier->y() = origY;
+//            emit cls->gClassifierPositionChanged();
+//            // TODO:
+//        }
+//        void redo() override {
+//            cls->setPos(newX, newY);
+//            cls->umlClassifier->x() = newX;
+//            cls->umlClassifier->y() = newY;
+//            emit cls->gClassifierPositionChanged();
+//        }
+//    };
+//    std::shared_ptr<ICommand> cmd{new Cmd(this)};
+//    CommandBuilder::get_commander().execute(cmd);
 }

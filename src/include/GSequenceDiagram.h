@@ -16,7 +16,7 @@ class GSequenceDiagram: public QObject{
 Q_OBJECT
 public:
 //    ~GSequenceDiagram();
-    GSequenceDiagram(GraphicsScene *scene, std::string name, ClassDiagram *classDiagram, QFrame *settings);
+    GSequenceDiagram(GraphicsScene *scene, SequenceDiagram *model, ClassDiagram *classDiagram, QFrame *settings);
 signals:
     void classContentUpdated();
     void updateMsgPos();

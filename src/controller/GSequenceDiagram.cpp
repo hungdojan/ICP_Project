@@ -21,11 +21,10 @@
 #define HORIZONTAL_GAP 350
 #define NUM_INDEXES 20
 
-GSequenceDiagram::GSequenceDiagram(GraphicsScene *scene, std::string name, ClassDiagram *classDiagram, QFrame *settings):
-    QObject(), classDiagram{classDiagram}, settings{settings}, index{1}, scene{scene}{
+GSequenceDiagram::GSequenceDiagram(GraphicsScene *scene, SequenceDiagram *model, ClassDiagram *classDiagram, QFrame *settings):
+    QObject(), classDiagram{classDiagram}, sequanceDiagram{model}, settings{settings}, msgList{new QListWidget()}, index{1}, scene{scene}{
 
     addSettings();
-    sequanceDiagram = classDiagram->getSequenceDiagram(name);
 }
 
 void GSequenceDiagram::addSettings(){
@@ -142,7 +141,6 @@ void GSequenceDiagram::addSettings(){
     vLayoutTree->setContentsMargins(0,5,0,0);
     vLayout->addWidget(frameList);
 
-    msgList = new QListWidget();
     msgList->setStyleSheet("QListWidget { background-color: #32373C; border-top-left-radius: 7px; border-top-right-radius: 7px; }"
                          "QListWidget::item { height: 25px; }");
     vLayoutTree->addWidget(msgList);

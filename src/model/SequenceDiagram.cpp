@@ -85,8 +85,6 @@ SequenceDiagram::~SequenceDiagram() {
     for (auto m : messages_) {
         delete m;
     }
-    // delete SequenceDiagram::undefOperation;
-    // delete SequenceDiagram::undefClass;
 }
 
 UMLMessage *SequenceDiagram::addMessage(UMLObject *src, UMLObject *dst) {

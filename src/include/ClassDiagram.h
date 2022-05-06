@@ -98,7 +98,6 @@ public:
      */
     UMLClassifier *addOrReplaceClassifier(UMLClassifier *classifier);
 
-    // Adds multiple classifiers into the class diagram.
     /**
      * Adds collection of class elements into the class diagram. Use _cleanUnsuccessful_ flag
      * to define, whether to dealloc objects that weren't able to insert.
@@ -135,6 +134,10 @@ public:
      */
     UMLClassifier *getClassifier(const std::string &name) const ;
 
+    /**
+     * @brief Return vector of UMLClass instances.
+     * @return Vector of UMLClass instances.
+     */
     const std::vector<UMLClass *> getClasses() const;
 
     /**
@@ -144,7 +147,6 @@ public:
      */
     bool isInClassDiagram(const UMLClassifier *classifier) const ;
 
-    // Removes classifier from the class diagram
     /**
      * Removes class element from the class diagram by name.
      * When class element is found in the diagram, it is removed from the diagram and returned to user
@@ -155,7 +157,6 @@ public:
      */
     UMLClassifier *removeClassElement(const std::string &name);
 
-    // Removes classifier from the class diagram
     /**
      * Removes class element from the class diagram if found.
      * User has to handle resource deletion.
@@ -170,15 +171,52 @@ public:
      */
     void createJsonObject(QJsonObject &object) override;
 
-    // sequence diagram methods
-    // TODO: add, search, remove
-    // Class destructor
+    /**
+     * @brief Add sequence diagram into the class diagram
+     * @param name Name of the diagram.
+     * @return New instance of sequence diagram when no instance of diagram was found.
+     */
     SequenceDiagram *addSequenceDiagram(const std::string &name);
+
+    /**
+     * @brief Add sequence diagram into the class diagram
+     * @param name Name of the diagram.
+     * @return Whether diagram insertion ended successfully.
+     */
     bool addSequenceDiagram(SequenceDiagram *sequenceDiagram);
+
+    /**
+     * @brief Returns instance of sequence diagram in class diagram.
+     * @param name Sequence diagram's name.
+     * @return Found instance, nullptr if not.
+     */
     SequenceDiagram *getSequenceDiagram(const std::string &name);
+
+    /**
+     * @brief Add multiple sequence diagrams at once.
+     * Clear up diagrams that were not added.
+     * @param sequenceDiagrams Vector of sequence diagrams.
+     * @param clearUnsuccessful Whether to clear unsuccessfully added diagrams.
+     */
     void addSequenceDiagrams(const std::vector<SequenceDiagram *> &sequenceDiagrams, bool clearUnsuccessful);
+
+    /**
+     * @brief Remove sequence diagram from the class diagram.
+     * @param s Instance of sequence diagram.
+     * @return Whether instance was found and deleted successfully.
+     */
     bool removeSequenceDiagram(SequenceDiagram *s);
+
+    /**
+     * @brief Remove sequence diagram from the class diagram.
+     * @param name Name of the sequence diagram.
+     * @return Whether instance was found and deleted successfully.
+     */
     bool removeSequenceDiagram(const std::string &name);
+
+    /**
+     * @brief Clear all sequence diagrams in the class diagram.
+     */
     void clearSequenceDiagrams();
 
     ~ClassDiagram() override;

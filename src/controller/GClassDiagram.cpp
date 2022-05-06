@@ -13,6 +13,7 @@
 #include "UMLRelation.h"
 #include "GRelation.h"
 #include "UMLInterface.h"
+#include "CommandBuilder.h"
 
 GClassDiagram::GClassDiagram(GraphicsScene *scene, ClassDiagram *model) : scene_{scene}, classDiagramModel{model} {
     gClassSettings = new GClassSettings(((MainWindow*)scene->parent())->getCategoryTree(), classDiagramModel);
@@ -48,6 +49,7 @@ GClassDiagram::GClassDiagram(GraphicsScene *scene, ClassDiagram *model) : scene_
                                                QString::fromStdString(relation->srcMsg()), QString::fromStdString(relation->dstMsg())));
         }
     }
+    CommandBuilder::get_commander().clear();
 }
 
 void GClassDiagram::addClassifier() {
