@@ -69,7 +69,8 @@ void GMessage::onUpdateMsgPos() {
 }
 
 QString GMessage::getFuncName(){
-    return name;
+//    return name;
+    return QString::fromStdString(model_->text());
 }
 
 std::vector<QGraphicsLineItem*> GMessage::getItems(){
@@ -88,7 +89,7 @@ void GMessage::addLine(qreal x1, qreal x2, qreal y, enum direction dir){
 
     QPen pen;
     pen.setWidth(LINE_WIDTH);
-    if(type == T_RESPONSE)
+    if(model_->messageType() == T_RESPONSE)
         pen.setDashPattern({0, 1, 5, 6});
 
     line->setPen(pen);
@@ -115,17 +116,17 @@ void GMessage::addLtoL(qreal x1, qreal y1, enum direction dir){
 void GMessage::addArrow(QGraphicsLineItem *line, enum GMessage::direction dir, qreal x1, qreal x2, qreal y){
 //    QString sign = dir == GMessage::LTOR? "►":"◄";
     QString sign = "";
-    if(type == T_SYNC)
+    if(model_->messageType() == T_SYNC)
         sign = dir == GMessage::LTOR? "►":"◄";
-    else if(type == T_ASYNC || type == T_RESPONSE)
+    else if(model_->messageType() == T_ASYNC || model_->messageType() == T_RESPONSE)
         sign = dir == GMessage::LTOR? ">":"<";
-    else if(type == T_CREATE) {
+    else if(model_->messageType() == T_CREATE) {
         sign = dir == GMessage::LTOR ? "▣" : "▣";//
-        name = "CREATE";
+        model_->setText("CREATE");
     }
-    else if(type == T_DELETE) {
+    else if(model_->messageType() == T_DELETE) {
         sign = dir == GMessage::LTOR ? "╳" : "╳";
-        name = "DELETE";
+        model_->setText("DELETE");
     }
 
     auto arrow = new QGraphicsTextItem(sign, line);
@@ -145,4 +146,8 @@ void GMessage::addArrow(QGraphicsLineItem *line, enum GMessage::direction dir, q
 
 void GMessage::warn(){
     text->setDefaultTextColor(Qt::red);
+}
+
+UMLMessage *GMessage::model() {
+    return model_;
 }
