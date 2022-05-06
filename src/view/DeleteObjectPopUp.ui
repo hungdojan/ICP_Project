@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>DeleteObjectPopUp</class>
+ <widget class="QDialog" name="DeleteObjectPopUp">
+  <property name="geometry">
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>719</width>
+    <height>302</height>
+   </rect>
+  </property>
+  <property name="windowTitle">
+   <string>DeleteObjectPopUp</string>
+  </property>
+  <property name="styleSheet">
+   <string notr="true">background-color: #282C31; color: white</string>
+  </property>
+  <widget class="QLabel" name="label">
+   <property name="geometry">
+    <rect>
+     <x>30</x>
+     <y>40</y>
+     <width>661</width>
+     <height>17</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string>You are trying to delete an UML classifier, but there is a depending Object in Sequence diagram</string>
+   </property>
+  </widget>
+  <widget class="QPushButton" name="buttonRemove">
+   <property name="geometry">
+    <rect>
+     <x>100</x>
+     <y>200</y>
+     <width>131</width>
+     <height>25</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string>Remove both</string>
+   </property>
+  </widget>
+  <widget class="QPushButton" name="buttonCancel">
+   <property name="geometry">
+    <rect>
+     <x>460</x>
+     <y>200</y>
+     <width>131</width>
+     <height>25</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string>Cancel (keep)</string>
+   </property>
+  </widget>
+ </widget>
+ <resources/>
+ <connections/>
+</ui>

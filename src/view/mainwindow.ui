@@ -257,7 +257,7 @@ QHeaderView::section {
    </widget>
    <widget class="QMenu" name="menuDiagram">
     <property name="title">
-     <string>Add diagram</string>
+     <string>Sequence diagram</string>
     </property>
     <addaction name="actionAdd"/>
     <addaction name="actionDelete"/>

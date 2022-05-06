@@ -17,6 +17,7 @@ Q_OBJECT
 public:
 //    ~GSequenceDiagram();
     GSequenceDiagram(GraphicsScene *scene, SequenceDiagram *model, ClassDiagram *classDiagram, QFrame *settings);
+    void deleteBeforeClass(UMLClassifier *classifier);
 signals:
     void classContentUpdated();
     void updateMsgPos();
@@ -33,6 +34,7 @@ private:
     void addMsgItem(QListWidget *qList, GMessage *gMsg);
     QListWidget *msgList;
     void updateAfterMsgDelete();
+    void deleteTimeline(GTimeline *tl);
 private slots:
     void onClassDiagramUpdated();
     void onAddPressed();

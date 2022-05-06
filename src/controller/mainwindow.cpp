@@ -16,6 +16,7 @@
 #include <QComboBox>
 #include "SequenceDiagram.h"
 #include <QFileDialog>
+#include <QSignalMapper>
 #include "JsonParser.h"
 #include "CommandBuilder.h"
 
@@ -23,12 +24,13 @@ int MainWindow::index = 1;
 MainWindow::MainWindow(QWidget *parent) :
         QMainWindow(parent), ui(new Ui::MainWindow) {
     ui->setupUi(this);
+    mapper = nullptr;
 
     scene = new GraphicsScene(ui->graphicsView, this);
     ui->graphicsView->setScene(scene);
 
     classDiagram = new ClassDiagram("MyClassDiagram");
-    gClassDiagram = new GClassDiagram(scene, classDiagram);
+    gClassDiagram = new GClassDiagram(scene, classDiagram, this);
 
     connect(ui->addClassButton, SIGNAL(pressed()), gClassDiagram, SLOT(addClassifier()));
     connect(ui->addInterfaceButton, SIGNAL(pressed()), gClassDiagram, SLOT(addClassifierInterface()));
@@ -43,6 +45,7 @@ MainWindow::MainWindow(QWidget *parent) :
 MainWindow::~MainWindow() {
     delete ui;
     delete scene;
+    delete mapper;
 }
 QTreeWidget *MainWindow::getCategoryTree(){
     return ui->treeWidget;
@@ -82,6 +85,8 @@ void MainWindow::clickedDiagram(QAction *a){
     gSequenceDiagrams.push_back(gSeqDiag);
 
     connect(gClassDiagram, SIGNAL(classDiagramUpdated()), gSeqDiag, SLOT(onClassDiagramUpdated()));
+
+//    connect(gClassDiagram, SIGNAL(removeObjectBeforeClass()), gSeqDiag, SLOT(onGTimelineDeleted()));
 }
 
 void MainWindow::saveClassDiagram() {
@@ -118,7 +123,7 @@ void MainWindow::loadClassDiagram() {
 
     ui->graphicsView->setScene(scene);
 
-    gClassDiagram = new GClassDiagram(scene, classDiagram);
+    gClassDiagram = new GClassDiagram(scene, classDiagram, this);
     connect(ui->addClassButton, SIGNAL(pressed()), gClassDiagram, SLOT(addClassifier()));
     connect(ui->addInterfaceButton, SIGNAL(pressed()), gClassDiagram, SLOT(addClassifierInterface()));
 }
@@ -136,7 +141,7 @@ void MainWindow::newClassDiagram() {
     ui->graphicsView->setScene(scene);
 
     classDiagram = new ClassDiagram("MyClassDiagram");
-    gClassDiagram = new GClassDiagram(scene, classDiagram);
+    gClassDiagram = new GClassDiagram(scene, classDiagram, this);
     connect(ui->addClassButton, SIGNAL(pressed()), gClassDiagram, SLOT(addClassifier()));
     connect(ui->addInterfaceButton, SIGNAL(pressed()), gClassDiagram, SLOT(addClassifierInterface()));
     // clickedDiagram(new QAction()); // TODO remove

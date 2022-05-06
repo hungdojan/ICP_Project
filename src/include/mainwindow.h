@@ -12,6 +12,7 @@
 #include <QMainWindow>
 #include <QGraphicsScene>
 #include <QTreeWidget>
+#include <QSignalMapper>
 #include "GraphicsScene.h"
 #include "GClassDiagram.h"
 #include "GSequenceDiagram.h"
@@ -27,6 +28,7 @@ public:
     explicit MainWindow(QWidget *parent = nullptr);
     ~MainWindow() override;
     QTreeWidget *getCategoryTree();
+    std::vector<GSequenceDiagram*> gSequenceDiagrams;
 
 private slots:
     void clickedDiagram(QAction *a);
@@ -40,8 +42,8 @@ private:
     Ui::MainWindow *ui;
     GraphicsScene *scene;
     GClassDiagram *gClassDiagram;
-    std::vector<GSequenceDiagram*> gSequenceDiagrams;
     ClassDiagram *classDiagram;
+    QSignalMapper *mapper;
 };
 
 
