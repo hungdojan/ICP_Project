@@ -3,6 +3,7 @@
 //
 
 #include "GObject.h"
+//#include "UMLObject.h"
 #include <QBrush>
 #include <QDebug>
 #include <QGraphicsRectItem>
@@ -25,6 +26,26 @@ GObject::GObject(QString className, QString name, qreal x, qreal y, qreal w, qre
     gName = new GText(name, x, y, this);
     connect(this, SIGNAL(centerText()), gName, SLOT(centerText()));
     gClassName = new GText("("+className+")", x, y+25, this);
+    connect(this, SIGNAL(centerText()), gClassName, SLOT(centerText()));
+    emit centerText();
+}
+
+GObject::GObject(UMLObject *model, qreal x, qreal y, qreal w, qreal h):
+        QObject(), QGraphicsRectItem(), model{model}, x{x}, y{y}, width{w}, height{h}{
+
+    setFlag(QGraphicsItem::ItemIsSelectable);
+    setFlag(QGraphicsItem::ItemSendsScenePositionChanges);
+    setFlag(QGraphicsItem::ItemIsFocusable);
+
+    setBrush(QBrush(QColor(UNSELECTED_COLOR)));
+    setZValue(1);
+
+    // TODO: model must not be nullptr
+
+    setRect(x, y, w, h);
+    gName = new GText(QString::fromStdString(model->name()),x, y, this);
+    connect(this, SIGNAL(centerText()), gName, SLOT(centerText()));
+    gClassName = new GText("("+QString::fromStdString(model->model()->name())+")", x, y+25, this);
     connect(this, SIGNAL(centerText()), gClassName, SLOT(centerText()));
     emit centerText();
 }

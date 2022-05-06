@@ -27,13 +27,26 @@ GTimeline::GTimeline(UMLClass *cls, QString name, GraphicsScene *scene, qreal x,
 
     connect(scene, SIGNAL(selectionChanged()), this, SLOT(onFrameSelected()));
 }
+GTimeline::GTimeline(UMLObject *model, GraphicsScene *scene, qreal x, qreal y, int indexes) :
+        QObject{}, model_{model}, scene{scene}, dashHeight{1.0 * indexes * MSG_GAP} {
+    head = createHead(x, y);
+
+    dashedLine = createDashedLine();
+
+    for(int i = 0; i < indexes; i++)
+        frameCreate(i);
+
+    connect(scene, SIGNAL(selectionChanged()), this, SLOT(onFrameSelected()));
+}
 
 qreal GTimeline::getX(){
     return dashedLine->sceneBoundingRect().x();
 }
 
+UMLObject *GTimeline::model() { return model_; }
+
 GObject *GTimeline::createHead(qreal x, qreal y){
-    auto head = new GObject(QString::fromStdString(cls->name()), name, x, y, HEAD_W, HEAD_H);
+    auto head = new GObject(model_, x, y, HEAD_W, HEAD_H);
     connect(head, SIGNAL(gObjectDeleted()), this, SLOT(onGObjectDeleted()));
     connect(this, SIGNAL(gObjectResize()), head, SLOT(onGObjectResize()));
     scene->addItem(head);
@@ -123,6 +136,6 @@ QString GTimeline::getName(){
 }
 
 void GTimeline::onClassContentUpdated(){
-    head->gClassName->setPlainText(QString::fromStdString("("+cls->name())+")");
+    head->gClassName->setPlainText(QString::fromStdString("("+model_->model()->name())+")");
     emit gObjectResize();
 }

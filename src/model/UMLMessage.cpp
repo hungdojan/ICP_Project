@@ -27,6 +27,14 @@ const UMLOperation *UMLMessage::baseOperation() const {
     return baseOperation_;
 }
 
+const std::string &UMLMessage::messageType() const {
+    return messageType_;
+}
+
+std::string &UMLMessage::messageType() {
+    return messageType_;
+}
+
 bool UMLMessage::setOperation(const std::string &name) {
     auto operationsAvailable = dst_->model()->getOperations();
     auto iter{std::find_if(operationsAvailable.begin(), operationsAvailable.end(),
