@@ -15,7 +15,7 @@ class GClassDiagram: public QObject{
 Q_OBJECT
 public:
     GClassDiagram() =delete;
-    GClassDiagram(GraphicsScene *scene, ClassDiagram *model);
+    GClassDiagram(GraphicsScene *scene, ClassDiagram *model, MainWindow *mainWindow);
     void setModel(ClassDiagram *model);
     const ClassDiagram *model() const;
     void scene(GraphicsScene *scene);

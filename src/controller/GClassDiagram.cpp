@@ -13,9 +13,12 @@
 #include "UMLRelation.h"
 #include "GRelation.h"
 #include "UMLInterface.h"
+#include "DeleteObjectPopUp.h"
 #include "CommandBuilder.h"
+#include "GSequenceDiagram.h"
 
-GClassDiagram::GClassDiagram(GraphicsScene *scene, ClassDiagram *model) : scene_{scene}, classDiagramModel{model} {
+GClassDiagram::GClassDiagram(GraphicsScene *scene, ClassDiagram *model, MainWindow *mainWindow) :
+    scene_{scene}, classDiagramModel{model}, mainWindow{mainWindow}{
     gClassSettings = new GClassSettings(((MainWindow*)scene->parent())->getCategoryTree(), classDiagramModel);
     if (model == nullptr) {
         model = new ClassDiagram("");
@@ -89,6 +92,37 @@ void GClassDiagram::onGClassifierSelectionChanged(){
 
 void GClassDiagram::onGClassifierDeleted(){
     auto src = (GClassifier*)sender();
+
+    for(auto seq: classDiagramModel->sequenceDiagrams()){
+        bool alreadyClickedRemove = false;
+        bool removeClicked = true;
+        for(auto obj: seq->objects()){
+            if(src->umlClassifier->name() == obj->model()->name()) {
+                // Do not open 'ask window to remove' twice
+                if(!alreadyClickedRemove) {
+                    DeleteObjectPopUp deleteObjectPopUp;
+                    deleteObjectPopUp.setModal(true);
+                    deleteObjectPopUp.exec();
+                    removeClicked = deleteObjectPopUp.removeClicked();
+                }
+                if (!removeClicked) {
+                    return; //Cancel
+                }
+                else {
+                    if (mainWindow->gSequenceDiagrams.size() > 0) {
+                        for (auto seqDiag: mainWindow->gSequenceDiagrams) {
+                            seqDiag->deleteBeforeClass(src->umlClassifier);
+                        }
+//                        for(int i = mainWindow->gSequenceDiagrams.size()-1; i >= 0; i--){
+//                            mainWindow->gSequenceDiagrams.at(i)->deleteBeforeClass(src->umlClassifier);
+//                        }
+                        // TODO opacne mazat !!!!!!!! ?? ale nemazu seqdiagram ale jen timeline v nich...
+                    }
+                    alreadyClickedRemove = true;
+                }
+            }
+        }
+    }
 
     for(int i = gRelations.size()-1; i >= 0; i--){
         if(dynamic_cast<GClassifier *>(gRelations.at(i)->getDst()) == src || dynamic_cast<GClassifier *>(gRelations.at(i)->getSrc()) == src) {

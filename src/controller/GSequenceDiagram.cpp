@@ -19,7 +19,8 @@
 #include <QListWidget>
 
 #define HORIZONTAL_GAP 350
-#define NUM_INDEXES 20
+#define NUM_INDEXES 15
+#define START_Y 0
 
 GSequenceDiagram::GSequenceDiagram(GraphicsScene *scene, SequenceDiagram *model, ClassDiagram *classDiagram, QFrame *settings):
     QObject(), classDiagram{classDiagram}, sequanceDiagram{model}, settings{settings}, msgList{new QListWidget()}, index{1}, scene{scene}{
@@ -352,15 +353,17 @@ void GSequenceDiagram::onFuncUpdate(){
 void GSequenceDiagram::onAddPressed(){
     if(!settings->findChild<QComboBox*>()->currentText().isEmpty()) {
         auto instName = settings->findChild<QLineEdit*>()->text();
-        if(!instName.isEmpty() && !getClassifByInst(instName)){
-            auto tl = new GTimeline(dynamic_cast<UMLClass*>(classDiagram->getClassifier(settings->findChild<QComboBox *>()->currentText().toStdString())),
-                                    instName, scene, gTimelines.size() * HORIZONTAL_GAP, 0, NUM_INDEXES);
-            gTimelines.push_back(tl);
+        if(!instName.isEmpty() && sequanceDiagram->getObject(instName) == nullptr){
+            auto instClass = dynamic_cast<UMLClass*>(classDiagram->getClassifier(settings->findChild<QComboBox *>()->currentText().toStdString()));
 
+            auto objectModel = sequanceDiagram->addObject(instClass, instName.toStdString());
+            // newObj->setModel(instClass);
+            // TODO: add instance of gobject
+            auto tl = new GTimeline(objectModel, scene, gTimelines.size() * HORIZONTAL_GAP, START_Y, NUM_INDEXES);
+            gTimelines.push_back(tl);
             connect(tl, SIGNAL(gTimelineDeleted()), this, SLOT(onGTimelineDeleted()));
             connect(this, SIGNAL(classContentUpdated()), tl, SLOT(onClassContentUpdated()));
 
-            sequanceDiagram->addObject(dynamic_cast<UMLClass*>(classDiagram->getClassifier(tl->getName().toStdString())), tl->getName().toStdString());
             onClassDiagramUpdated();
         }
     }
@@ -370,6 +373,32 @@ void GSequenceDiagram::onAddPressed(){
 void GSequenceDiagram::onGTimelineDeleted() {
     auto tl = dynamic_cast<GTimeline *>(sender());
 
+    deleteTimeline(tl);
+}
+
+void GSequenceDiagram::deleteBeforeClass(UMLClassifier *classifier){
+//    for(auto tl: gTimelines){
+//        if(tl->model()->model()->name() == classifier->name()){
+//            deleteTimeline(tl);
+//        }
+//    }
+    std::vector<GTimeline*> toDelete;
+    for(auto tl: gTimelines) {
+        if(tl->model()->name() == classifier->name())
+            toDelete.push_back(tl);
+    }
+    for(auto td: toDelete){
+        deleteTimeline(td);
+    }
+
+//    for(int i = gTimelines.size()-1; i >= 0; i--){
+//        if(gTimelines.at(i)->model()->name() == classifier->name()){
+//            deleteTimeline(gTimelines.at(i));
+//        }
+//    }
+}
+
+void GSequenceDiagram::deleteTimeline(GTimeline *tl){
     if(!gTimelines.empty()) {
         gTimelines.erase(std::find(gTimelines.begin(), gTimelines.end(), tl));
 

@@ -10,7 +10,7 @@ GraphicsScene::GraphicsScene(QGraphicsView *view, QObject *parent): QGraphicsSce
     // QGraphicsView pointer
     this->view = view;
 }
-
+#include <QDebug>
 void GraphicsScene::wheelEvent(QGraphicsSceneWheelEvent *wheelEvent){
     // Zoom
     if (wheelEvent->modifiers() & Qt::ControlModifier) {
@@ -23,3 +23,4 @@ void GraphicsScene::wheelEvent(QGraphicsSceneWheelEvent *wheelEvent){
     }
     QGraphicsScene::wheelEvent(wheelEvent);
 }
+
