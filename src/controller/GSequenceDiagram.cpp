@@ -156,7 +156,9 @@ void GSequenceDiagram::addSettings(){
 void GSequenceDiagram::onMsgDoubleClick(const QModelIndex &ix){
     // Delete message
     auto msg = gMessages.at(msgList->currentRow());
-    gMessages.erase(std::find(gMessages.begin(), gMessages.end(), gMessages.at(msgList->currentRow())));
+    auto iter {std::find(gMessages.begin(), gMessages.end(), gMessages.at(msgList->currentRow()))};
+    sequanceDiagram->removeMessage((*iter)->model());
+    gMessages.erase(iter);
     auto msgWidget = msgList->currentItem();
     msgList->removeItemWidget(msgWidget);
     delete msg;
@@ -280,16 +282,18 @@ void GSequenceDiagram::onSaveMsg(){
             messageModel = new UMLMessage(operation, src->model(), dst->model());
         else
             messageModel = new UMLMessage(boxes[4]->currentText().toStdString(), src->model(), dst->model());
-//        messageModel->messageType() = bo
+        messageModel->messageType() = boxes[4]->currentText().toStdString();
+        sequanceDiagram->addMessage(messageModel);
 //        GMessage gMessage = new GMessage()
-        auto gMsg = src->addMsg(funcName, dst, dir, boxes[4]->currentText(), index++);
+//        auto gMsg = src->addMsg(funcName, dst, dir, boxes[4]->currentText(), index++);
+        auto gMsg = new GMessage(scene, messageModel, dir, src, dst, index++);
         gMessages.push_back(gMsg); // Msg name boxes[3]
         addMsgItem(msgList, gMsg);
 
         connect(this, SIGNAL(updateMsgPos()), gMsg, SLOT(onUpdateMsgPos()));
     }
     else if(boxes[4]->currentText() != "create" || boxes[3]->currentText() != "delete"){
-
+        // TODO:
     }
 }
 
@@ -396,7 +400,7 @@ void GSequenceDiagram::deleteBeforeClass(UMLClassifier *classifier){
 //    }
     std::vector<GTimeline*> toDelete;
     for(auto tl: gTimelines) {
-        if(tl->model()->name() == classifier->name())
+        if(tl->model()->model()->name() == classifier->name())
             toDelete.push_back(tl);
     }
     for(auto td: toDelete){

@@ -20,6 +20,7 @@ public:
     ~GMessage();
     GTimeline *src;
     GTimeline *dst;
+    UMLMessage *model();
     std::vector<QGraphicsLineItem*>getItems();
     int index;
     QString getFuncName();
