@@ -29,6 +29,7 @@ public:
     ~MainWindow() override;
     QTreeWidget *getCategoryTree();
     std::vector<GSequenceDiagram*> gSequenceDiagrams;
+    void createSequenceDiagram(SequenceDiagram *model);
 
 private slots:
     void clickedDiagram(QAction *a);
