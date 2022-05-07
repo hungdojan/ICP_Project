@@ -35,8 +35,6 @@ GClassifier::GClassifier(std::string name, qreal x, qreal y, qreal width, qreal 
         umlClassifier = ClassDiagram::createClassifier(name, ClassDiagram::CLASS);
 
     classDiagram->addClassifier(umlClassifier);
-//    x = 0;
-//    y = 0;
 
     titleRect = new QGraphicsRectItem(this->x,this->y, width, ROW_HEIGHT*2, this);
     title = new GText(QString::fromStdString(umlClassifier->name()), this->x, this->y, titleRect);
@@ -52,8 +50,6 @@ GClassifier::GClassifier(std::string name, qreal x, qreal y, qreal width, qreal 
     setPos(x, y);
     umlClassifier->x() = x;
     umlClassifier->y() = y;
-//    this->x = 0;
-//    this->y = 0;
 
     contentSaved();
 
@@ -79,8 +75,6 @@ GClassifier::GClassifier(UMLClassifier *model, qreal x, qreal y, qreal width, qr
 
     if(!isInterface)
         attribRect = new QGraphicsRectItem(this->x,this->y+2*ROW_HEIGHT, width, ROW_HEIGHT, this);
-    // this->x = 0;
-    // this->y = 0;
 
     contentSaved();
     setPos(x, y);
@@ -130,9 +124,6 @@ void GClassifier::resizeRectangles(){
     setRect(x, y, width, height);
     titleRect->setRect(x, y, width, ROW_HEIGHT*2);
     emit gClassifierPositionChanged();
-
-    umlClassifier->x() = sceneBoundingRect().x();
-    umlClassifier->y() = sceneBoundingRect().y();
 }
 
 void GClassifier::contentDeleted(){
