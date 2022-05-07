@@ -313,7 +313,9 @@ void GSequenceDiagram::onSaveMsg(){
         dir = GMessage::RTOL;//todo
 
     // Add the message to gMessages vector and to a QListWidget
-    auto funcName = boxes[3]->currentText();
+    // extract function name from the combobox
+    auto funcName = boxes[3]->currentText().split(" ").value(1);
+    funcName = funcName.left(funcName.size() - 2);
     if((!funcName.isEmpty() && boxes[4]->currentText() != "create" && boxes[4]->currentText() != "delete") ||
         (boxes[4]->currentText() == "create" || boxes[4]->currentText() == "delete")) {
         auto operation = dynamic_cast<UMLOperation*>(dst->model()->model()->getAttribute(funcName.toStdString()));
@@ -321,7 +323,7 @@ void GSequenceDiagram::onSaveMsg(){
         if (operation != nullptr)
             messageModel = new UMLMessage(operation, src->model(), dst->model());
         else
-            messageModel = new UMLMessage(boxes[4]->currentText().toStdString(), src->model(), dst->model());
+            messageModel = new UMLMessage(funcName.toStdString(), src->model(), dst->model());
         messageModel->messageType() = boxes[4]->currentText().toStdString();
         sequanceDiagram->addMessage(messageModel);
 //        GMessage gMessage = new GMessage()
