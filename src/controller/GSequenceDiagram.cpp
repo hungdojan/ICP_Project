@@ -314,8 +314,7 @@ void GSequenceDiagram::onSaveMsg(){
 
     // Add the message to gMessages vector and to a QListWidget
     // extract function name from the combobox
-    auto funcName = boxes[3]->currentText().split(" ").value(1);
-    funcName = funcName.left(funcName.size() - 2);
+    auto funcName = boxes[3]->currentText().split(" ").value(1).split("(").value(0);
     if((!funcName.isEmpty() && boxes[4]->currentText() != "create" && boxes[4]->currentText() != "delete") ||
         (boxes[4]->currentText() == "create" || boxes[4]->currentText() == "delete")) {
         auto operation = dynamic_cast<UMLOperation*>(dst->model()->model()->getAttribute(funcName.toStdString()));
