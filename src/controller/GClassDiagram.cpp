@@ -55,6 +55,13 @@ GClassDiagram::GClassDiagram(GraphicsScene *scene, ClassDiagram *model, MainWind
     CommandBuilder::get_commander().clear();
 }
 
+void GClassDiagram::loadSequenceDiagram() {
+    // TODO: init sequenceDiagram
+    for (auto sd : classDiagramModel->sequenceDiagrams()) {
+        mainWindow->createSequenceDiagram(sd);
+    }
+}
+
 void GClassDiagram::addClassifier() {
     addGClassifier(new GClassifier(getIndexed("class"), 2*name_index, 2*name_index, 100, 150, classDiagramModel));
 }
@@ -191,3 +198,4 @@ void GClassDiagram::onGClassifierContentChanged(){
 
     emit classDiagramUpdated(); // Notify SequenceDiagram
 }
+

@@ -31,6 +31,7 @@ MainWindow::MainWindow(QWidget *parent) :
 
     classDiagram = new ClassDiagram("MyClassDiagram");
     gClassDiagram = new GClassDiagram(scene, classDiagram, this);
+    gClassDiagram->loadSequenceDiagram();
 
     connect(ui->addClassButton, SIGNAL(pressed()), gClassDiagram, SLOT(addClassifier()));
     connect(ui->addInterfaceButton, SIGNAL(pressed()), gClassDiagram, SLOT(addClassifierInterface()));
@@ -65,27 +66,10 @@ void MainWindow::clickedDiagram(QAction *a){
         return;
     }
 
-    QWidget *seq = new QWidget();
-    QHBoxLayout *hLayout = new QHBoxLayout(seq);
-    hLayout->setContentsMargins(0,0,0,0);
-    QGraphicsView *gView = new QGraphicsView();
-    gView->setStyleSheet("QGraphicsView { background-color: #FFFFFF; }");
-    GraphicsScene *seqScene = new GraphicsScene(gView, this);
-    gView->setScene(seqScene);
-    hLayout->addWidget(gView);
-    hLayout->setSpacing(0);
-
-    QFrame *rightPanelSettings = new QFrame();
-    hLayout->addWidget(rightPanelSettings);
 
     QString tabName = "SequenceDiagram" + QString::number(MainWindow::index++);
-    ui->diagramsTabs->addTab(seq, tabName);
     auto sequenceDiagramModel = classDiagram->addSequenceDiagram(tabName.toStdString());
-    GSequenceDiagram *gSeqDiag = new GSequenceDiagram(seqScene, sequenceDiagramModel, classDiagram, rightPanelSettings);
-    gSequenceDiagrams.push_back(gSeqDiag);
-
-    connect(gClassDiagram, SIGNAL(classDiagramUpdated()), gSeqDiag, SLOT(onClassDiagramUpdated()));
-
+    createSequenceDiagram(sequenceDiagramModel);
 //    connect(gClassDiagram, SIGNAL(removeObjectBeforeClass()), gSeqDiag, SLOT(onGTimelineDeleted()));
 }
 
@@ -126,6 +110,7 @@ void MainWindow::loadClassDiagram() {
     gClassDiagram = new GClassDiagram(scene, classDiagram, this);
     connect(ui->addClassButton, SIGNAL(pressed()), gClassDiagram, SLOT(addClassifier()));
     connect(ui->addInterfaceButton, SIGNAL(pressed()), gClassDiagram, SLOT(addClassifierInterface()));
+    gClassDiagram->loadSequenceDiagram();
 }
 
 void MainWindow::newClassDiagram() {
@@ -144,7 +129,30 @@ void MainWindow::newClassDiagram() {
     gClassDiagram = new GClassDiagram(scene, classDiagram, this);
     connect(ui->addClassButton, SIGNAL(pressed()), gClassDiagram, SLOT(addClassifier()));
     connect(ui->addInterfaceButton, SIGNAL(pressed()), gClassDiagram, SLOT(addClassifierInterface()));
+    gClassDiagram->loadSequenceDiagram();
     // clickedDiagram(new QAction()); // TODO remove
+}
+
+void MainWindow::createSequenceDiagram(SequenceDiagram *model) {
+    QWidget *seq = new QWidget();
+    QHBoxLayout *hLayout = new QHBoxLayout(seq);
+    hLayout->setContentsMargins(0,0,0,0);
+    QGraphicsView *gView = new QGraphicsView();
+    gView->setStyleSheet("QGraphicsView { background-color: #FFFFFF; }");
+    GraphicsScene *seqScene = new GraphicsScene(gView, this);
+    gView->setScene(seqScene);
+    hLayout->addWidget(gView);
+    hLayout->setSpacing(0);
+
+    QFrame *rightPanelSettings = new QFrame();
+    hLayout->addWidget(rightPanelSettings);
+
+    ui->diagramsTabs->addTab(seq, QString::fromStdString(model->name()));
+    GSequenceDiagram *gSeqDiag = new GSequenceDiagram(seqScene, model, classDiagram, rightPanelSettings);
+    gSequenceDiagrams.push_back(gSeqDiag);
+
+    connect(gClassDiagram, SIGNAL(classDiagramUpdated()), gSeqDiag, SLOT(onClassDiagramUpdated()));
+
 }
 
 /* mainwindow.cpp */

@@ -214,43 +214,40 @@ void GClassifier::mouseMoveEvent(QGraphicsSceneMouseEvent *event) {
 
 void GClassifier::mouseReleaseEvent(QGraphicsSceneMouseEvent *event) {
     QGraphicsItem::mouseReleaseEvent(event);
-    auto pos = this->pos();
-    umlClassifier->x() = pos.x();
-    umlClassifier->y() = pos.y();
-//    class Cmd : public ICommand {
-//        GClassifier *cls;
-//        double origX = 0;
-//        double origY = 0;
-//        double newX = 0;
-//        double newY = 0;
-//    public:
-//        explicit Cmd(GClassifier *c) : cls{c} {
-//            origX = cls->umlClassifier->x();
-//            origY = cls->umlClassifier->y();
-//            auto pos = cls->pos();
-//            newX = pos.x();
-//            newY = pos.y();
-//        }
-//        void execute() override {
-//            cls->setPos(newX, newY);
-//            cls->umlClassifier->x() = newX;
-//            cls->umlClassifier->y() = newY;
-//            emit cls->gClassifierPositionChanged();
-//        }
-//        void undo() override {
-//            cls->setPos(origX, origY);
-//            cls->umlClassifier->x() = origX;
-//            cls->umlClassifier->y() = origY;
-//            emit cls->gClassifierPositionChanged();
-//            // TODO:
-//        }
-//        void redo() override {
-//            cls->setPos(newX, newY);
-//            cls->umlClassifier->x() = newX;
-//            cls->umlClassifier->y() = newY;
-//            emit cls->gClassifierPositionChanged();
-//        }
-//    };
-//    std::shared_ptr<ICommand> cmd{new Cmd(this)};
-//    CommandBuilder::get_commander().execute(cmd);
+    class Cmd : public ICommand {
+        GClassifier *cls;
+        double origX = 0;
+        double origY = 0;
+        double newX = 0;
+        double newY = 0;
+    public:
+        explicit Cmd(GClassifier *c) : cls{c} {
+            origX = cls->umlClassifier->x();
+            origY = cls->umlClassifier->y();
+            auto pos = cls->pos();
+            newX = pos.x();
+            newY = pos.y();
+        }
+        void execute() override {
+            cls->setPos(newX, newY);
+            cls->umlClassifier->x() = newX;
+            cls->umlClassifier->y() = newY;
+            emit cls->gClassifierPositionChanged();
+        }
+        void undo() override {
+            cls->setPos(origX, origY);
+            cls->umlClassifier->x() = origX;
+            cls->umlClassifier->y() = origY;
+            emit cls->gClassifierPositionChanged();
+            // TODO:
+        }
+        void redo() override {
+            cls->setPos(newX, newY);
+            cls->umlClassifier->x() = newX;
+            cls->umlClassifier->y() = newY;
+            emit cls->gClassifierPositionChanged();
+        }
+    };
+    std::shared_ptr<ICommand> cmd{new Cmd(this)};
+    CommandBuilder::get_commander().execute(cmd);
 }

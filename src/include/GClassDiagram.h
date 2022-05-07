@@ -22,6 +22,7 @@ public:
     const ClassDiagram *model() const;
     void scene(GraphicsScene *scene);
     const GraphicsScene *scene() const;
+    void loadSequenceDiagram();
 signals:
     void updateUndefTypes();
     void classDiagramUpdated();

@@ -24,6 +24,45 @@
 
 GSequenceDiagram::GSequenceDiagram(GraphicsScene *scene, SequenceDiagram *model, ClassDiagram *classDiagram, QFrame *settings):
     QObject(), classDiagram{classDiagram}, sequanceDiagram{model}, settings{settings}, msgList{new QListWidget()}, index{1}, scene{scene}{
+    // TODO: add objects and timeline from model
+    if (model != nullptr) {
+        std::map<UMLObject *, GTimeline *> mapOfObjects;
+        for (auto obj : model->objects()) {
+            auto tl = new GTimeline(obj, scene, gTimelines.size() * HORIZONTAL_GAP, START_Y, NUM_INDEXES);
+            gTimelines.push_back(tl);
+            mapOfObjects.insert({obj, tl});
+            connect(tl, SIGNAL(gTimelineDeleted()), this, SLOT(onGTimelineDeleted()));
+            connect(this, SIGNAL(classContentUpdated()), tl, SLOT(onClassContentUpdated()));
+        }
+
+        for (auto msg : model->messages()) {
+            auto iter = mapOfObjects.find(const_cast<UMLObject *>(msg->src()));
+            if (iter == mapOfObjects.end())
+                return;
+            GTimeline *src = iter->second;
+            iter = mapOfObjects.find(const_cast<UMLObject *>(msg->dst()));
+            if (iter == mapOfObjects.end())
+                return;
+            GTimeline *dst = iter->second;
+            GMessage::direction dir;
+            if (src->getX() < dst->getX()) {
+                dir = GMessage::direction::LTOR;
+            }
+            else if (src == dst) {
+                dir = GMessage::LTOL;
+            }
+            else {
+                dir = GMessage::RTOL;
+            }
+
+            auto gMsg = new GMessage(scene, msg, dir, src, dst, index++);
+            gMessages.push_back(gMsg); // Msg name boxes[3]
+            addMsgItem(msgList, gMsg);
+
+            connect(this, SIGNAL(updateMsgPos()), gMsg, SLOT(onUpdateMsgPos()));
+
+        }
+    }
 
     addSettings();
 }
@@ -86,8 +125,8 @@ void GSequenceDiagram::addSettings(){
     QComboBox *comboBoxSrc = new QComboBox();
     comboBoxSrc->setFixedWidth(145);
     hLayoutMsg1->addWidget(comboBoxSrc);
-    for(auto cls: classDiagram->getClasses()){
-        comboBoxSrc->addItem(QString::fromStdString(cls->name()));
+    for(auto obj: sequanceDiagram->objects()){
+        comboBoxSrc->addItem(QString::fromStdString(obj->name()));
     }
     // Message frame horizontal 1 - combo dst
     QLabel *labelTo = new QLabel("  to:");
@@ -96,8 +135,8 @@ void GSequenceDiagram::addSettings(){
     comboBoxDst->setFixedWidth(145);
 
     hLayoutMsg1->addWidget(comboBoxDst);
-    for(auto cls: classDiagram->getClasses()){
-        comboBoxDst->addItem(QString::fromStdString(cls->name()));
+    for(auto obj: sequanceDiagram->objects()){
+        comboBoxDst->addItem(QString::fromStdString(obj->name()));
     }
     connect(comboBoxDst, SIGNAL(currentTextChanged(const QString &)), this, SLOT(onFuncUpdate()));
 
@@ -106,6 +145,7 @@ void GSequenceDiagram::addSettings(){
     vLayoutMsg->addWidget(hFrame2);
     QHBoxLayout *hLayoutMsg2 = new QHBoxLayout(hFrame2);
     QComboBox *comboBoxFuncs = new QComboBox();
+    // TODO: add operations??
     hLayoutMsg2->addWidget(comboBoxFuncs);
 
     // Message frame horizontal 3
