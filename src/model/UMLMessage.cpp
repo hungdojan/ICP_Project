@@ -105,7 +105,7 @@ void UMLMessage::createJsonObject(QJsonObject &object) {
     object.insert("dst", QString::fromStdString(dst_->name()));
     object.insert("name", QString::fromStdString(name_));
     object.insert("baseOperation", QString::fromStdString(baseOperation_->name()));
-
+    object.insert("messageType", QString::fromStdString(messageType_));
 }
 
 UMLMessage::~UMLMessage() {

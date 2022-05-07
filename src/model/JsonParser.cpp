@@ -219,6 +219,7 @@ void loadSequenceDiagrams(ClassDiagram &classDiagram, QJsonArray &buffer) {
             try {
                 auto message = new UMLMessage(baseOperation, src, dst);
                 message->setText(msgName);
+                message->messageType() = qMessage["messageType"].toString().toStdString();
                 messages.insert({qMessage["index"].toInt(), message});
             } catch (std::invalid_argument &e) { }
         }
