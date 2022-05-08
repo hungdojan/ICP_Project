@@ -58,8 +58,11 @@ void MainWindow::deleteDiagram() {
     ui->menuBar->setHidden(true);
     ui->menuBar->setHidden(false);
 
-    if(ui->diagramsTabs->currentIndex() != 0)
+    if(ui->diagramsTabs->currentIndex() != 0) {
+        QString name{ui->diagramsTabs->tabText(ui->diagramsTabs->currentIndex())};
+        classDiagram->removeSequenceDiagram(name.toStdString());
         ui->diagramsTabs->removeTab(ui->diagramsTabs->currentIndex());
+    }
 }
 
 void MainWindow::clickedDiagram(QAction *a){

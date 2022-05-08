@@ -242,9 +242,28 @@ public:
      */
     virtual void clearRelations();
 
+    /**
+     * @brief Adds observer into the collection of observers.
+     * @param observer Instance of observer.
+     */
     void attach(IObserver *observer) override;
+
+    /**
+     * @brief Removes observer from the collection of observers.
+     * @param observer Instance of observer.
+     */
     void detach(IObserver *observer) override;
-    void notify(const std::string &msg) final;
+
+    /**
+     * @brief Sends message to all subscribers/observers.
+     * @param msg Message content.
+     */
+    void notify(const std::string &msg) override;
+
+    /**
+     * @brief Returns number of observers of this classifier.
+     * @return Number of observers of this classifier.
+     */
     unsigned long observerCount() const;
 
     /**

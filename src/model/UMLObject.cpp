@@ -38,3 +38,23 @@ void UMLObject::update(const std::string &msg) {
         model_ = SequenceDiagram::undefClass;
     }
 }
+
+void UMLObject::attach(IObserver *observer) {
+    observers_.insert(observer);
+}
+
+void UMLObject::detach(IObserver *observer) {
+    observers_.erase(observer);
+}
+
+void UMLObject::notify(const std::string &msg) {
+    for (auto o : observers_) {
+        o->update(msg);
+    }
+}
+
+UMLObject::~UMLObject() {
+    for (auto o : observers_) {
+        o->update(name());
+    }
+}

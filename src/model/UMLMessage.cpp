@@ -22,8 +22,13 @@ UMLMessage::UMLMessage(UMLOperation *baseOperation, UMLObject *src, UMLObject *d
         throw std::invalid_argument("At least one of the objects must not be nullptr");
     if (src == nullptr)
         src_ = SequenceDiagram::undefObject;
+    else
+        src_->attach(this);
+
     if (dst == nullptr)
         dst_ = SequenceDiagram::undefObject;
+    else
+        dst_->attach(this);
     setOperation(baseOperation);
 }
 const UMLObject *UMLMessage::dst() const {
@@ -103,6 +108,12 @@ void UMLMessage::update(const std::string &msg) {
     if (msg == "DELETE") {
         baseOperation_ = SequenceDiagram::undefOperation;
     }
+    else if (msg == src_->name()) {
+        src_ = SequenceDiagram::undefObject;
+    }
+    else if (msg == dst_->name()) {
+        dst_ = SequenceDiagram::undefObject;
+    }
 }
 
 void UMLMessage::createJsonObject(QJsonObject &object, int index) {
@@ -123,4 +134,9 @@ UMLMessage::~UMLMessage() {
     if (baseOperation_ != nullptr) {
         baseOperation_->detach(this);
     }
+    if (dst_ != SequenceDiagram::undefObject)
+        dst_->detach(this);
+
+    if (src_ != SequenceDiagram::undefObject)
+        src_->detach(this);
 }

@@ -19,7 +19,7 @@
 /**
  * @brief Representation of object in sequence diagram.
  */
-class UMLObject : public Element, public IObserver {
+class UMLObject : public Element, public IObserver, public ISubject {
     /** Base class model of object. */
     UMLClass *model_;
 public:
@@ -50,10 +50,30 @@ public:
     void update(const std::string &msg) override;
 
     /**
+     * @brief Adds observer into the collection of observers.
+     * @param observer Instance of observer.
+     */
+    void attach(IObserver *observer) override;
+
+    /**
+     * @brief Removes observer from the collection of observers.
+     * @param observer Instance of observer.
+     */
+    void detach(IObserver *observer) override;
+
+    /**
+     * @brief Sends message to all subscribers/observers.
+     * @param msg Message content.
+     */
+    void notify(const std::string &msg) override;
+
+    /**
      * @brief Creates JSON representation of element's content.
      * @param object Reference to QJsonObject instance.
      */
    void createJsonObject(QJsonObject &object) override;
+
+   ~UMLObject() override;
 };
 
 #endif //DIAGRAMEDITOR_UMLOBJECT_H
