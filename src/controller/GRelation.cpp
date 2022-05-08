@@ -1,10 +1,18 @@
+/**
+ * @brief Graphic representation of UML relation in a class diagram
+ *
+ * @file GRelation.cpp
+ * @date 07/05/2022
+ * @authors Hung Do     (xdohun00)
+ *          David Kedra (xkedra00)
+ */
+
 #include "GRelation.h"
 #include "GClassifier.h"
 #include "GraphicsScene.h"
 #include <QDebug>
 #include <QPen>
 #include <QtMath>
-
 
 GRelation::GRelation(QGraphicsItem *parent, QGraphicsItem *target, QString srcMsg, QString dstMsg):
     QObject(), QGraphicsLineItem{NULL}{

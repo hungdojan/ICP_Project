@@ -1,6 +1,8 @@
 /**
  * Main window controller
  *
+ * @file mainwindow.cpp
+ * @date 07/05/2022
  * @authors Hung Do (xdohun00@stud.fit.vutbr.cz)
  *          David Kedra (xkedra00@stud.fit.vutbr.cz)
  */
@@ -66,11 +68,9 @@ void MainWindow::clickedDiagram(QAction *a){
         return;
     }
 
-
     QString tabName = "SequenceDiagram" + QString::number(MainWindow::index++);
     auto sequenceDiagramModel = classDiagram->addSequenceDiagram(tabName.toStdString());
     createSequenceDiagram(sequenceDiagramModel);
-//    connect(gClassDiagram, SIGNAL(removeObjectBeforeClass()), gSeqDiag, SLOT(onGTimelineDeleted()));
 }
 
 void MainWindow::saveClassDiagram() {
@@ -89,10 +89,6 @@ void MainWindow::loadClassDiagram() {
     if (filePath == "")
         return;
 
-    // TODO: warning dialog popup
-    // ask user to save current work
-    // exit if user cancel
-    // TODO: clean current and load from file
     for (int i = ui->diagramsTabs->count(); i >= 1; i--)
         ui->diagramsTabs->removeTab(i);
     delete scene;
@@ -130,7 +126,6 @@ void MainWindow::newClassDiagram() {
     connect(ui->addClassButton, SIGNAL(pressed()), gClassDiagram, SLOT(addClassifier()));
     connect(ui->addInterfaceButton, SIGNAL(pressed()), gClassDiagram, SLOT(addClassifierInterface()));
     gClassDiagram->loadSequenceDiagram();
-    // clickedDiagram(new QAction()); // TODO remove
 }
 
 void MainWindow::createSequenceDiagram(SequenceDiagram *model) {

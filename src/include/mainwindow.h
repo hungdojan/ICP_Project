@@ -1,6 +1,8 @@
 /**
  * Main window header
  *
+ * @file mainwindow.h
+ * @date 07/05/2022
  * @authors Hung Do (xdohun00@stud.fit.vutbr.cz)
  *          David Kedra (xkedra00@stud.fit.vutbr.cz)
  */

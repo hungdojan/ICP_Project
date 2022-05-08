@@ -1,12 +1,16 @@
-//
-// Created by darbix on 21.4.22.
-//
+/**
+ * @brief Main graphics for UML class diagram
+ *
+ * @file GClassDiagram.cpp
+ * @date 07/05/2022
+ * @authors Hung Do     (xdohun00)
+ *          David Kedra (xkedra00)
+ */
 
 #include "GClassDiagram.h"
 #include "GraphicsScene.h"
 #include "ClassDiagram.h"
 #include <QDebug>
-#include <QLabel>
 #include <QHBoxLayout>
 #include "GClassSettings.h"
 #include "mainwindow.h"
@@ -15,7 +19,6 @@
 #include "UMLInterface.h"
 #include "DeleteObjectPopUp.h"
 #include "CommandBuilder.h"
-#include "GSequenceDiagram.h"
 
 GClassDiagram::GClassDiagram(GraphicsScene *scene, ClassDiagram *model, MainWindow *mainWindow) :
     scene_{scene}, classDiagramModel{model}, mainWindow{mainWindow}{
@@ -56,7 +59,6 @@ GClassDiagram::GClassDiagram(GraphicsScene *scene, ClassDiagram *model, MainWind
 }
 
 void GClassDiagram::loadSequenceDiagram() {
-    // TODO: init sequenceDiagram
     for (auto sd : classDiagramModel->sequenceDiagrams()) {
         mainWindow->createSequenceDiagram(sd);
     }
@@ -120,10 +122,6 @@ void GClassDiagram::onGClassifierDeleted(){
                         for (auto seqDiag: mainWindow->gSequenceDiagrams) {
                             seqDiag->deleteBeforeClass(src->umlClassifier);
                         }
-//                        for(int i = mainWindow->gSequenceDiagrams.size()-1; i >= 0; i--){
-//                            mainWindow->gSequenceDiagrams.at(i)->deleteBeforeClass(src->umlClassifier);
-//                        }
-                        // TODO opacne mazat !!!!!!!! ?? ale nemazu seqdiagram ale jen timeline v nich...
                     }
                     alreadyClickedRemove = true;
                 }

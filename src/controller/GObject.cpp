@@ -1,9 +1,14 @@
-//
-// Created by darbix on 26.4.22.
-//
+/**
+ * @brief Sequence diagram instance object of the UMLClass
+ * Timeline head rectangle
+ *
+ * @file GObject.cpp
+ * @date 07/05/2022
+ * @authors Hung Do     (xdohun00)
+ *          David Kedra (xkedra00)
+ */
 
 #include "GObject.h"
-//#include "UMLObject.h"
 #include <QBrush>
 #include <QDebug>
 #include <QGraphicsRectItem>
@@ -40,7 +45,7 @@ GObject::GObject(UMLObject *model, qreal x, qreal y, qreal w, qreal h):
     setBrush(QBrush(QColor(UNSELECTED_COLOR)));
     setZValue(1);
 
-    // TODO: model must not be nullptr
+    // Model must not be nullptr
 
     setRect(x, y, w, h);
     gName = new GText(QString::fromStdString(model->name()),x, y, this);

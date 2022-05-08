@@ -1,6 +1,11 @@
-//
-// Created by darbix on 21.4.22.
-//
+/**
+ * @brief General graphic class for rectangle objects UMLInterface or UMLClass
+ *
+ * @file GClassifier.cpp
+ * @date 07/05/2022
+ * @authors Hung Do     (xdohun00)
+ *          David Kedra (xkedra00)
+ */
 
 #include <GraphicsScene.h>
 #include <QBrush>
@@ -14,6 +19,8 @@
 #include "UMLClassifier.h"
 #include "UMLInterface.h"
 #include "UMLOperation.h"
+#include "ICommand.h"
+#include "CommandBuilder.h"
 
 #define ROW_HEIGHT 25
 #define MIN_WIDTH 125
@@ -40,8 +47,8 @@ GClassifier::GClassifier(std::string name, qreal x, qreal y, qreal width, qreal 
     title = new GText(QString::fromStdString(umlClassifier->name()), this->x, this->y, titleRect);
     classificType = new GText(isInterface? "<interface>": "<class>", this->x, this->y+title->sceneBoundingRect().height(), titleRect);
 
-    connect(this, SIGNAL(gTextChanged()), title, SLOT(onTextChanged()));
-    connect(this, SIGNAL(gTextChanged()), classificType, SLOT(onTextChanged()));
+//    connect(this, SIGNAL(gTextChanged()), title, SLOT(onTextChanged()));
+//    connect(this, SIGNAL(gTextChanged()), classificType, SLOT(onTextChanged()));
     connect(this, SIGNAL(centerText()), title, SLOT(centerText()));
     connect(this, SIGNAL(centerText()), classificType, SLOT(centerText()));
 
@@ -68,8 +75,8 @@ GClassifier::GClassifier(UMLClassifier *model, qreal x, qreal y, qreal width, qr
     title = new GText(QString::fromStdString(umlClassifier->name()), this->x, this->y, titleRect);
     classificType = new GText(isInterface? "<interface>": "<class>", this->x, this->y+title->sceneBoundingRect().height(), titleRect);
 
-    connect(this, SIGNAL(gTextChanged()), title, SLOT(onTextChanged()));
-    connect(this, SIGNAL(gTextChanged()), classificType, SLOT(onTextChanged()));
+//    connect(this, SIGNAL(gTextChanged()), title, SLOT(onTextChanged()));
+//    connect(this, SIGNAL(gTextChanged()), classificType, SLOT(onTextChanged()));
     connect(this, SIGNAL(centerText()), title, SLOT(centerText()));
     connect(this, SIGNAL(centerText()), classificType, SLOT(centerText()));
 
@@ -130,8 +137,7 @@ void GClassifier::contentDeleted(){
     contentSaved();
     emit gClassifierContentChanged();
 }
-#include "ICommand.h"
-#include "CommandBuilder.h"
+
 QVariant GClassifier::itemChange(GraphicsItemChange change, const QVariant &value){
     if(change == QGraphicsItem::ItemSelectedChange){
         if (value == true) {
@@ -163,7 +169,7 @@ void GClassifier::loadAttributes(){
             if (dynamic_cast<UMLOperation *>(a) == nullptr) {
                 auto attrib = new GText(QString::fromStdString(std::string(*a)),x,
                                         ROW_HEIGHT * 2 + (index++ * ROW_HEIGHT) + y, attribRect);
-                connect(this, SIGNAL(gTextChanged()), attrib, SLOT(onTextChanged()));
+//                connect(this, SIGNAL(gTextChanged()), attrib, SLOT(onTextChanged()));
                 gTextAttributes.push_back(attrib);
             }
         }
@@ -174,7 +180,7 @@ void GClassifier::loadAttributes(){
             if(op) {
                 auto attrib = new GText(QString::fromStdString(std::string(*op)),
                         x,ROW_HEIGHT * 2 + (index++ * ROW_HEIGHT) + y, this);
-                connect(this, SIGNAL(gTextChanged()), attrib, SLOT(onTextChanged()));
+//                connect(this, SIGNAL(gTextChanged()), attrib, SLOT(onTextChanged()));
                 gTextAttributes.push_back(attrib);
             }
         }
@@ -188,7 +194,7 @@ void GClassifier::loadAttributes(){
             if(op) {
                 auto attrib = new GText(QString::fromStdString(std::string(*op)),
                                         x, ROW_HEIGHT * 2 + (index++ * ROW_HEIGHT) + y, this);
-                connect(this, SIGNAL(gTextChanged()), attrib, SLOT(onTextChanged()));
+//                connect(this, SIGNAL(gTextChanged()), attrib, SLOT(onTextChanged()));
                 gTextAttributes.push_back(attrib);
             }
         }

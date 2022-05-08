@@ -1,6 +1,11 @@
-//
-// Created by darbix on 26.4.22.
-//
+/**
+ * @brief Graphic class for a sequence diagram message
+ *
+ * @file GMessage.cpp
+ * @date 07/05/2022
+ * @authors Hung Do     (xdohun00)
+ *          David Kedra (xkedra00)
+ */
 
 #include "GMessage.h"
 #include <QGraphicsLineItem>
@@ -12,7 +17,7 @@
 #define LINE_WIDTH 2
 #define BACK_LINE_LEN 250
 #define BACK_LINE_HEIGHT 25
-#define MSG_GAP 100
+#define MSG_GAP 80
 
 #define T_RESPONSE "response"
 #define T_SYNC "sync"
@@ -40,7 +45,9 @@ GMessage::GMessage(GraphicsScene *scene, UMLMessage *model, enum direction dir, 
         addLine(src->getX(), dst->getX(), posY, dir);
 
     addText();
-
+    auto x = model->messageType();
+    auto y = model_->messageType();
+    return;
 }
 
 GMessage::~GMessage(){
@@ -144,8 +151,11 @@ void GMessage::addArrow(QGraphicsLineItem *line, enum GMessage::direction dir, q
         arrow->setPos(x2 - textOffset*2, y - textOffset - arrow->sceneBoundingRect().height()/2.0);
 }
 
-void GMessage::warn(){
-    text->setDefaultTextColor(Qt::red);
+void GMessage::warn(bool warning){
+    if(warning)
+        text->setDefaultTextColor(Qt::red);
+    else
+        text->setDefaultTextColor(Qt::black);
 }
 
 UMLMessage *GMessage::model() {
