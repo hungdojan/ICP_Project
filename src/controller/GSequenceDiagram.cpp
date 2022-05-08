@@ -374,7 +374,7 @@ void GSequenceDiagram::onClassDiagramUpdated(){
     // If a class function changed, text goes red
     for(auto msg: gMessages){
         bool containsFunc = false;
-        for(auto op: getClassifByInst(msg->src->getName())->getOperations()){
+        for(auto op: getClassifByInst(msg->dst->getName())->getOperations()){
             if(op->name() == msg->getFuncName().toStdString())
                 containsFunc = true;
         }
@@ -461,6 +461,10 @@ void GSequenceDiagram::deleteTimeline(GTimeline *tl){
                         break;
                     }
                 }
+
+                // Remove message UML model
+                sequanceDiagram->removeMessage(m->model());
+
                 gMessages.erase(gMessages.begin() + i);
                 delete m;
                 index--; // Lower index for new messages
