@@ -1,30 +1,33 @@
-//
-// Created by darbix on 26.4.22.
-//
+/**
+ * @brief Sequence diagram window with graphics for UMLSequenceDiagram
+ *
+ * @file GSequenceDiagram.cpp
+ * @date 07/05/2022
+ * @authors Hung Do     (xdohun00)
+ *          David Kedra (xkedra00)
+ */
 
 #include "GSequenceDiagram.h"
 #include <QDebug>
 #include <QFrame>
 #include <QVBoxLayout>
 #include <QComboBox>
-#include <QGraphicsLineItem>
 #include <QPushButton>
 #include "GTimeline.h"
 #include "GMessage.h"
 #include "GObject.h"
 #include <QLineEdit>
 #include <QLabel>
-#include <QTreeWidget>
 #include <QHeaderView>
 #include <QListWidget>
 
 #define HORIZONTAL_GAP 350
-#define NUM_INDEXES 15
+#define NUM_INDEXES 20
 #define START_Y 0
 
 GSequenceDiagram::GSequenceDiagram(GraphicsScene *scene, SequenceDiagram *model, ClassDiagram *classDiagram, QFrame *settings):
     QObject(), classDiagram{classDiagram}, sequanceDiagram{model}, settings{settings}, msgList{new QListWidget()}, index{1}, scene{scene}{
-    // TODO: add objects and timeline from model
+
     if (model != nullptr) {
         std::map<UMLObject *, GTimeline *> mapOfObjects;
         for (auto obj : model->objects()) {
@@ -60,7 +63,6 @@ GSequenceDiagram::GSequenceDiagram(GraphicsScene *scene, SequenceDiagram *model,
             addMsgItem(msgList, gMsg);
 
             connect(this, SIGNAL(updateMsgPos()), gMsg, SLOT(onUpdateMsgPos()));
-
         }
     }
 
@@ -145,8 +147,15 @@ void GSequenceDiagram::addSettings(){
     vLayoutMsg->addWidget(hFrame2);
     QHBoxLayout *hLayoutMsg2 = new QHBoxLayout(hFrame2);
     QComboBox *comboBoxFuncs = new QComboBox();
-    // TODO: add operations??
     hLayoutMsg2->addWidget(comboBoxFuncs);
+
+    auto dstString = comboBoxDst->currentText();
+    if (!dstString.isEmpty()) {
+        for (auto operation : sequanceDiagram->getObject(dstString.toStdString())->model()->getOperations()) {
+            comboBoxFuncs->addItem(QString::fromStdString(std::string(*operation)));
+        }
+    }
+
 
     // Message frame horizontal 3
     QFrame *hFrame3 = new QFrame();
@@ -310,7 +319,7 @@ void GSequenceDiagram::onSaveMsg(){
     if(srcIndex < dstIndex)
         dir = GMessage::LTOR;
     else if(srcIndex > dstIndex)
-        dir = GMessage::RTOL;//todo
+        dir = GMessage::RTOL;
 
     // Add the message to gMessages vector and to a QListWidget
     // extract function name from the combobox
@@ -325,16 +334,11 @@ void GSequenceDiagram::onSaveMsg(){
             messageModel = new UMLMessage(funcName.toStdString(), src->model(), dst->model());
         messageModel->messageType() = boxes[4]->currentText().toStdString();
         sequanceDiagram->addMessage(messageModel);
-//        GMessage gMessage = new GMessage()
-//        auto gMsg = src->addMsg(funcName, dst, dir, boxes[4]->currentText(), index++);
         auto gMsg = new GMessage(scene, messageModel, dir, src, dst, index++);
         gMessages.push_back(gMsg); // Msg name boxes[3]
         addMsgItem(msgList, gMsg);
 
         connect(this, SIGNAL(updateMsgPos()), gMsg, SLOT(onUpdateMsgPos()));
-    }
-    else if(boxes[4]->currentText() != "create" || boxes[3]->currentText() != "delete"){
-        // TODO:
     }
 }
 
@@ -355,7 +359,7 @@ void GSequenceDiagram::onClassDiagramUpdated(){
                 }
             }
             else if(i == 3 && !gTimelines.empty()){
-                // Update fuction list of the class of the instance at boxes[2]
+                // Update function list of the class of the instance at boxes[2]
                 UMLClassifier *cls = getClassifByInst(boxes[2]->currentText());
                 if(cls) {
                     for (auto funcs: cls->getOperations()) { // call 'to:' obj methods
@@ -371,23 +375,17 @@ void GSequenceDiagram::onClassDiagramUpdated(){
     for(auto msg: gMessages){
         bool containsFunc = false;
         for(auto op: getClassifByInst(msg->src->getName())->getOperations()){
-            if(std::string(*op) == msg->getFuncName().toStdString())
+            if(op->name() == msg->getFuncName().toStdString())
                 containsFunc = true;
         }
         if(!containsFunc && msg->getFuncName() != "DELETE" && msg->getFuncName() != "CREATE")
-            msg->warn();
+            msg->warn(true); // Message is red - warning
+        else
+            msg->warn(false); // Message is ok
     }
 }
 
 UMLClassifier *GSequenceDiagram::getClassifByInst(QString instName){
-    // UMLClassifier *cls = nullptr;
-    // if(!gTimelines.empty()) {
-    //     for (auto tl: gTimelines) {
-    //         if (tl->model()->name() == instName.toStdString())
-    //             cls = tl->cls;
-    //     }
-    // }
-//    return cls;
     auto iter {std::find_if(gTimelines.begin(), gTimelines.end(),
         [instName](GTimeline *gt){ return gt->model()->name() == instName.toStdString(); })};
     if (iter == gTimelines.end())
@@ -414,8 +412,7 @@ void GSequenceDiagram::onAddPressed(){
             auto instClass = dynamic_cast<UMLClass*>(classDiagram->getClassifier(settings->findChild<QComboBox *>()->currentText().toStdString()));
 
             auto objectModel = sequanceDiagram->addObject(instClass, instName.toStdString());
-            // newObj->setModel(instClass);
-            // TODO: add instance of gobject
+
             auto tl = new GTimeline(objectModel, scene, gTimelines.size() * HORIZONTAL_GAP, START_Y, NUM_INDEXES);
             gTimelines.push_back(tl);
             connect(tl, SIGNAL(gTimelineDeleted()), this, SLOT(onGTimelineDeleted()));

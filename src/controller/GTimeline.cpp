@@ -1,6 +1,11 @@
-//
-// Created by darbix on 26.4.22.
-//
+/**
+ * @brief Sequence diagram instance timeline for messages
+ *
+ * @file GTimeline.cpp
+ * @date 07/05/2022
+ * @authors Hung Do     (xdohun00)
+ *          David Kedra (xkedra00)
+ */
 
 #include "GTimeline.h"
 #include <QGraphicsLineItem>
@@ -9,7 +14,7 @@
 #include <QDebug>
 
 #define DASH_WIDTH 3
-#define MSG_GAP 90
+#define MSG_GAP 80
 #define SELECTED_COLOR "#9999A9"
 #define HEAD_W 120
 #define HEAD_H 50
@@ -28,7 +33,7 @@ GTimeline::GTimeline(UMLClass *cls, QString name, GraphicsScene *scene, qreal x,
     connect(scene, SIGNAL(selectionChanged()), this, SLOT(onFrameSelected()));
 }
 GTimeline::GTimeline(UMLObject *model, GraphicsScene *scene, qreal x, qreal y, int indexes) :
-        QObject{}, model_{model}, scene{scene}, dashHeight{1.0 * indexes * MSG_GAP} {
+        QObject{}, model_{model}, scene{scene}, dashHeight{1.0 * indexes * MSG_GAP}, indexes{indexes}{
     head = createHead(x, y);
 
     dashedLine = createDashedLine();
@@ -72,32 +77,22 @@ void GTimeline::onGObjectDeleted(){
     emit gTimelineDeleted();
 }
 
-GMessage *GTimeline::addMsg(QString name, GTimeline *target, enum GMessage::direction dir, QString type, int index){
-//    if(indexes < index){
-//        indexes = index;
-//        dashHeight = indexes * MSG_GAP;
-//        dashedLine->setLine(head->boundingRect().center().x(), head->boundingRect().center().y(),
-//                            head->boundingRect().center().x(), head->boundingRect().center().y()+dashHeight);
-//    }
-
-    auto msg = new GMessage(scene, name, dir, this, target, type, index);
-
-    return msg;
-}
-
 void GTimeline::changePos(qreal x, qreal y){
-    // Remember old frame selections before move
+//    // Remember old frame selections before move
+    std::vector<bool>oldSelected;
     for(auto f: frames) {
-        oldSelected.push_back(f->brush() == QBrush(QColor(SELECTED_COLOR))); // isSelected bool
+        oldSelected.push_back(f->brush().color() == QColor(SELECTED_COLOR)); // isSelected bool
     }
-    frames.clear();
-    // delete dashedLine;
-    delete head;
+
+    delete head; // cascade delete dashedLine and frames with parent
     head = createHead(x, y);
     dashedLine = createDashedLine();
+    frames.clear();
+
     for(int i = 0; i < indexes; i++) {
         frameCreate(i, oldSelected[i]);
     }
+    oldSelected.clear();
 }
 
 void GTimeline::frameCreate(int index, bool isSelected){
@@ -126,9 +121,7 @@ void GTimeline::onFrameSelected() {
 }
 
 GTimeline::~GTimeline(){
-    frames.clear();
     delete head;
-    //todo
 }
 
 QString GTimeline::getName(){

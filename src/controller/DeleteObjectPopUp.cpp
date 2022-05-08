@@ -1,6 +1,11 @@
-//
-// Created by darbix on 5.5.22.
-//
+/**
+ * @brief Dialog window that open when a user needs to remove a class but sequence diag. object exists
+ *
+ * @file DeleteObjectPopUp.cpp
+ * @date 07/05/2022
+ * @authors Hung Do     (xdohun00)
+ *          David Kedra (xkedra00)
+ */
 
 #include "DeleteObjectPopUp.h"
 #include "../view/ui_DeleteObjectPopUp.h"

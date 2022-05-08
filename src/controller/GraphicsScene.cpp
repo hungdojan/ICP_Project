@@ -1,6 +1,11 @@
-//
-// Created by darbix on 21.4.22.
-//
+/**
+ * @brief QGraphicsScene inheritor scene which is zoomable
+ *
+ * @file GraphicsScene.cpp
+ * @date 07/05/2022
+ * @authors Hung Do     (xdohun00)
+ *          David Kedra (xkedra00)
+ */
 
 #include "GraphicsScene.h"
 #include <QGraphicsSceneWheelEvent>
@@ -10,7 +15,7 @@ GraphicsScene::GraphicsScene(QGraphicsView *view, QObject *parent): QGraphicsSce
     // QGraphicsView pointer
     this->view = view;
 }
-#include <QDebug>
+
 void GraphicsScene::wheelEvent(QGraphicsSceneWheelEvent *wheelEvent){
     // Zoom
     if (wheelEvent->modifiers() & Qt::ControlModifier) {

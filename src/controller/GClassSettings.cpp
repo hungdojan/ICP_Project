@@ -1,3 +1,11 @@
+/**
+ * @brief Main GUI settings panel for class and interface objects
+ *
+ * @file GClassSettings.cpp
+ * @date 07/05/2022
+ * @authors Hung Do     (xdohun00)
+ *          David Kedra (xkedra00)
+ */
 
 #include <QBoxLayout>
 #include <QLabel>
@@ -7,8 +15,6 @@
 #include <QLineEdit>
 #include <QDebug>
 #include <QString>
-#include <QRadioButton>
-#include <QCheckBox>
 #include <QComboBox>
 #include "GClassifier.h"
 #include "UMLInterface.h"
@@ -16,30 +22,12 @@
 #include "ClassDiagram.h"
 #include "UMLRelation.h"
 
-#define SAVE_BUTTON_STYLE "QPushButton { background-color: qlineargradient(x1:0, y1:0, x2:0, y2:1,\n"\
-                              "stop:0 #6BD96A, stop:0.05 #2BA94A, stop:0.95 #0B892A, stop:1 #06690F); font-size: 30px; border-radius: 3px;}" \
-                              "QPushButton:hover { background-color: #25A545;}"\
-                              "QPushButton:pressed { background-color: #057525;}"
-#define SELECTED_ROW_STYLE "QFrame {background-color: #229944}"
-#define CATEGORY_HEADER_STYLE "QFrame { background-color: qlineargradient(x1:0, y1:0, x2:0, y2:1,\n"\
-                              "stop:0 #50555A, stop:0.05 #35383D, stop:0.95 #33363B, stop:1 #152020); }"
-#define DELETE_BUTTON_STYLE "QPushButton { color: #FF4444;}"
-#define RELATION_PARENT_STYLE "QLabel { color: rgb(255,255,255,145); border: 1px solid rgb(0,0,0,70); border-radius: 2px;}"
-
-#define RELATION_TYPES " ,0,1,*,0..1,0..*,1..*,◆,◇,◁"
-#define INHERITANCE_SYMB "◁"
-#define ACCESSIBILITIES "+,-,#,~"
-
-#define GENERAL "General"
-#define ATTRIBUTES "Attributes"
-#define FUNCTIONS "Functions"
-#define RELATIONS "Relations"
-
 GClassSettings::GClassSettings(QTreeWidget *tree,  ClassDiagram *classDiagram): QObject(), classDiagram{classDiagram}{
     this->tree = tree;
 
     selectedGClassifier = nullptr;
 
+    // Keep all category tree items
     categories.push_back(addSavePanel());
     categories.push_back(addCategoryGeneral());
     categories.push_back(addCategoryAttributes());
@@ -56,19 +44,17 @@ void GClassSettings::hideContent() {
     for(int i = 0; i < tree->topLevelItemCount(); i++){
         tree->topLevelItem(i)->setHidden(true);
 
-        // todo starts at attributes, remove only blank???
-        if( i > 1) {
+        // Remove additional rows from the panel (skip first button category)
+        if(i > 1) {
             for (int k = 1; k < tree->topLevelItem(i)->childCount(); k++) {
                 tree->topLevelItem(i)->removeChild(tree->topLevelItem(i)->child(k));
-                k--; // todo only for removing all children, number of them decreases -> also index
+                k--; // Removing all children, number of them (+index) decreases
             }
         }
     }
 }
 
 void GClassSettings::loadContent(GClassifier *gClassifier){
-    //todo add attributes(e.g) rows to categories, when needed
-
     // Currently selected GClassifier
     selectedGClassifier = gClassifier;
 
@@ -171,7 +157,7 @@ void GClassSettings::saveContent(){
             }
         } else if (categoryName.toStdString().find(FUNCTIONS) != std::string::npos) {
             UMLClass *cls;
-            if ((cls = dynamic_cast<UMLClass *>(selectedGClassifier->umlClassifier))) { // TODO "similar" as class attributes saving
+            if ((cls = dynamic_cast<UMLClass *>(selectedGClassifier->umlClassifier))) {
                 // Remove old operations
                 for(auto a: cls->attributes()){
                     if(dynamic_cast<UMLOperation*>(a))
@@ -236,7 +222,6 @@ void GClassSettings::saveContent(){
                     auto msgR = tree->itemWidget(category->child(a),0)->findChildren<QComboBox*>()[1]->currentText().toStdString();
                     UMLRelation *rel;
 
-                    //todo
                     // If the source does not have INHERITANCE_SYMB
                     if(msgL != INHERITANCE_SYMB){
                         rel = selectedGClassifier->umlClassifier->addRelation(classDiagram->getClassifier(name));
@@ -244,7 +229,7 @@ void GClassSettings::saveContent(){
                         rel->dstMsg() = msgR;
                         rel->setRelationType(UMLRelation::ASSOCIATION);
 
-                        if(msgR == INHERITANCE_SYMB)
+                        if(msgR == INHERITANCE_SYMB && !selectedGClassifier->umlClassifier->isAbstract())
                             rel->setRelationType(UMLRelation::INHERITANCE);
                     }
 
@@ -305,7 +290,9 @@ void GClassSettings::deleteRow(){
 }
 
 void GClassSettings::selectionChanged(){
-    // todo gets first, but must exist..
+    if(tree->selectedItems().empty())
+        return;
+
     QTreeWidgetItem *item = tree->selectedItems().at(0);
     if(item->parent() != nullptr) {
         // Color all to default
@@ -415,7 +402,8 @@ void GClassSettings::addFuncRow(QWidget *obj, const QString &access, const QStri
 
     tree->setItemWidget(row, 0, rowFrame);
 
-    category->setExpanded(false); // todo function else overwrites relations category
+    // function else overwrites relations category
+    category->setExpanded(false);
     category->setExpanded(true);
 }
 
@@ -465,7 +453,7 @@ void GClassSettings::addRelationRow(QWidget *obj, const QString &dst, const QStr
     if(!srcMsg.isEmpty())
         comboBoxParent->setCurrentText(srcMsg);
     rowLayoutH2->addWidget(comboBoxParent);
-    comboBoxParent->setDisabled(true); //todo
+    comboBoxParent->setDisabled(true);
 
     auto *comboBoxTarget = new QComboBox();
     comboBoxTarget->addItems(QStringList(x.split(",")));
