@@ -1,3 +1,14 @@
+/**
+ * @brief Definition of UMLObject class methods.
+ *
+ * This source code serves as submission for semester assignment of class ICP at FIT, BUT 2021/22.
+ *
+ * @file UMLObject.cpp
+ * @date 22/04/2022
+ * @authors Hung Do     (xdohun00)
+ *          David Kedra (xkedra00)
+ */
+
 #include "UMLObject.h"
 #include "ClassDiagram.h"
 #include <QString>

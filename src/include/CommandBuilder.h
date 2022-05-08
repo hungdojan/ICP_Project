@@ -17,6 +17,9 @@
 #include <QObject>
 #include "ICommand.h"
 
+/**
+ * @brief Representation of command invoker.
+ */
 class CommandBuilder : public QObject {
 Q_OBJECT
     CommandBuilder() =default;

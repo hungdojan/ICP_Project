@@ -1,6 +1,13 @@
-//
-// Created by rebulien on 4/20/22.
-//
+/**
+ * @brief Definition of class UMLOperation methods.
+ *
+ * This source code serves as submission for semester assignment of class ICP at FIT, BUT 2021/22.
+ *
+ * @file UMLOperation.cpp
+ * @date 22/04/2022
+ * @authors Hung Do     (xdohun00)
+ *          David Kedra (xkedra00)
+ */
 
 #include "UMLOperation.h"
 #include "UMLAttribute.h"
@@ -68,9 +75,6 @@ bool UMLOperation::removeParameter(const std::string &name) {
 }
 
 bool UMLOperation::removeParameter(UMLAttribute *parameter) {
-    // TODO: check if std::find works otherwise return by reference is needed to prevent from leakage
-    // FIXME: need to define operator==
-    // auto iter{std::find(parameters_.begin(), parameters_.end(),parameter)};
     auto iter{std::find(parameters_.begin(), parameters_.end(), parameter)};
     if (iter == parameters_.end())
         return false;

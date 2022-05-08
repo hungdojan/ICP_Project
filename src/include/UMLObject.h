@@ -16,13 +16,37 @@
 #include "Element.h"
 #include "UMLClass.h"
 
+/**
+ * @brief Representation of object in sequence diagram.
+ */
 class UMLObject : public Element, public IObserver {
+    /** Base class model of object. */
     UMLClass *model_;
 public:
     UMLObject() =delete;
+    /**
+     * @brief Class constructor.
+     * @param name Object's name.
+     * @param instanceOfClass Object's class model.
+     */
     explicit UMLObject(const std::string &name, UMLClass *instanceOfClass) : Element{name}, model_{instanceOfClass} { }
+
+    /**
+     * @brief Returns object's model.
+     * @return Instance of object's class model.
+     */
     UMLClass *model() const;
+
+    /**
+     * @brief Updates object's class model.
+     * @param model New class model.
+     */
     void setModel(UMLClass *model);
+
+    /**
+     * @brief Message receiver method.
+     * @param msg Message content.
+     */
     void update(const std::string &msg) override;
 
     /**

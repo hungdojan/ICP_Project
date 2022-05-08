@@ -173,6 +173,7 @@ void loadClassElements(ClassDiagram &classDiagram, QJsonArray &buffer) {
 }
 
 void loadSequenceDiagrams(ClassDiagram &classDiagram, QJsonArray &buffer) {
+    // load sequence diagrams from the buffer
     for (auto sd : buffer) {
         std::map<int, UMLMessage *> messages;
         QJsonObject qSequenceDiagram = sd.toObject();
@@ -180,12 +181,14 @@ void loadSequenceDiagrams(ClassDiagram &classDiagram, QJsonArray &buffer) {
             throw std::invalid_argument("Expected SequenceDiagram, received something else!");
         std::string name{qSequenceDiagram["name"].toString().toStdString()};
         auto sequenceDiagram = new SequenceDiagram(name, classDiagram);
+        // load obejcts from the class diagram
         for (auto o : qSequenceDiagram["objects"].toArray()) {
             QJsonObject qObject = o.toObject();
             if (qObject["_class"] != "UMLObject")
                 throw std::invalid_argument("Expected UMLObject, received something else!");
             std::string objName{qObject["name"].toString().toStdString()};
             UMLClass *baseModel;
+            // sets base model of object
             if (qObject["model"].toString().toStdString() == "#UNDEF")
                 baseModel = SequenceDiagram::undefClass;
             else
@@ -195,11 +198,14 @@ void loadSequenceDiagrams(ClassDiagram &classDiagram, QJsonArray &buffer) {
                 continue;
             sequenceDiagram->addObject(baseModel, objName);
         }
+
+        // load messages from the sequence diagram
         for (auto m : qSequenceDiagram["messages"].toArray()) {
             QJsonObject qMessage = m.toObject();
             if (qMessage["_class"] != "UMLMessage")
                 throw std::invalid_argument("Expected UMLMessage, received something else!");
 
+            // extract data of the message
             std::string msgName = qMessage["name"].toString().toStdString();
             UMLObject *src = nullptr;
             UMLObject *dst = nullptr;

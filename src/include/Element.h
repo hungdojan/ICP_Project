@@ -40,6 +40,9 @@ public:
      */
     virtual void createJsonObject(QJsonObject &object) =0;
 
+    /**
+     * @brief Class destructor.
+     */
     virtual ~Element() =default;
 
 protected:

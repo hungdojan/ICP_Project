@@ -178,6 +178,7 @@ void ClassDiagram::createJsonObject(QJsonObject &object) {
     std::unordered_set<UMLRelation *> setOfRelations;
     // insert class elements
     for (auto classifier : classElements_) {
+        // ignore classifier with no connections (no observers)
         if (dynamic_cast<UMLClass*>(classifier) == nullptr &&
             dynamic_cast<UMLInterface*>(classifier) == nullptr && classifier->observerCount() < 1)
             continue;

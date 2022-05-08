@@ -15,6 +15,9 @@
 #define DIAGRAMEDITOR_JSONPARSER_H
 #include "ClassDiagram.h"
 
+/**
+ * @brief Class that parse class diagram to and from JSON file.
+ */
 class JsonParser {
 public:
     /**

@@ -24,8 +24,8 @@ run: $(TARGET)
 test: $(TEST_TARGET)
 	$<
 
-# doc: Doxyfile
-# 	doxygen
+doc: Doxyfile
+	doxygen
 
 pack: src/* examples/* README.txt Makefile CMakeLists.txt
 	rm -f *.zip

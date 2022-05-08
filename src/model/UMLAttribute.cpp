@@ -1,6 +1,13 @@
-//
-// Created by rebulien on 4/19/22.
-//
+/**
+ * @brief Definition of UMLAttribute methods.
+ *
+ * This source code serves as submission for semester assignment of class ICP at FIT, BUT 2021/22.
+ *
+ * @file UMLAttribute.cpp
+ * @date 22/04/2022
+ * @authors Hung Do     (xdohun00)
+ *          David Kedra (xkedra00)
+ */
 
 #include "UMLAttribute.h"
 #include "ClassDiagram.h"

@@ -29,13 +29,14 @@ class UMLAttribute;
 class UMLRelation;
 class UMLOperation;
 
+/**
+ * @brief Representation of any kind of data type or element in class diagram.
+ */
 class UMLClassifier : public Element, public ISubject {
 protected:
     // set visibility for other classes
     friend class ClassDiagram;
     friend class UMLRelation;
-    /** Collection of observers */
-    std::unordered_set<IObserver *> observers_;
     /**
      * Separates user-defined classes from
      * built-in or primitive data types (for example used in attributes and methods

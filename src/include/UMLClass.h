@@ -22,6 +22,9 @@
 #include <list>
 #include <unordered_set>
 
+/**
+ * @brief Representation of class in class diagram.
+ */
 class UMLClass : public UMLClassifier {
 protected:
     /** Collection of attributes and operations of the class */

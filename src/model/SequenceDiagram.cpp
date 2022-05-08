@@ -1,6 +1,13 @@
-//
-// Created by rebulien on 4/19/22.
-//
+/**
+ * @brief Definition of SequenceDiagram class methods.
+ *
+ * This source code serves as submission for semester assignment of class ICP at FIT, BUT 2021/22
+ *
+ * @file SequenceDiagram.cpp
+ * @date 22/04/2022
+ * @authors Hung Do     (xdohun00)
+ *          David Kedra (xkedra00)
+ */
 
 #include "SequenceDiagram.h"
 #include "UMLMessage.h"
@@ -68,11 +75,6 @@ UMLObject *SequenceDiagram::getObject(const std::string &name) const {
 }
 
 UMLObject *SequenceDiagram::getObject(QString name) const {
-//    auto iter{std::find_if(objects_.begin(), objects_.end(),
-//                           [name](UMLObject *obj) { return name.toStdString() == obj->name(); })};
-//    if (iter == objects_.end())
-//        return nullptr;
-//    return *iter;
     for (auto o : objects_) {
         if (o->name() == name.toStdString())
             return o;
@@ -117,20 +119,6 @@ long SequenceDiagram::getMessagePosition(UMLMessage *msg) {
     if (iter == messages_.end())
         return -1;
     return std::distance(iter, messages_.end());
-}
-
-bool SequenceDiagram::moveMessageIntoPosition(UMLMessage *msg, int pos) {
-    if (pos < 0 || pos >= messages_.size())
-        return false;
-    auto iter{std::find(messages_.begin(), messages_.end(),msg)};
-    if (iter == messages_.end())
-        return false;
-    auto item = *iter;
-    messages_.erase(iter);
-    iter = messages_.begin();
-    iter += pos;
-    messages_.insert(iter, item);
-    return true;
 }
 
 bool SequenceDiagram::removeMessage(UMLMessage *msg) {
