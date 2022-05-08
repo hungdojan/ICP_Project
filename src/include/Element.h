@@ -16,6 +16,9 @@
 #include <utility>
 #include <QJsonObject>
 
+/**
+ * @brief Base class for all UML elements.
+ */
 class Element {
 protected:
     /** Element's name */
