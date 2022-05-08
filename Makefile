@@ -27,13 +27,13 @@ test: $(TEST_TARGET)
 doc: Doxyfile
 	doxygen
 
-pack: src/* examples/* README.txt Makefile CMakeLists.txt
+pack: src/* examples/* README.txt Makefile CMakeLists.txt Doxyfile
 	rm -f *.zip
 	zip -r $(ZIP_NAME) $^
-	zip $(ZIP_NAME) doc
+	# zip $(ZIP_NAME) doc
 
 clean:
-	rm -rf doc/* *.zip build/
+	rm -rf doc *.zip build/
 
 #######################################
 
