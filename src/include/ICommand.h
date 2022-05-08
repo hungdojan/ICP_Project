@@ -15,7 +15,7 @@
 #define DIAGRAMEDITOR_ICOMMAND_H
 
 /**
- * This class represents Command design pattern.
+ * @brief Representation of Command design pattern.
  */
 class ICommand {
 public:
