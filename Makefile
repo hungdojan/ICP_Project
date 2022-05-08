@@ -27,7 +27,7 @@ test: $(TEST_TARGET)
 doc: Doxyfile
 	doxygen
 
-pack: src/* examples/* README.txt Makefile CMakeLists.txt Doxyfile
+pack: src/* examples/* README.txt Makefile CMakeLists.txt Doxyfile $(TEST_NAME)
 	rm -f *.zip
 	zip -r $(ZIP_NAME) $^
 	# zip $(ZIP_NAME) doc

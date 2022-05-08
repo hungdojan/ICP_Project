@@ -108,10 +108,10 @@ void UMLMessage::update(const std::string &msg) {
     if (msg == "DELETE") {
         baseOperation_ = SequenceDiagram::undefOperation;
     }
-    else if (msg == src_->name()) {
+    if (msg == src_->name()) {
         src_ = SequenceDiagram::undefObject;
     }
-    else if (msg == dst_->name()) {
+    if (msg == dst_->name()) {
         dst_ = SequenceDiagram::undefObject;
     }
 }
