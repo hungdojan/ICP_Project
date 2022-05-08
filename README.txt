@@ -43,3 +43,7 @@ Načítání a ukládání do souboru
 ------------------------------
 Program povoluje i načítání a ukládání do souborů formátu JSON. To se řeší pomocí klávesových zkratek `Ctrl+S`
 pro uložení souboru a `Ctrl+O` pro načtení souboru.
+
+Použití knihovny třetích stran
+------------------------------
+- GoogleTest [https://github.com/google/googletest]
