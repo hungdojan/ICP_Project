@@ -1,0 +1,481 @@
+{
+    "_class": "ClassDiagram",
+    "classElements": [
+        {
+            "_class": "UMLClass",
+            "attributes": [
+                {
+                    "_class": "UMLOperation",
+                    "name": "addClassElement",
+                    "parameters": [
+                        {
+                            "_class": "UMLAttribute",
+                            "name": "element",
+                            "type": "UMLClassifier",
+                            "visibility": 0
+                        }
+                    ],
+                    "type": "void",
+                    "visibility": 43
+                },
+                {
+                    "_class": "UMLAttribute",
+                    "name": "classElements",
+                    "type": "UMLClassifier",
+                    "visibility": 43
+                },
+                {
+                    "_class": "UMLOperation",
+                    "name": "getClassElement",
+                    "parameters": [
+                        {
+                            "_class": "UMLAttribute",
+                            "name": "name",
+                            "type": "string",
+                            "visibility": 0
+                        }
+                    ],
+                    "type": "UMLClassifier",
+                    "visibility": 43
+                },
+                {
+                    "_class": "UMLOperation",
+                    "name": "removeClassElement",
+                    "parameters": [
+                        {
+                            "_class": "UMLAttribute",
+                            "name": "element",
+                            "type": "UMLClassifier",
+                            "visibility": 0
+                        }
+                    ],
+                    "type": "void",
+                    "visibility": 43
+                },
+                {
+                    "_class": "UMLOperation",
+                    "name": "addSequenceDiagram",
+                    "parameters": [
+                        {
+                            "_class": "UMLAttribute",
+                            "name": "diagram",
+                            "type": "SequenceDiagram",
+                            "visibility": 0
+                        }
+                    ],
+                    "type": "void",
+                    "visibility": 43
+                },
+                {
+                    "_class": "UMLOperation",
+                    "name": "getSequenceDiagram",
+                    "parameters": [
+                        {
+                            "_class": "UMLAttribute",
+                            "name": "name",
+                            "type": "string",
+                            "visibility": 0
+                        }
+                    ],
+                    "type": "SequenceDiagram",
+                    "visibility": 43
+                },
+                {
+                    "_class": "UMLOperation",
+                    "name": "removeSequenceDiagram",
+                    "parameters": [
+                        {
+                            "_class": "UMLAttribute",
+                            "name": "diagram",
+                            "type": "SequenceDiagram",
+                            "visibility": 0
+                        }
+                    ],
+                    "type": "void",
+                    "visibility": 43
+                }
+            ],
+            "isAbstract": false,
+            "isUserDefined": true,
+            "name": "ClassDiagram",
+            "x": -264,
+            "y": -129
+        },
+        {
+            "_class": "UMLClass",
+            "attributes": [
+                {
+                    "_class": "UMLAttribute",
+                    "name": "name",
+                    "type": "string",
+                    "visibility": 43
+                },
+                {
+                    "_class": "UMLOperation",
+                    "name": "setName",
+                    "parameters": [
+                        {
+                            "_class": "UMLAttribute",
+                            "name": "name",
+                            "type": "string",
+                            "visibility": 0
+                        }
+                    ],
+                    "type": "void",
+                    "visibility": 43
+                },
+                {
+                    "_class": "UMLOperation",
+                    "name": "getName",
+                    "parameters": [
+                    ],
+                    "type": "string",
+                    "visibility": 43
+                }
+            ],
+            "isAbstract": false,
+            "isUserDefined": true,
+            "name": "Element",
+            "x": 176,
+            "y": -301
+        },
+        {
+            "_class": "UMLClass",
+            "attributes": [
+                {
+                    "_class": "UMLAttribute",
+                    "name": "objects",
+                    "type": "UMLObject",
+                    "visibility": 43
+                },
+                {
+                    "_class": "UMLOperation",
+                    "name": "getObject",
+                    "parameters": [
+                        {
+                            "_class": "UMLAttribute",
+                            "name": "name",
+                            "type": "string",
+                            "visibility": 0
+                        }
+                    ],
+                    "type": "UMLObject",
+                    "visibility": 43
+                },
+                {
+                    "_class": "UMLAttribute",
+                    "name": "baseDiagram",
+                    "type": "ClassDiagram",
+                    "visibility": 43
+                },
+                {
+                    "_class": "UMLOperation",
+                    "name": "addObject",
+                    "parameters": [
+                        {
+                            "_class": "UMLAttribute",
+                            "name": "object",
+                            "type": "UMLObject",
+                            "visibility": 0
+                        }
+                    ],
+                    "type": "void",
+                    "visibility": 43
+                },
+                {
+                    "_class": "UMLOperation",
+                    "name": "removeObject",
+                    "parameters": [
+                        {
+                            "_class": "UMLAttribute",
+                            "name": "object",
+                            "type": "UMLObject",
+                            "visibility": 0
+                        }
+                    ],
+                    "type": "void",
+                    "visibility": 43
+                }
+            ],
+            "isAbstract": false,
+            "isUserDefined": true,
+            "name": "SequenceDiagram",
+            "x": 582,
+            "y": -117
+        },
+        {
+            "_class": "UMLClass",
+            "attributes": [
+                {
+                    "_class": "UMLOperation",
+                    "name": "getAttribute",
+                    "parameters": [
+                        {
+                            "_class": "UMLAttribute",
+                            "name": "name",
+                            "type": "string",
+                            "visibility": 0
+                        }
+                    ],
+                    "type": "UMLAttribtue",
+                    "visibility": 43
+                },
+                {
+                    "_class": "UMLAttribute",
+                    "name": "attributes",
+                    "type": "UMLAttribute",
+                    "visibility": 43
+                },
+                {
+                    "_class": "UMLOperation",
+                    "name": "addAttribute",
+                    "parameters": [
+                    ],
+                    "type": "void",
+                    "visibility": 43
+                },
+                {
+                    "_class": "UMLOperation",
+                    "name": "removeAttribute",
+                    "parameters": [
+                        {
+                            "_class": "UMLAttribute",
+                            "name": "attribute",
+                            "type": "UMLAttribute",
+                            "visibility": 0
+                        }
+                    ],
+                    "type": "void",
+                    "visibility": 43
+                }
+            ],
+            "isAbstract": false,
+            "isUserDefined": true,
+            "name": "UMLClassifier",
+            "x": -39,
+            "y": 231
+        },
+        {
+            "_class": "UMLClass",
+            "attributes": [
+                {
+                    "_class": "UMLOperation",
+                    "name": "getInstanceOfClass",
+                    "parameters": [
+                    ],
+                    "type": "UMLClassifier",
+                    "visibility": 43
+                },
+                {
+                    "_class": "UMLAttribute",
+                    "name": "instanceOfClass",
+                    "type": "UMLClassifier",
+                    "visibility": 43
+                },
+                {
+                    "_class": "UMLOperation",
+                    "name": "setInstanceOfClass",
+                    "parameters": [
+                        {
+                            "_class": "UMLAttribute",
+                            "name": "instanceOfClass",
+                            "type": "UMLClassifier",
+                            "visibility": 0
+                        }
+                    ],
+                    "type": "void",
+                    "visibility": 43
+                }
+            ],
+            "isAbstract": false,
+            "isUserDefined": true,
+            "name": "UMLObject",
+            "x": 413,
+            "y": 242
+        },
+        {
+            "_class": "UMLClassifier",
+            "isAbstract": false,
+            "isUserDefined": false,
+            "name": "string",
+            "x": 0,
+            "y": 0
+        },
+        {
+            "_class": "UMLClassifier",
+            "isAbstract": false,
+            "isUserDefined": false,
+            "name": "void",
+            "x": 0,
+            "y": 0
+        },
+        {
+            "_class": "UMLClassifier",
+            "isAbstract": false,
+            "isUserDefined": false,
+            "name": "UMLAttribute",
+            "x": 0,
+            "y": 0
+        },
+        {
+            "_class": "UMLClassifier",
+            "isAbstract": false,
+            "isUserDefined": false,
+            "name": "UMLAttribtue",
+            "x": 0,
+            "y": 0
+        },
+        {
+            "_class": "UMLClassifier",
+            "isAbstract": false,
+            "isUserDefined": false,
+            "name": "UMLClass",
+            "x": 0,
+            "y": 0
+        }
+    ],
+    "name": "MyClassDiagram",
+    "relations": [
+        {
+            "_class": "UMLRelation",
+            "dst": "UMLObject",
+            "dstMsg": "0..*",
+            "relationType": 0,
+            "src": "SequenceDiagram",
+            "srcMsg": " "
+        },
+        {
+            "_class": "UMLRelation",
+            "dst": "Element",
+            "dstMsg": "◁",
+            "relationType": 6,
+            "src": "UMLClassifier",
+            "srcMsg": " "
+        },
+        {
+            "_class": "UMLRelation",
+            "dst": "Element",
+            "dstMsg": "◁",
+            "relationType": 6,
+            "src": "UMLObject",
+            "srcMsg": " "
+        },
+        {
+            "_class": "UMLRelation",
+            "dst": "Element",
+            "dstMsg": "◁",
+            "relationType": 6,
+            "src": "SequenceDiagram",
+            "srcMsg": " "
+        },
+        {
+            "_class": "UMLRelation",
+            "dst": "Element",
+            "dstMsg": "◁",
+            "relationType": 6,
+            "src": "ClassDiagram",
+            "srcMsg": " "
+        },
+        {
+            "_class": "UMLRelation",
+            "dst": "UMLClassifier",
+            "dstMsg": "0..*",
+            "relationType": 0,
+            "src": "ClassDiagram",
+            "srcMsg": " "
+        }
+    ],
+    "sequenceDiagrams": [
+        {
+            "_class": "SequenceDiagram",
+            "messages": [
+                {
+                    "_class": "UMLMessage",
+                    "baseOperation": "#UNDEF",
+                    "dst": "classElement",
+                    "index": 0,
+                    "messageType": "create",
+                    "name": "CREATE",
+                    "src": "cd"
+                },
+                {
+                    "_class": "UMLMessage",
+                    "baseOperation": "addClassElement",
+                    "dst": "cd",
+                    "index": 1,
+                    "messageType": "response",
+                    "name": "",
+                    "src": "classElement"
+                },
+                {
+                    "_class": "UMLMessage",
+                    "baseOperation": "#UNDEF",
+                    "dst": "sq",
+                    "index": 2,
+                    "messageType": "create",
+                    "name": "CREATE",
+                    "src": "cd"
+                },
+                {
+                    "_class": "UMLMessage",
+                    "baseOperation": "#UNDEF",
+                    "dst": "obj",
+                    "index": 3,
+                    "messageType": "create",
+                    "name": "CREATE",
+                    "src": "sq"
+                },
+                {
+                    "_class": "UMLMessage",
+                    "baseOperation": "#UNDEF",
+                    "dst": "obj",
+                    "index": 4,
+                    "messageType": "sync",
+                    "name": "setName",
+                    "src": "obj"
+                },
+                {
+                    "_class": "UMLMessage",
+                    "baseOperation": "addObject",
+                    "dst": "sq",
+                    "index": 5,
+                    "messageType": "response",
+                    "name": "",
+                    "src": "obj"
+                },
+                {
+                    "_class": "UMLMessage",
+                    "baseOperation": "addSequenceDiagram",
+                    "dst": "cd",
+                    "index": 6,
+                    "messageType": "response",
+                    "name": "",
+                    "src": "sq"
+                }
+            ],
+            "name": "SequenceDiagram1",
+            "objects": [
+                {
+                    "_class": "UMLObject",
+                    "model": "ClassDiagram",
+                    "name": "cd"
+                },
+                {
+                    "_class": "UMLObject",
+                    "model": "UMLClassifier",
+                    "name": "classElement"
+                },
+                {
+                    "_class": "UMLObject",
+                    "model": "SequenceDiagram",
+                    "name": "sq"
+                },
+                {
+                    "_class": "UMLObject",
+                    "model": "UMLObject",
+                    "name": "obj"
+                }
+            ]
+        }
+    ]
+}
